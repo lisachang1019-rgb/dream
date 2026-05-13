@@ -539,8 +539,7 @@
 {id:422, grade:"last", name:"last賞-3 3.0娃娃", count:1, url:"https://i.postimg.cc/hjy8Xt5p/AHRL4979.jpg"},
 
         ];
-
-       let currentPool = [];
+        let currentPool = [];
         let isRolling = false;
 
         db.ref('pool').on('value', (snap) => {
@@ -623,7 +622,6 @@
             // 3. 進行抽獎交易與標記代碼
             db.ref('pool').transaction((p) => {
                 if (p && p.length > 0) {
-                    // 這裡整合了之前的 SA 機率與加權邏輯 (暫以隨機為例，可套用之前的加權代碼)
                     const finalIdx = Math.floor(Math.random() * p.length);
                     window.lastDraw = p[finalIdx];
                     p.splice(finalIdx, 1);
@@ -649,7 +647,9 @@
                         nameDisplay.innerText = result.name;
                         
                         saveLocalRecord(result.name);
-                        sendToGoogleForm(name + "(" + code + ")", result.name);
+                        
+                        // --- 修改這裡：傳入三個參數 ---
+                        sendToGoogleForm(name, code, result.name);
                         
                         isRolling = false;
                         checkStatus();
@@ -677,11 +677,17 @@
             container.innerHTML = history.map(h => `<div class="history-item">🕒 ${h.time} - 抽中：${h.name}</div>`).join('');
         }
 
-        function sendToGoogleForm(name, card) {
-            const FORM_ID = "1FAIpQLSdKRudwWeJy9a_iRpD2JKQqERtOteRwF2P4phoHtPQpqYVX_A";
-            const url = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse?entry.1434310166=${encodeURIComponent(name)}&entry.1197525866=${encodeURIComponent(card)}&submit=Submit`;
+        // --- 修改這裡：全新的表單傳送函式 ---
+        function sendToGoogleForm(name, code, card) {
+            const FORM_ID = "1FAIpQLSdZO-5VoffM6QduOcJ8kvEXVyFR0mdF-qtX3zQkGxqc0h7NTA";
+            const url = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse?` + 
+                        `entry.66319557=${encodeURIComponent(name)}&` + 
+                        `entry.14544484=${encodeURIComponent(code)}&` + 
+                        `entry.2002653907=${encodeURIComponent(card)}&` + 
+                        `submit=Submit`;
             new Image().src = url;
         }
+
         renderHistory();
     </script>
 </body>
