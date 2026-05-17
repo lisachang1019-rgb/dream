@@ -68,7 +68,7 @@
             align-items: center;
         }
         
-        /* 【已修改】滾動卡片：將總動畫時間拉長到 3 秒，並預設透明度為 0 避免閃爍 */
+        /* 滾動卡片：開場慢速時，在畫面上待 3 秒 */
         .scrolling-card {
             position: absolute;
             width: 92%; 
@@ -83,7 +83,7 @@
             animation: slideLeft 3s cubic-bezier(0.25, 1, 0.5, 1) forwards; 
         }
         
-        /* 【已修改】控制卡片「進場 (快速) ➔ 停留 (大約2秒) ➔ 退場 (快速)」 */
+        /* 控制卡片「進場 (快速) ➔ 停留 (大約2秒) ➔ 退場 (快速)」 */
         @keyframes slideLeft {
             0% { transform: translateX(80%); opacity: 0; }      
             15% { transform: translateX(0); opacity: 1; }       
@@ -163,7 +163,7 @@
             <div class="total-rem" id="total-count">--</div>
         </div>
         <div class="input-group">
-            <input type="text" id="user-name" placeholder="請輸入暱稱..." oninput="checkStatus()">
+            <input type="text" id="user-name" placeholder="請輸入IG or FB..." oninput="checkStatus()">
             <input type="text" id="user-code" placeholder="請輸入抽獎代碼..." oninput="checkStatus()">
         </div>
         
@@ -177,7 +177,7 @@
         <div id="card-name" style="margin-bottom:15px; font-weight:bold; height:1.2em; color: #ff4757; font-size: 20px;"></div>
         
         <div class="btn-group">
-            <button id="draw-btn-10" class="btn" onclick="draw(10)" disabled>豪華十連抽</button>
+            <button id="draw-btn-10" class="btn" onclick="draw(10)" disabled>十連抽</button>
             <button id="draw-btn" class="btn" onclick="draw(1)" disabled>請完整輸入資料</button>
         </div>
 
@@ -690,7 +690,6 @@
             }
         });
 
-        // 開場順序展示邏輯
         function startBackgroundScroll() {
             if (backgroundScrollInterval) return;
             const scroller = document.getElementById('scroller-container');
@@ -702,7 +701,6 @@
 
             let currentIndex = 0;
             
-            // 【已修改】配合卡片3秒的動畫時間，JS計時器設定為每 3.2 秒派出一張卡
             backgroundScrollInterval = setInterval(() => {
                 if (sortedCards.length === 0) return;
                 
@@ -712,7 +710,6 @@
                 slideImg.className = 'scrolling-card';
                 scroller.appendChild(slideImg);
                 
-                // 動畫演完 3 秒後自動銷毀
                 setTimeout(() => { slideImg.remove(); }, 3000);
                 
                 currentIndex = (currentIndex + 1) % sortedCards.length;
@@ -743,7 +740,8 @@
                 btn10.disabled = true;
             } else {
                 btn1.innerText = "單抽";
-                btn10.innerText = `✨ 豪華十連抽！`;
+                // 【已修改】狀態檢查時的按鈕文字也同步改為十連抽
+                btn10.innerText = `十連抽`;
                 btn1.disabled = isDisabled;
                 btn10.disabled = isDisabled || (currentPool.length < 10);
             }
@@ -761,7 +759,7 @@
 
             const firstLetter = code.charAt(0).toUpperCase();
             if (drawCount === 1 && firstLetter !== 'S') {
-                alert("❌ 此代碼為「十連抽專用券」，請點擊【豪華十連抽】按鈕！");
+                alert("❌ 此代碼為「十連抽專用券」，請點擊【十連抽】按鈕！");
                 return;
             }
             if (drawCount === 10 && firstLetter !== 'T') {
@@ -803,7 +801,6 @@
             const specialCards = cardConfig.filter(c => c.grade === "S" || c.grade === "A");
             let showSpecial = true;
             
-            // 按下抽獎後，依然維持原本 70ms 的超快滾動速度
             let rollInterval = setInterval(() => {
                 let randomCard = (showSpecial && specialCards.length > 0) 
                     ? specialCards[Math.floor(Math.random() * specialCards.length)]
@@ -812,13 +809,12 @@
                 const slideImg = document.createElement('img');
                 slideImg.src = randomCard.url;
                 slideImg.className = 'scrolling-card';
-                // 抽獎滾動時暫時覆蓋 CSS 動畫改為快速閃過
-                slideImg.style.animation = 'slideLeft 0.25s linear forwards'; 
+                slideImg.style.animation = 'slideLeft 0.35s linear forwards'; 
                 scroller.appendChild(slideImg);
                 
-                setTimeout(() => { slideImg.remove(); }, 250);
+                setTimeout(() => { slideImg.remove(); }, 350);
                 showSpecial = !showSpecial;
-            }, 70); 
+            }, 180); 
 
             db.ref('pool').transaction((p) => {
                 if (p && p.length >= drawCount) {
