@@ -30,7 +30,6 @@
         }
         .total-rem { font-size: 32px; font-weight: bold; color: #ff4757; }
         
-        /* 抽獎大框框：毛玻璃質感與立體層次陰影 */
         .card-area { 
             width: 260px; 
             height: 380px; 
@@ -68,7 +67,6 @@
             align-items: center;
         }
         
-        /* 滾動卡片：開場慢速時，在畫面上待 3 秒 */
         .scrolling-card {
             position: absolute;
             width: 92%; 
@@ -83,7 +81,6 @@
             animation: slideLeft 3s cubic-bezier(0.25, 1, 0.5, 1) forwards; 
         }
         
-        /* 控制卡片「進場 (快速) ➔ 停留 (大約2秒) ➔ 退場 (快速)」 */
         @keyframes slideLeft {
             0% { transform: translateX(80%); opacity: 0; }      
             15% { transform: translateX(0); opacity: 1; }       
@@ -91,7 +88,6 @@
             100% { transform: translateX(-80%); opacity: 0; }   
         }
 
-        /* 十連抽個別卡片玻璃底座 */
         .mini-card-box {
             width: 18%;
             text-align: center;
@@ -740,7 +736,6 @@
                 btn10.disabled = true;
             } else {
                 btn1.innerText = "單抽";
-                // 【已修改】狀態檢查時的按鈕文字也同步改為十連抽
                 btn10.innerText = `十連抽`;
                 btn1.disabled = isDisabled;
                 btn10.disabled = isDisabled || (currentPool.length < 10);
@@ -816,12 +811,17 @@
                 showSpecial = !showSpecial;
             }, 180); 
 
+            // 【全新修改】核心鎖定機制：在雲端事務處理中加入 30% 限制條件
             db.ref('pool').transaction((p) => {
                 if (p && p.length >= drawCount) {
                     window.lastDrawResults = []; 
                     let hasHighAward = false;    
 
+                    // 計算初始總張數（18張），及其 30% 門檻（18 * 0.3 = 5.4 ➜ 即剩餘 5 張以下才解鎖）
+                    const initialTotalCount = 631; 
+                    
                     for (let i = 0; i < drawCount; i++) {
+                        // 保底機制（十連抽最後一抽）
                         if (drawCount === 10 && i === 9 && !hasHighAward) {
                             let availableDCards = p.filter(id => {
                                 let card = cardConfig.find(c => c.id === id);
@@ -836,11 +836,28 @@
                             }
                         }
 
-                        const finalIdx = Math.floor(Math.random() * p.length);
-                        const drawnId = p[finalIdx];
+                        // 進行強制鎖定過濾：
+                        let finalIdx;
+                        let drawnId;
+                        let card;
+                        let maxAttempts = 500; // 防止無窮迴圈的保險機制
+                        let attempts = 0;
+
+                        do {
+                            finalIdx = Math.floor(Math.random() * p.length);
+                            drawnId = p[finalIdx];
+                            card = cardConfig.find(c => c.id === drawnId);
+                            attempts++;
+                            
+                            // 核心判定：如果當前剩餘張數 > 5 張 (大於30%)，且不幸抽到 S 或 A，就強制重新抽取！
+                            if (p.length > 190 && card && (card.grade === "S" || card.grade === "A")) {
+                                continue; // 重新選一張
+                            }
+                            break; // 符合條件，跳出選卡
+                        } while (attempts < maxAttempts);
+
                         window.lastDrawResults.push(drawnId);
                         
-                        let card = cardConfig.find(c => c.id === drawnId);
                         if (card && ["S","A","B","C","D"].includes(card.grade)) {
                             hasHighAward = true;
                         }
