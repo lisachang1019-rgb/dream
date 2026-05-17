@@ -540,7 +540,7 @@
 {id:422, grade:"last", name:"last賞-3 3.0娃娃", count:1, url:"https://i.postimg.cc/nzP4M1gT/IMG-E4065.jpg"},
         ];
 
-        let currentPool = [];
+     let currentPool = [];
         let isRolling = false;
 
         db.ref('pool').on('value', (snap) => {
@@ -550,7 +550,7 @@
             } else {
                 currentPool = data;
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('total-count').innerText = currentPool.length + " 抽";
+                document.getElementById('total-count').innerText = "剩餘抽數: " + currentPool.length + " 抽";
                 checkStatus();
             }
         });
@@ -575,7 +575,7 @@
                 btn10.innerText = "已全數售罄";
             } else {
                 btn1.innerText = "單抽";
-                btn10.innerText = `✨ 豪華十連抽！(剩 ${currentPool.length} 抽)`;
+                btn10.innerText = `✨ 豪華十連抽！`;
             }
             
             btn1.disabled = isDisabled;
@@ -587,20 +587,17 @@
             const name = document.getElementById('user-name').value.trim();
             const code = document.getElementById('user-code').value.trim();
 
-            // 1. 檢查代碼是否在合法清單內
             if (!validCodes.includes(code)) {
                 alert("❌ 無效的代碼，請重新確認！");
                 return;
             }
 
-            // 【新加入：嚴格限制單抽與十連抽代碼】
+            // 嚴格限制單抽（S）與十連抽（T）代碼
             const firstLetter = code.charAt(0).toUpperCase();
-            
             if (drawCount === 1 && firstLetter !== 'S') {
                 alert("❌ 此代碼為「十連抽專用券」，請點擊【豪華十連抽】按鈕！");
                 return;
             }
-            
             if (drawCount === 10 && firstLetter !== 'T') {
                 alert("❌ 此代碼為「單抽專用券」，請點擊【單抽】按鈕！");
                 return;
@@ -624,7 +621,6 @@
             multiContainer.style.display = "none";
             img.style.display = "block";
 
-            // 2. 檢查代碼是否已被使用過
             const codeRef = db.ref('usedCodes/' + code);
             const snapshot = await codeRef.get();
             if (snapshot.exists()) {
@@ -634,7 +630,7 @@
                 return;
             }
 
-            // 轉動時強制閃爍 S賞 和 A賞
+            // 轉動特效池：自動篩選 S賞 與 A賞
             const specialCards = cardConfig.filter(c => 
                 c.id.toUpperCase().includes('S') || c.id.toUpperCase().includes('A')
             );
@@ -648,7 +644,7 @@
                 showSpecial = !showSpecial;
             }, 60); 
 
-            // 3. 進行抽獎交易
+            // 資料庫連動交易
             db.ref('pool').transaction((p) => {
                 if (p && p.length >= drawCount) {
                     window.lastDrawResults = []; 
@@ -686,19 +682,17 @@
                 return;
             }, (err, committed) => {
                 if (committed) {
-                    // 4. 抽獎成功，鎖定代碼
                     db.ref('usedCodes/' + code).set({
                         user: name,
                         time: firebase.database.ServerValue.TIMESTAMP,
                         count: drawCount
                     });
 
-                    // 1.5 秒後定格動畫
                     setTimeout(() => {
                         clearInterval(rollInterval); 
                         
                         if (drawCount === 1) {
-                            // 單抽結果顯示
+                            // 【單抽結果展示】
                             const result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
                             img.src = result.url;
                             nameDisplay.innerText = result.name;
@@ -706,7 +700,7 @@
                             saveLocalRecord(result.name);
                             sendToGoogleForm(name, code, result.name);
                         } else {
-                            // 十連抽結果顯示（排排站）
+                            // 【十連抽結果展示】
                             img.style.display = "none"; 
                             multiContainer.style.display = "flex";
                             
@@ -717,8 +711,8 @@
                                 cardDiv.style.width = "18%";
                                 cardDiv.style.textAlign = "center";
                                 cardDiv.innerHTML = `
-                                    <img src="${result.url}" style="width: 100%; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                                    <div style="font-size: 12px; margin-top: 5px;">第 ${index+1} 抽:<br>${result.name}</div>
+                                    <img src="${result.url}" style="width: 100%; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
+                                    <div style="font-size: 11px; margin-top: 5px; color:#555;">#${index+1} 抽:<br><b>${result.name}</b></div>
                                 `;
                                 multiContainer.appendChild(cardDiv);
                                 
@@ -750,7 +744,7 @@
             const history = JSON.parse(localStorage.getItem('myDrawHistory')) || [];
             const container = document.getElementById('my-history');
             if (history.length === 0) return;
-            container.innerHTML = history.map(h => `<div class="history-item">🕒 ${h.time} - 抽中：${h.name}</div>`).join('');
+            container.innerHTML = history.map(h => `<div class="history-item">🕒 ${h.time} - ${h.name}</div>`).join('');
         }
 
         function sendToGoogleForm(name, code, card) {
@@ -764,6 +758,6 @@
         }
 
         renderHistory();
-    </script>
+        </script>
 </body>
 </html>
