@@ -11,9 +11,36 @@
         .container { max-width: 400px; margin: auto; }
         .pool-card { background: #1e1e1e; padding: 15px; border-radius: 12px; margin-bottom: 15px; border-bottom: 3px solid #ff4757; }
         .total-rem { font-size: 32px; font-weight: bold; color: #ff4757; }
+        
+        /* 抽獎展示區域改為相對定位與溢出隱藏 */
         .card-area { width: 260px; height: 380px; background: #1e1e1e; border: 2px solid #333; margin: 20px auto; border-radius: 15px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         #card-img { width: 100%; height: 100%; object-fit: cover; display: none; }
-        #rolling-text { font-size: 24px; color: #ff4757; font-weight: bold; display: none; }
+        
+        /* 從右向左轉圈圈滑動跑馬燈樣式 */
+        .scroller-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+        }
+        .scrolling-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: translateX(100%); 
+            animation: slideLeft 0.5s linear forwards;
+        }
+        @keyframes slideLeft {
+            0% { transform: translateX(100%); opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { transform: translateX(-100%); opacity: 0; }
+        }
+
         .input-group { margin-bottom: 15px; }
         input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #2a2a2a; color: white; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; }
         
@@ -29,8 +56,6 @@
 
         .history-section { margin-top: 30px; text-align: left; background: #1e1e1e; padding: 15px; border-radius: 12px; }
         .history-item { padding: 8px 0; border-bottom: 1px solid #333; font-size: 13px; color: #eccc68; }
-        .rolling { animation: blur 0.1s infinite alternate; }
-        @keyframes blur { from { opacity: 0.5; transform: scale(0.95); } to { opacity: 1; transform: scale(1.05); } }
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 1000; display: flex; align-items: center; justify-content: center; font-weight: bold; }
     </style>
 </head>
@@ -50,7 +75,9 @@
         
         <div class="card-area" id="display-box">
             <span id="msg" style="color: #444;">READY</span>
-            <div id="rolling-text">???</div>
+            
+            <div id="scroller-container" class="scroller-container"></div>
+            
             <img id="card-img" src="">
         </div>
         
@@ -59,8 +86,8 @@
         <div id="card-name" style="margin-bottom:15px; font-weight:bold; height:1.2em; color: #eccc68; font-size: 20px;"></div>
         
         <div class="btn-group">
-            <button id="draw-btn" class="btn" onclick="draw(1)" disabled>請完整輸入資料</button>
             <button id="draw-btn-10" class="btn" onclick="draw(10)" disabled>豪華十連抽</button>
+            <button id="draw-btn" class="btn" onclick="draw(1)" disabled>請完整輸入資料</button>
         </div>
 
         <div class="history-section">
@@ -82,7 +109,6 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
         // 這裡設定你可以使用的抽獎代碼清單
         const validCodes = 
 ["ST176","S9PKK","SE594","STG6R","S9ON2","SZ565","SMALK","SXL9D","SLXGW","S617A","S9P0K",
@@ -625,21 +651,22 @@
             document.getElementById('draw-btn').disabled = true;
             document.getElementById('draw-btn-10').disabled = true;
 
-            const rollText = document.getElementById('rolling-text');
             const img = document.getElementById('card-img');
             const msg = document.getElementById('msg');
             const nameDisplay = document.getElementById('card-name');
             const multiContainer = document.getElementById('multi-result-container');
             const displayBox = document.getElementById('display-box');
+            const scroller = document.getElementById('scroller-container');
 
             msg.style.display = "none";
             nameDisplay.innerText = "";
-            if (rollText) rollText.style.display = "none";
             
             multiContainer.innerHTML = "";
             multiContainer.style.display = "none";
             displayBox.style.display = "flex";
-            img.style.display = "block";
+            img.style.display = "none"; 
+            scroller.innerHTML = "";
+            scroller.style.display = "block"; 
 
             const codeRef = db.ref('usedCodes/' + code);
             const snapshot = await codeRef.get();
@@ -650,19 +677,24 @@
                 return;
             }
 
-            // 轉動特效池
-            const specialCards = cardConfig.filter(c => 
-                c.grade === "S" || c.grade === "A"
-            );
-
+            // 轉圈圈滾動特效
+            const specialCards = cardConfig.filter(c => c.grade === "S" || c.grade === "A");
             let showSpecial = true;
+            
             let rollInterval = setInterval(() => {
                 let randomCard = (showSpecial && specialCards.length > 0) 
                     ? specialCards[Math.floor(Math.random() * specialCards.length)]
                     : cardConfig[Math.floor(Math.random() * cardConfig.length)];
-                img.src = randomCard.url;
+                
+                const slideImg = document.createElement('img');
+                slideImg.src = randomCard.url;
+                slideImg.className = 'scrolling-card';
+                scroller.appendChild(slideImg);
+                
+                setTimeout(() => { slideImg.remove(); }, 500);
+                
                 showSpecial = !showSpecial;
-            }, 60); 
+            }, 150); 
 
             // 資料庫連動交易
             db.ref('pool').transaction((p) => {
@@ -708,13 +740,17 @@
                         count: drawCount
                     });
 
+                    // 滾動展示維持時間拉長為 3 秒（3000毫秒）後開獎
                     setTimeout(() => {
                         clearInterval(rollInterval); 
+                        scroller.style.display = "none"; 
+                        scroller.innerHTML = "";
                         
                         if (drawCount === 1) {
                             // 【單抽結果展示】
                             const result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
                             img.src = result.url;
+                            img.style.display = "block"; 
                             nameDisplay.innerText = result.name;
                             
                             saveLocalRecord(result.name);
@@ -743,9 +779,10 @@
                         
                         isRolling = false;
                         checkStatus();
-                    }, 1500); 
+                    }, 3000); 
                 } else {
                     clearInterval(rollInterval);
+                    scroller.style.display = "none";
                     alert("抽獎失敗，剩餘抽數可能不足，請再試一次");
                     isRolling = false;
                     checkStatus();
