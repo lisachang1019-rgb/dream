@@ -30,14 +30,13 @@
         }
         .total-rem { font-size: 32px; font-weight: bold; color: #ff4757; }
         
-        /* 【優化】抽獎大框框：強化玻璃厚度、多層高級陰影質感 */
+        /* 抽獎大框框：毛玻璃質感與立體層次陰影 */
         .card-area { 
             width: 260px; 
             height: 380px; 
             background: rgba(255, 255, 255, 0.15); 
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            /* 重點：多層陰影做出玻璃厚度感 (外陰影、內發光、內陰影) */
             border: 2px solid rgba(255, 255, 255, 0.7); 
             margin: 20px auto; 
             border-radius: 24px; 
@@ -56,7 +55,6 @@
             height: 100%; 
             object-fit: cover; 
             display: none; 
-            /* 讓顯示出來的結果卡片也有微透明與實體玻璃感 */
             border-radius: 20px;
         }
         
@@ -70,27 +68,30 @@
             align-items: center;
         }
         
-        /* 【優化】滾動卡片本身加上微小的卡片邊框與陰影，像有厚度的實體卡片在滑動 */
+        /* 【已修改】滾動卡片：將總動畫時間拉長到 3 秒，並預設透明度為 0 避免閃爍 */
         .scrolling-card {
             position: absolute;
-            width: 92%; /* 稍微縮小一點點，露出玻璃底座邊框 */
+            width: 92%; 
             height: 94%;
             top: 3%;
             left: 4%;
             object-fit: cover;
             border-radius: 16px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.12); /* 卡片自身的漂浮陰影 */
-            transform: translateX(100%); 
-            animation: slideLeft 0.3s linear forwards;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.12); 
+            transform: translateX(0); 
+            opacity: 0;
+            animation: slideLeft 3s cubic-bezier(0.25, 1, 0.5, 1) forwards; 
         }
+        
+        /* 【已修改】控制卡片「進場 (快速) ➔ 停留 (大約2秒) ➔ 退場 (快速)」 */
         @keyframes slideLeft {
-            0% { transform: translateX(110%); opacity: 0; }
-            15% { opacity: 1; }
-            85% { opacity: 1; }
-            100% { transform: translateX(-110%); opacity: 0; }
+            0% { transform: translateX(80%); opacity: 0; }      
+            15% { transform: translateX(0); opacity: 1; }       
+            85% { transform: translateX(0); opacity: 1; }       
+            100% { transform: translateX(-80%); opacity: 0; }   
         }
 
-        /* 十連抽個別卡片：也加上玻璃底與精緻陰影 */
+        /* 十連抽個別卡片玻璃底座 */
         .mini-card-box {
             width: 18%;
             text-align: center;
@@ -689,6 +690,7 @@
             }
         });
 
+        // 開場順序展示邏輯
         function startBackgroundScroll() {
             if (backgroundScrollInterval) return;
             const scroller = document.getElementById('scroller-container');
@@ -700,6 +702,7 @@
 
             let currentIndex = 0;
             
+            // 【已修改】配合卡片3秒的動畫時間，JS計時器設定為每 3.2 秒派出一張卡
             backgroundScrollInterval = setInterval(() => {
                 if (sortedCards.length === 0) return;
                 
@@ -709,9 +712,11 @@
                 slideImg.className = 'scrolling-card';
                 scroller.appendChild(slideImg);
                 
-                setTimeout(() => { slideImg.remove(); }, 500);
+                // 動畫演完 3 秒後自動銷毀
+                setTimeout(() => { slideImg.remove(); }, 3000);
+                
                 currentIndex = (currentIndex + 1) % sortedCards.length;
-            }, 1200); 
+            }, 3200); 
         }
 
         startBackgroundScroll();
@@ -798,6 +803,7 @@
             const specialCards = cardConfig.filter(c => c.grade === "S" || c.grade === "A");
             let showSpecial = true;
             
+            // 按下抽獎後，依然維持原本 70ms 的超快滾動速度
             let rollInterval = setInterval(() => {
                 let randomCard = (showSpecial && specialCards.length > 0) 
                     ? specialCards[Math.floor(Math.random() * specialCards.length)]
@@ -806,6 +812,8 @@
                 const slideImg = document.createElement('img');
                 slideImg.src = randomCard.url;
                 slideImg.className = 'scrolling-card';
+                // 抽獎滾動時暫時覆蓋 CSS 動畫改為快速閃過
+                slideImg.style.animation = 'slideLeft 0.25s linear forwards'; 
                 scroller.appendChild(slideImg);
                 
                 setTimeout(() => { slideImg.remove(); }, 250);
@@ -874,7 +882,6 @@
                             window.lastDrawResults.forEach((id, index) => {
                                 const result = cardConfig.find(c => c.id === id);
                                 
-                                // 改為包含玻璃外框的包裝容器
                                 const cardDiv = document.createElement('div');
                                 cardDiv.className = 'mini-card-box';
                                 cardDiv.innerHTML = `
