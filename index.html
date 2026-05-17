@@ -68,53 +68,54 @@
 
         // 這裡設定你可以使用的抽獎代碼清單
         const validCodes = 
-["C9Z1","584E","6Z3Z","N8W5","242F","24Q1","T841","7WGN","VC32","P61F","2OD0","UJD0","AE4F","R893",
- "DBWC","S11Y","7YO4","339V","U2S6","TJ14","MWTK","4Q68","3E63","W879","CE38","78A0","LM9P","TUOO",
- "R74M","48ED","LS8L","9FX6","GZES","6D24","RN0F","40Q1","432A","66K6","XL7K","5RX8","6FBX","O35A",
- "1OIE","9881","SOLN","W416","D9A6","IR7F","GV59","XR96","XW91","HWS4","4TP2","HK89","2JP3","E3R1",
- "EN30","2883","0W3F","TFE0","EU4T","1650","6479","R17L","H6QX","8DDD","471L","V32G","B4M4","PF3X",
- "445L","6N0G","UBXE","U0OI","69Q8","111X","3512","90V4","75XX","20M4","4944","40NW","0ZX8","ASI6",
- "XTTE","RJ62","T181","TD4U","8UUN","009X","P46V","29W4","3Q09","PKSC","PVT8","T5H9","7NZA","6L34",
- "3C07","PQHX","1G5P","391T","4XF3","130P","WTZD","29QD","O74E","P1EV","XEW9","X0R8","E0GQ","3676",
- "4215","1L57","GT04","3XXH","HQ46","69BN","7O6Q","KN9Z","JAW6","35N8","P712","I4S4","23YN","54O4",
- "5097","49VR","JY34","0NX5","0X06","CUF5","05BF","HR96","EHQU","FD8Y","F8OU","79U3","5A36","4XL9",
- "R82S","7EC8","FFY3","8GZ6","0Y81","8MER","O7W7","7ZYG","3935","VI2F","XO1L","985A","ZO96","DVC9",
- "J42S","V824","D19Q","820","W103","6S0W","96A7","SEM8","30XX","KX5W","N6N6","5GF9","R914","6SLM",
- "7G32","7QC5","KC9V","98F2","AXI0","5BTT","N7PL","Z091","R7GD","1CK7","T357","G3RT","G5Y7","4NQN",
- "89H1","2496","89UL","SRM9","284X","1O1L","ZT2Z","KG89","L1B1","O70K","YQY0","H619","7O27","S02H",
- "951H","Z9NL","B6VX","N57V","GL29","6RLZ","J596","B4H5","53GC","TBRZ","622Z","3625","PBLS","2X9H",
- "9FBU","4KE3","K95Z","MQS6","7OBZ","71U0","WSXM","94U3","YQ2Y","02K4","1YFS","T5LQ","1M1I","L38C",
- "3JMD","X999","1RJK","QD2V","DYIF","6H52","14DD","YZ3P","52A4","VA28","6E93","87Q4","75Q5","OI81",
- "I086","48WV","HTO0","9Z47","9BC9","Q9A5","16D7","UKHU","WFP1","3R28","1T79","4232","GLL5","ZHI8",
- "05G4","O9FV","I77O","BV8Q","R31P","7GTF","B314","7T93","UX8O","C738","1IVI","31NQ","1A35","N4X3",
- "A814","K9C8","56VB","QPIU","DN73","E58G","HY2I","R8L9","UWQL","T3R0","N771","77O8","05OT","NU68",
- "E317","DSB4","57FB","SDCI","7D56","5GV2","TE90","WWY3","2N42","OCXK","2269","5NXK","496B","S813",
- "C9S0","6697","0BZ2","98JM","W0KT","O22Y","22PW","6029","SWRL","VGGI","660","W1QP","405Y","61D3",
- "3782","2AAL","621W","7X16","UI4E","3BYX","D3LV","8E2C","XYQ2","92JV","38QS","1D2G","248D",
- "15PA","8UEQ","XAT9","6U07","3A58","OWV9","LF85","6027","ND0I","3PA4","IZ10","1KC2","STI9","95VP",
- "E89U","NFBS","NG9C","26U2","8YLV","HQO6","9V8Q","BI3D","5IQK","R886","6K3V","C1TK","VI84","JI57",
- "8668","6IX5","747C","O27W","3AH9","LE1H","G6YK","17L9","1L40","Y830","URI7","3KI2","S34J","3CJ8",
- "67VT","ISY3","J247","E6H3","F297","3123","295X","WR95","5U87","3VU5","K9Z0","19Y0","17X0","982J",
- "1NE7","Z7GR","J5BX","6D1B","P7AN","2TRZ","1XSK","67P1","32OR","NO81","9UFD","SJ44","R12G","YZ25",
- "9MU0","QJOQ","169P","Q6V1","7LFP","59B0","D1OP","9LG5","W297","FMIL","BSYZ","B64S","AMK1","2YON",
- "7J8A","Q99W","M60T","6EE6","1P5G","DF6B","30W3","2RD2","0","N281","2F6P","Z58Z","GX1I","7G2E",
- "F0YM","SE54","4P7L","46M6","UX1G","Y36Y","Q9HK","G432","H07K","O5UL","EV6Z","7X1E","GL4V","95K2",
- "URX5","M297","X7JX","3U4Q","7N2E","5078","Q899","82Y1","12KS","7S5Z","RTWL","HZ7O","4HJL","H0C0",
- "471I","G606","JB1Q","QYW9","19DG","51YW","SNQ4","52TZ","9T4Z","1JNF","B3VF","KVNB","M23P","762G",
- "P73D","EF71","14T9","2W12","9L0Y","7WO1","21BH","2X01","15Q4","2N34","9V1F","E9O9","8K88","7VN3",
- "B41O","9U80","5XXE","K2L9","C8N2","3U77","2W4H","UGPN","87F6","B66U","N80J","MVR2","OVFB","IPXW",
- "C6Q2","F1NX","3VF7","217","EH9N","8LFR","84DA","8U41","NG16","6W25","73A3","L34O","X6H0","URCF",
- "53D4","845K","EXC4","6OK9","I7D8","H942","3699","1907","YC6J","4A7X","5QJ2","9P2X","ON1F","KJE5",
- "T1ZM","GVA6","56RR","6628","X883","T66U","9PXX","LR8D","SR43","14EP","993E","72IZ","ZS1T","Y6YY",
- "W2R1","SATP","II6E","IXQW","WV7N","N6FF","K2FQ","B2LR","782H","M343","G093","6E9P","5OJG","CKK1",
- "56AZ","7M27","M6K5","6HOK","1394","CKKX","FW7I","8604","9LZ1","3T61","M2UI","R354","J79K","JGV4",
- "ED2K","36AO","5B07","191H","Y995","OD91","2AKD","7Z2Y","R48W","282B","392","FFUO","4Q5D","680A",
- "5VZ8","AM47","EP77","KE8Q","3742","3119","X117","GFV4","P20M","Y1Y4","FX11","2A4U","4N31","C65F",
- "IU69","01U7","9GDR","CT57","5S6W","739A","136O","3TVD","1MUM","3D70","4AQV","53XA","212A","F430",
- "IER0","6072","7X9M","AF5R","G96E","375","O7OY","2YG5","X7ID","LFYT","9QN3","754V","87R2","H3JO",
- "8A1Y","I8JM","13HI","63HO","0E2G","J6T5","AQU2","77T4","GU87","A528","DMD4","830J","788Y","6P9D","89XC","X0WI"]
+["ST176","S9PKK","SE594","STG6R","S9ON2","SZ565","SMALK","SXL9D","SLXGW","S617A","S9P0K",
+ "SQ237","S94U2","SDV7O","S5312","SWUE0","SW08Q","S50OU","S704V","S9F36","SMAG3","S1H63",
+ "S296O","S2E0D","SJ3EF","S9B7P","SD4Q4","SHXN5","S820Y","SC0SG","SKI72","S86U2","SDPBF",
+ "SP745","SRVW9","S2585","SX605","S5DTZ","S55B2","SW7TX","S4JJ8","SFDCL","SD07T","SFXQ2",
+ "SD62R","SV2B0","S7L5E","SM0RU","SQ5H1","SO94X","S4FW6","SD145","S46C8","S397R","SX16X",
+ "SD0MO","S6LGV","S618F","S56UF","SYK4B","S2UZ8","S5T2M","SACS9","S06HI","SZZML","ST82Z",
+ "S3QT4","SM62N","SBV9K","S9SGP","SD6U2","SYLC6","SJR08","SEOTC","S31NJ","S14S6","SJ7M4",
+ "S2TL2","S4W9D","S42MA","SA7O7","SJVU4","S281H","SMKIM","S8CM9","SID3X","SN4G8","SD7PY",
+ "SG2S5","S1Q7S","S5962","S227B","S50EV","SKA4I","S535G","SWA7A","S8KN0","SA80P","SS140",
+ "S7G99","S5IY6","S074L","SG214","SV4A2","SI6PZ","S8T0Q","SHUJ1","SS4QS","SQ260","S71RM",
+ "S39F3","SWBD0","S5YD4","S2T6L","STX9O","SO4I3","SPAB8","S0KAI","S4UJG","SOY82","S95H9",
+ "S5A7O","SV9L1","S3Z21","SUL20","SS6V6","SKPD0","STB01","S81NB","S5NHE","S9C88","S3W74",
+ "SHP8S","SM531","S49R1","S2765","S4RL7","S99VW","S3670","S3HAQ","S469M","S849P","S1W78",
+ "S1G8F","SV770","S67MU","S14A2","SB3FD","S9M2P","SH4O6","SJW44","S89T3","S2PMR","SLF30",
+ "SQ5L7","S86Z7","SHUVV","S6I4M","S8X2J","SDGGJ","SBDZ5","S4D6J","SMDFB","S17J0","SIH5K",
+ "SHMH5","S2N88","S9A2T","S7K8K","SX984","SG59P","S3S04","SE1F7","SK472","S3K1L","S8S86",
+ "S15O6","S94F1","SXUER","S0CA7","S5592","SO677","SGW25","S289","SC514","SZB78","S66UO",
+ "S47M4","SJTL6","STLWV","S2ISJ","ST457","S7A7S","SXZE6","S64PS","S091D","SVG58","SHPXC",
+ "S362","SA77R","S3028","S9Z52","S2T2C","S5YP1","S220H","SP752","S1CYR","SX0M6","S8821",
+ "S0P0O","S64QK","S998A","S37R9","S1W6J","S79LI","S5968","SZR7W","SK894","SIQES","SEU3R",
+ "SR109","S0CA0","S5F7K","S678R","SFAZP","S3O5Z","SSD3L","SK0TO","S2N2R","S39FU","SY51S",
+ "S075O","SOFD4","SJTJQ","SS2N0","SV982","S9000","SG8Q3","S7838","SKJ1E","SG7AZ","S5343",
+ "S170000","SABNP","SQA1B","S80DP","SF2BM","S7OA6","S334T","SMIGR","S4K07","S3TK9","SOACG",
+ "SS3QC","SA8NN","SC6UX","S7W74","SLLJ8","SE3CT","SWQ88","S37YK","S4VM3","SDK3G","S7DRJ",
+ "S48NE","SR6AC","ST0DN","S3D9D","S59YX","SV42M","S543","SMF85","SPNP9","S0","SMMP6","SV7GT",
+ "SQBRR","SZMEK","S1O77","S5FE4","S967K","S376E","S74WI","S644D","S970N","S23V1","S43KZ",
+ "SQFD3","SE422","SKVX4","SUXS2","SQ399","S9607","SE4HX","S4Y81","S3GUZ","S35U1","S2A42",
+ "S951C","SFFM4","S6971","SJW68","SJJ72","SZR89","S5OSM","S8B4P","S8EG2","S7728","STRH0",
+ "S9D5T","SJP83","SQP28","S56FX","SJE1S","SFBRI","S127","SA334","SIF6J","S6WU4","SQMJW",
+ "S7JKN","S1TM7","SB3JK","SYE83","S9317","S3IN7","SMD46","S1OU0","S06J4","S5W09","S901Y",
+ "SCE3K","SV26R","SSCU9","SWM5M","SW28W","S5JM6","S836X","SUUB0","S1F14","S5DPM","SBRO6",
+ "S23TI","SC772","S9LH1","STDMZ","SW433","SA2XW","SP7OY","S8146","TSZ2U","T9Z6E","TB5MF",
+ "T781W","TJ84U","T66J0","T9U7G","T141Q","TZNPA","T4X1D","TU4N7","TE9VE","T1H0R","T1MWC",
+ "TGPX2","TDQZ2","T579V","TO4HQ","TWF5T","TBBZD","TLZVY","TU5B1","TV8P9","T1Q3D","T3U5A",
+ "TN27O","T82GZ","THU80","TR37Z","TZWC9","TE39I","T1MS7","TDY8Z","TL86C","T9Z22","TCD8F",
+ "TK16O","TVW0H","TG59Z","TIN02","T3199","TQNP6","T1459","T89S1","TN1VB","TWELK","T8JJP",
+ "TO929","T2N39","TVOFS","TJEKG","T094M","T22D6","TDF8S","TQ1BX","TG6RL","TAIH3","T1KE3",
+ "T9X4K","TVO10","T2NL6","T9T95","T4X6R","TZ469","TGU3E","TAME3","T8KKX","TYO81","T4PXE",
+ "TTDX4","T3S93","TH58Z","TD8HB","T4EM3","TIGRX","TJ4Y6","TE38K","TOA1E","TN40X","TX3RY",
+ "T4N1Z","TD88G","TBAB4","TME2E","T4INV","TL839","T00V0","T2383","TKDUW","T2ZJ4","TG4X7",
+ "TK797","T335","TH8OR","T5ASC","TS1NX","TRA0K","T29PM","T1HAF","TP302","TQ97V","TAJ17",
+ "T0JFA","TF5HI","T126I","T8F8P","T3IMF","T8907","T3C2E","TJHM0","TTHN1","TC06L","TO36S",
+ "TS6OZ","T09T8","TXQ4W","TNH9B","TEWQ1","T276D","T7PX6","T7C18","TLUHB","T0K3N","T35CE",
+ "TV28L","TZ15K","TWZH3","TNFCS","T6353","TIO26","T34T0","T392Q","THQ7K","T95BK","T0GP5",
+ "T6174","TJJFX","T135","TG97B","T2G1M","T2G1D","TOB1K","T3M4S","TX0JV","T8EU2","TECZ3",
+ "T2C76","TKHUQ","T62LQ","TMXC2"]
 
-        const cardConfig = [
+
 {id:1, grade:"F", name:"F賞-3單人卡", count:1, url:"https://i.postimg.cc/446p9wht/1.jpg"},
 {id:2, grade:"F", name:"F賞-13雙人卡", count:3, url:"https://i.postimg.cc/3J3mCpg4/2.jpg"},
 {id:3, grade:"F", name:"F賞-37雙人卡", count:1, url:"https://i.postimg.cc/qMpyXn83/3.jpg"},
@@ -538,6 +539,7 @@
 {id:421, grade:"S", name:"S賞-3 4.0娃娃", count:1, url:"https://i.postimg.cc/LXbthVwT/IMG-E4064.jpg"},
 {id:422, grade:"last", name:"last賞-3 3.0娃娃", count:1, url:"https://i.postimg.cc/nzP4M1gT/IMG-E4065.jpg"},
         ];
+
         let currentPool = [];
         let isRolling = false;
 
@@ -563,39 +565,66 @@
             if (isRolling) return;
             const name = document.getElementById('user-name').value.trim();
             const code = document.getElementById('user-code').value.trim();
-            const btn = document.getElementById('draw-btn');
+            const btn1 = document.getElementById('draw-btn');
+            const btn10 = document.getElementById('draw-btn-10');
+            
+            const isDisabled = (currentPool.length === 0 || name === "" || code === "");
             
             if (currentPool.length === 0) {
-                btn.innerText = "已全數售罄";
-                btn.disabled = true;
-            } else if (name === "" || code === "") {
-                btn.innerText = "請完整輸入資料";
-                btn.disabled = true;
+                btn1.innerText = "已全數售罄";
+                btn10.innerText = "已全數售罄";
             } else {
-                btn.innerText = "點我抽獎！";
-                btn.disabled = false;
+                btn1.innerText = "單抽";
+                btn10.innerText = `✨ 豪華十連抽！(剩 ${currentPool.length} 抽)`;
             }
+            
+            btn1.disabled = isDisabled;
+            btn10.disabled = isDisabled || (currentPool.length < 10);
         }
 
-        async function draw() {
+        async function draw(drawCount) {
             if (isRolling) return;
             const name = document.getElementById('user-name').value.trim();
             const code = document.getElementById('user-code').value.trim();
 
+            // 1. 檢查代碼是否在合法清單內
             if (!validCodes.includes(code)) {
                 alert("❌ 無效的代碼，請重新確認！");
                 return;
             }
 
+            // 【新加入：嚴格限制單抽與十連抽代碼】
+            const firstLetter = code.charAt(0).toUpperCase();
+            
+            if (drawCount === 1 && firstLetter !== 'S') {
+                alert("❌ 此代碼為「十連抽專用券」，請點擊【豪華十連抽】按鈕！");
+                return;
+            }
+            
+            if (drawCount === 10 && firstLetter !== 'T') {
+                alert("❌ 此代碼為「單抽專用券」，請點擊【單抽】按鈕！");
+                return;
+            }
+
             isRolling = true;
-            const btn = document.getElementById('draw-btn');
+            document.getElementById('draw-btn').disabled = true;
+            document.getElementById('draw-btn-10').disabled = true;
+
             const rollText = document.getElementById('rolling-text');
             const img = document.getElementById('card-img');
             const msg = document.getElementById('msg');
             const nameDisplay = document.getElementById('card-name');
+            const multiContainer = document.getElementById('multi-result-container');
 
-            btn.disabled = true;
+            msg.style.display = "none";
+            nameDisplay.innerText = "";
+            if (rollText) rollText.style.display = "none";
+            
+            multiContainer.innerHTML = "";
+            multiContainer.style.display = "none";
+            img.style.display = "block";
 
+            // 2. 檢查代碼是否已被使用過
             const codeRef = db.ref('usedCodes/' + code);
             const snapshot = await codeRef.get();
             if (snapshot.exists()) {
@@ -605,70 +634,105 @@
                 return;
             }
 
-            msg.style.display = "none";
-            nameDisplay.innerText = "";
-            if (rollText) rollText.style.display = "none";
-            img.style.display = "block";
-
-            // 【新修改：先撈出所有的 S賞 和 A賞 卡片當作閃爍特效池】
-            // 這裡會去檢查你的 cardConfig 裡面，名字或 ID 有包含 'S' 或 'A' 的卡片
-            // 備註：如果你的配置裡是用別的名字區分（例如等級欄位），請確保篩選條件正確
+            // 轉動時強制閃爍 S賞 和 A賞
             const specialCards = cardConfig.filter(c => 
-                c.id.toUpperCase().includes('S') || 
-                c.id.toUpperCase().includes('A') ||
-                c.name.toUpperCase().includes('S賞') ||
-                c.name.toUpperCase().includes('A賞')
+                c.id.toUpperCase().includes('S') || c.id.toUpperCase().includes('A')
             );
 
-            let showSpecial = true; // 用來控制交替閃爍的開關
-
-            // 圖片閃爍滾動
+            let showSpecial = true;
             let rollInterval = setInterval(() => {
-                let randomCard;
-                
-                // 強迫交替：一次跑常規隨機，一次強迫跑 S賞 或 A賞
-                if (showSpecial && specialCards.length > 0) {
-                    randomCard = specialCards[Math.floor(Math.random() * specialCards.length)];
-                } else {
-                    randomCard = cardConfig[Math.floor(Math.random() * cardConfig.length)];
-                }
-                
+                let randomCard = (showSpecial && specialCards.length > 0) 
+                    ? specialCards[Math.floor(Math.random() * specialCards.length)]
+                    : cardConfig[Math.floor(Math.random() * cardConfig.length)];
                 img.src = randomCard.url;
-                showSpecial = !showSpecial; // 切換狀態
+                showSpecial = !showSpecial;
             }, 60); 
 
+            // 3. 進行抽獎交易
             db.ref('pool').transaction((p) => {
-                if (p && p.length > 0) {
-                    const finalIdx = Math.floor(Math.random() * p.length);
-                    window.lastDraw = p[finalIdx];
-                    p.splice(finalIdx, 1);
+                if (p && p.length >= drawCount) {
+                    window.lastDrawResults = []; 
+                    let hasHighAward = false;    
+
+                    for (let i = 0; i < drawCount; i++) {
+                        // 十連抽第 10 抽 D賞保底機制
+                        if (drawCount === 10 && i === 9 && !hasHighAward) {
+                            let availableDCards = p.filter(id => id.toUpperCase().includes('D'));
+                            if (availableDCards.length > 0) {
+                                const pickedId = availableDCards[Math.floor(Math.random() * availableDCards.length)];
+                                window.lastDrawResults.push(pickedId);
+                                const idxInPool = p.indexOf(pickedId);
+                                p.splice(idxInPool, 1);
+                                continue; 
+                            }
+                        }
+
+                        const finalIdx = Math.floor(Math.random() * p.length);
+                        const drawnId = p[finalIdx];
+                        window.lastDrawResults.push(drawnId);
+                        
+                        if (drawnId.toUpperCase().includes('S') || 
+                            drawnId.toUpperCase().includes('A') || 
+                            drawnId.toUpperCase().includes('B') || 
+                            drawnId.toUpperCase().includes('C') || 
+                            drawnId.toUpperCase().includes('D')) {
+                            hasHighAward = true;
+                        }
+
+                        p.splice(finalIdx, 1);
+                    }
                     return p;
                 }
                 return;
             }, (err, committed) => {
                 if (committed) {
+                    // 4. 抽獎成功，鎖定代碼
                     db.ref('usedCodes/' + code).set({
                         user: name,
-                        time: firebase.database.ServerValue.TIMESTAMP
+                        time: firebase.database.ServerValue.TIMESTAMP,
+                        count: drawCount
                     });
 
-                    // 1.5 秒後定格中獎結果
+                    // 1.5 秒後定格動畫
                     setTimeout(() => {
                         clearInterval(rollInterval); 
                         
-                        const result = cardConfig.find(c => c.id === window.lastDraw);
-                        img.src = result.url;
-                        nameDisplay.innerText = result.name;
-                        
-                        saveLocalRecord(result.name);
-                        sendToGoogleForm(name, code, result.name);
+                        if (drawCount === 1) {
+                            // 單抽結果顯示
+                            const result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
+                            img.src = result.url;
+                            nameDisplay.innerText = result.name;
+                            
+                            saveLocalRecord(result.name);
+                            sendToGoogleForm(name, code, result.name);
+                        } else {
+                            // 十連抽結果顯示（排排站）
+                            img.style.display = "none"; 
+                            multiContainer.style.display = "flex";
+                            
+                            window.lastDrawResults.forEach((id, index) => {
+                                const result = cardConfig.find(c => c.id === id);
+                                
+                                const cardDiv = document.createElement('div');
+                                cardDiv.style.width = "18%";
+                                cardDiv.style.textAlign = "center";
+                                cardDiv.innerHTML = `
+                                    <img src="${result.url}" style="width: 100%; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                                    <div style="font-size: 12px; margin-top: 5px;">第 ${index+1} 抽:<br>${result.name}</div>
+                                `;
+                                multiContainer.appendChild(cardDiv);
+                                
+                                saveLocalRecord(`[十連抽-${index+1}] ${result.name}`);
+                                sendToGoogleForm(`${name}(十連抽-${index+1})`, code, result.name);
+                            });
+                        }
                         
                         isRolling = false;
                         checkStatus();
                     }, 1500); 
                 } else {
                     clearInterval(rollInterval);
-                    alert("抽獎失敗，請再試一次");
+                    alert("抽獎失敗，剩餘抽數可能不足，請再試一次");
                     isRolling = false;
                     checkStatus();
                 }
