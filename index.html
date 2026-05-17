@@ -81,7 +81,7 @@
             border-radius: 16px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.12); /* 卡片自身的漂浮陰影 */
             transform: translateX(100%); 
-            animation: slideLeft 1.5s linear forwards;
+            animation: slideLeft 0.3s linear forwards;
         }
         @keyframes slideLeft {
             0% { transform: translateX(110%); opacity: 0; }
@@ -673,9 +673,9 @@
 {id:422, grade:"last", name:"last賞-3 3.0娃娃", count:1, url:"https://i.postimg.cc/nzP4M1gT/IMG-E4065.jpg"},
         ];
 
-     let currentPool = [];
+ let currentPool = [];
         let isRolling = false;
-        let backgroundScrollInterval = null; // 背景閒置播放計時器
+        let backgroundScrollInterval = null; 
 
         db.ref('pool').on('value', (snap) => {
             const data = snap.val();
@@ -689,23 +689,31 @@
             }
         });
 
-        // 【全新功能】一打開畫面就啟動常駐型隨機卡片播放
         function startBackgroundScroll() {
             if (backgroundScrollInterval) return;
             const scroller = document.getElementById('scroller-container');
             
+            const gradeOrder = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
+            const sortedCards = [...cardConfig].sort((a, b) => {
+                return (gradeOrder[a.grade] || 99) - (gradeOrder[b.grade] || 99);
+            });
+
+            let currentIndex = 0;
+            
             backgroundScrollInterval = setInterval(() => {
-                let randomCard = cardConfig[Math.floor(Math.random() * cardConfig.length)];
+                if (sortedCards.length === 0) return;
+                
+                let targetCard = sortedCards[currentIndex];
                 const slideImg = document.createElement('img');
-                slideImg.src = randomCard.url;
+                slideImg.src = targetCard.url;
                 slideImg.className = 'scrolling-card';
                 scroller.appendChild(slideImg);
                 
-                setTimeout(() => { slideImg.remove(); }, 250);
-            }, 120); // 閒置時也維持高流暢度的飛過速度
+                setTimeout(() => { slideImg.remove(); }, 500);
+                currentIndex = (currentIndex + 1) % sortedCards.length;
+            }, 1200); 
         }
 
-        // 啟動開場播放
         startBackgroundScroll();
 
         function initPool() {
@@ -760,7 +768,6 @@
             document.getElementById('draw-btn').disabled = true;
             document.getElementById('draw-btn-10').disabled = true;
 
-            // 暫停常駐的背景播放
             clearInterval(backgroundScrollInterval);
             backgroundScrollInterval = null;
 
@@ -784,11 +791,10 @@
                 alert("⚠️ 此代碼已被使用過，一組代碼僅限抽獎一次！");
                 isRolling = false;
                 checkStatus();
-                startBackgroundScroll(); // 恢復背景播放
+                startBackgroundScroll(); 
                 return;
             }
 
-            // 進入激烈的抽獎專用加速滾動
             const specialCards = cardConfig.filter(c => c.grade === "S" || c.grade === "A");
             let showSpecial = true;
             
@@ -806,7 +812,6 @@
                 showSpecial = !showSpecial;
             }, 70); 
 
-            // 資料庫連動交易
             db.ref('pool').transaction((p) => {
                 if (p && p.length >= drawCount) {
                     window.lastDrawResults = []; 
@@ -849,14 +854,12 @@
                         count: drawCount
                     });
 
-                    // 滾動展示維持 3 秒（3000毫秒）後開獎
                     setTimeout(() => {
                         clearInterval(rollInterval); 
                         scroller.style.display = "none"; 
                         scroller.innerHTML = "";
                         
                         if (drawCount === 1) {
-                            // 【單抽結果展示】
                             const result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
                             img.src = result.url;
                             img.style.display = "block"; 
@@ -865,18 +868,17 @@
                             saveLocalRecord(result.name);
                             sendToGoogleForm(name, code, result.name);
                         } else {
-                            // 【十連抽結果展示】
                             displayBox.style.display = "none"; 
                             multiContainer.style.display = "flex";
                             
                             window.lastDrawResults.forEach((id, index) => {
                                 const result = cardConfig.find(c => c.id === id);
                                 
+                                // 改為包含玻璃外框的包裝容器
                                 const cardDiv = document.createElement('div');
-                                cardDiv.style.width = "18%";
-                                cardDiv.style.textAlign = "center";
+                                cardDiv.className = 'mini-card-box';
                                 cardDiv.innerHTML = `
-                                    <img src="${result.url}" style="width: 100%; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                    <img src="${result.url}" style="width: 100%; border-radius: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
                                     <div style="font-size: 10px; margin-top: 5px; color:#555;">#${index+1}<br><span style="color:#ff4757; font-weight:bold;">${result.name.split('-')[0]}</span></div>
                                 `;
                                 multiContainer.appendChild(cardDiv);
@@ -888,7 +890,6 @@
                         
                         isRolling = false;
                         checkStatus();
-                        // 抽獎完不重新啟動背景播放，留給使用者看結果；若要刷新重新跑，重整網頁即可
                     }, 3000); 
                 } else {
                     clearInterval(rollInterval);
@@ -896,7 +897,7 @@
                     alert("抽獎失敗，剩餘抽數可能不足，請再試一次");
                     isRolling = false;
                     checkStatus();
-                    startBackgroundScroll(); // 失敗則恢復背景播放
+                    startBackgroundScroll(); 
                 }
             });
         }
