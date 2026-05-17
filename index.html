@@ -16,9 +16,17 @@
         #rolling-text { font-size: 24px; color: #ff4757; font-weight: bold; display: none; }
         .input-group { margin-bottom: 15px; }
         input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #2a2a2a; color: white; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; }
-        .btn { width: 100%; background: #ff4757; color: white; border: none; padding: 16px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 0 #cc3a47; transition: 0.1s; }
+        
+        /* 雙按鈕容器與樣式優化 */
+        .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        .btn { flex: 1; background: #ff4757; color: white; border: none; padding: 16px 10px; font-size: 16px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 0 #cc3a47; transition: 0.1s; }
         .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #cc3a47; }
-        .btn:disabled { background: #444; color: #888; box-shadow: none; cursor: not-allowed; }
+        .btn:disabled { background: #444; color: #888; box-shadow: none; cursor: not-allowed; transform: none !important; }
+        #draw-btn-10 { background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%); box-shadow: 0 4px 0 #cc3a47; }
+        
+        /* 十連抽排排站容器 */
+        #multi-result-container { display: none; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px auto; width: 100%; background: #1e1e1e; padding: 12px; border-radius: 15px; box-sizing: border-box; }
+
         .history-section { margin-top: 30px; text-align: left; background: #1e1e1e; padding: 15px; border-radius: 12px; }
         .history-item { padding: 8px 0; border-bottom: 1px solid #333; font-size: 13px; color: #eccc68; }
         .rolling { animation: blur 0.1s infinite alternate; }
@@ -39,13 +47,22 @@
             <input type="text" id="user-name" placeholder="請輸入暱稱..." oninput="checkStatus()">
             <input type="text" id="user-code" placeholder="請輸入抽獎代碼..." oninput="checkStatus()">
         </div>
+        
         <div class="card-area" id="display-box">
             <span id="msg" style="color: #444;">READY</span>
             <div id="rolling-text">???</div>
             <img id="card-img" src="">
         </div>
+        
+        <div id="multi-result-container"></div>
+
         <div id="card-name" style="margin-bottom:15px; font-weight:bold; height:1.2em; color: #eccc68; font-size: 20px;"></div>
-        <button id="draw-btn" class="btn" onclick="draw()" disabled>請完整輸入資料</button>
+        
+        <div class="btn-group">
+            <button id="draw-btn" class="btn" onclick="draw(1)" disabled>請完整輸入資料</button>
+            <button id="draw-btn-10" class="btn" onclick="draw(10)" disabled>豪華十連抽</button>
+        </div>
+
         <div class="history-section">
             <h4 style="margin: 0 0 10px 0; color: #fff; border-bottom: 1px solid #444; padding-bottom: 5px;">📜 我的抽獎紀錄</h4>
             <div id="my-history" style="max-height: 200px; overflow-y: auto;">尚未有紀錄</div>
@@ -54,15 +71,15 @@
 
     <script>
         const firebaseConfig = {
-  apiKey: "AIzaSyAxQR4TtkvkAXqjiF_A5k5Mri9Rejtpbu4",
-  authDomain: "dream-9d0bc.firebaseapp.com",
-  projectId: "dream-9d0bc",
-  storageBucket: "dream-9d0bc.firebasestorage.app",
-  messagingSenderId: "846831528495",
-  appId: "1:846831528495:web:9fd912cd78e179ae0af4da",
-  measurementId: "G-64R8XB675N",
-    databaseURL: "https://dream-9d0bc-default-rtdb.firebaseio.com/"
-};
+            apiKey: "AIzaSyAxQR4TtkvkAXqjiF_A5k5Mri9Rejtpbu4",
+            authDomain: "dream-9d0bc.firebaseapp.com",
+            projectId: "dream-9d0bc",
+            storageBucket: "dream-9d0bc.firebasestorage.app",
+            messagingSenderId: "846831528495",
+            appId: "1:846831528495:web:9fd912cd78e179ae0af4da",
+            measurementId: "G-64R8XB675N",
+            databaseURL: "https://dream-9d0bc-default-rtdb.firebaseio.com/"
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -550,7 +567,7 @@
             } else {
                 currentPool = data;
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('total-count').innerText = "剩餘抽數: " + currentPool.length + " 抽";
+                document.getElementById('total-count').innerText = currentPool.length + " 抽";
                 checkStatus();
             }
         });
@@ -573,13 +590,14 @@
             if (currentPool.length === 0) {
                 btn1.innerText = "已全數售罄";
                 btn10.innerText = "已全數售罄";
+                btn1.disabled = true;
+                btn10.disabled = true;
             } else {
                 btn1.innerText = "單抽";
                 btn10.innerText = `✨ 豪華十連抽！`;
+                btn1.disabled = isDisabled;
+                btn10.disabled = isDisabled || (currentPool.length < 10);
             }
-            
-            btn1.disabled = isDisabled;
-            btn10.disabled = isDisabled || (currentPool.length < 10);
         }
 
         async function draw(drawCount) {
@@ -612,6 +630,7 @@
             const msg = document.getElementById('msg');
             const nameDisplay = document.getElementById('card-name');
             const multiContainer = document.getElementById('multi-result-container');
+            const displayBox = document.getElementById('display-box');
 
             msg.style.display = "none";
             nameDisplay.innerText = "";
@@ -619,6 +638,7 @@
             
             multiContainer.innerHTML = "";
             multiContainer.style.display = "none";
+            displayBox.style.display = "flex";
             img.style.display = "block";
 
             const codeRef = db.ref('usedCodes/' + code);
@@ -630,9 +650,9 @@
                 return;
             }
 
-            // 轉動特效池：自動篩選 S賞 與 A賞
+            // 轉動特效池
             const specialCards = cardConfig.filter(c => 
-                c.id.toUpperCase().includes('S') || c.id.toUpperCase().includes('A')
+                c.grade === "S" || c.grade === "A"
             );
 
             let showSpecial = true;
@@ -651,9 +671,12 @@
                     let hasHighAward = false;    
 
                     for (let i = 0; i < drawCount; i++) {
-                        // 十連抽第 10 抽 D賞保底機制
+                        // 十連抽保底機制
                         if (drawCount === 10 && i === 9 && !hasHighAward) {
-                            let availableDCards = p.filter(id => id.toUpperCase().includes('D'));
+                            let availableDCards = p.filter(id => {
+                                let card = cardConfig.find(c => c.id === id);
+                                return card && card.grade === "D";
+                            });
                             if (availableDCards.length > 0) {
                                 const pickedId = availableDCards[Math.floor(Math.random() * availableDCards.length)];
                                 window.lastDrawResults.push(pickedId);
@@ -667,11 +690,8 @@
                         const drawnId = p[finalIdx];
                         window.lastDrawResults.push(drawnId);
                         
-                        if (drawnId.toUpperCase().includes('S') || 
-                            drawnId.toUpperCase().includes('A') || 
-                            drawnId.toUpperCase().includes('B') || 
-                            drawnId.toUpperCase().includes('C') || 
-                            drawnId.toUpperCase().includes('D')) {
+                        let card = cardConfig.find(c => c.id === drawnId);
+                        if (card && ["S","A","B","C","D"].includes(card.grade)) {
                             hasHighAward = true;
                         }
 
@@ -701,7 +721,7 @@
                             sendToGoogleForm(name, code, result.name);
                         } else {
                             // 【十連抽結果展示】
-                            img.style.display = "none"; 
+                            displayBox.style.display = "none"; 
                             multiContainer.style.display = "flex";
                             
                             window.lastDrawResults.forEach((id, index) => {
@@ -711,8 +731,8 @@
                                 cardDiv.style.width = "18%";
                                 cardDiv.style.textAlign = "center";
                                 cardDiv.innerHTML = `
-                                    <img src="${result.url}" style="width: 100%; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
-                                    <div style="font-size: 11px; margin-top: 5px; color:#555;">#${index+1} 抽:<br><b>${result.name}</b></div>
+                                    <img src="${result.url}" style="width: 100%; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
+                                    <div style="font-size: 10px; margin-top: 5px; color:#aaa;">#${index+1}<br><span style="color:#eccc68;">${result.name.split('-')[0]}</span></div>
                                 `;
                                 multiContainer.appendChild(cardDiv);
                                 
@@ -735,6 +755,7 @@
 
         function saveLocalRecord(cardName) {
             let history = JSON.parse(localStorage.getItem('myDrawHistory')) || [];
+            if(history.length > 0 && history[0] === "尚未有紀錄") history = [];
             history.unshift({ name: cardName, time: new Date().toLocaleTimeString() });
             localStorage.setItem('myDrawHistory', JSON.stringify(history));
             renderHistory();
@@ -743,8 +764,11 @@
         function renderHistory() {
             const history = JSON.parse(localStorage.getItem('myDrawHistory')) || [];
             const container = document.getElementById('my-history');
-            if (history.length === 0) return;
-            container.innerHTML = history.map(h => `<div class="history-item">🕒 ${h.time} - ${h.name}</div>`).join('');
+            if (history.length === 0) {
+                container.innerHTML = "尚未有紀錄";
+                return;
+            }
+            container.innerHTML = history.map(h => `<div class="history-item">🕒 ${h.time ? h.time : ''} - ${h.name}</div>`).join('');
         }
 
         function sendToGoogleForm(name, code, card) {
@@ -758,6 +782,6 @@
         }
 
         renderHistory();
-        </script>
+    </script>
 </body>
 </html>
