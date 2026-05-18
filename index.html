@@ -24,7 +24,7 @@
         }
         .container { max-width: 450px; margin: auto; padding-right: 15px; }
         
-        /* 右側固定雙標籤頁面（完美還原手寫手稿） */
+        /* 右側固定雙標籤頁面 */
         .side-tabs {
             position: fixed;
             top: 40px;
@@ -57,7 +57,7 @@
             background: #1a3a60;
         }
 
-        /* 彈出視窗超美外框 (Modal) */
+        /* 彈出視窗外框 (Modal) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -810,9 +810,11 @@ let currentPool = [];
             const track = document.getElementById('main-track');
             track.innerHTML = "";
 
-            const gradeOrder = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
+            // 自訂排序權重，將 Last 放在最前面（權重設定為 0）
+            const gradeOrder = { "LAST": 0, "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
+            
+            // 包含 Last賞 在內全部進行排序，不進行過濾
             const basePool = [...cardConfig]
-                .filter(c => c.grade !== "Last")
                 .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 99) - (gradeOrder[b.grade.toUpperCase()] || 99));
             
             trackCards = [...basePool, ...basePool, ...basePool];
@@ -824,7 +826,7 @@ let currentPool = [];
                 item.id = `track-item-${idx}`;
                 item.innerHTML = `
                     <img src="${card.url}" alt="${card.name}">
-                    <div class="card-label" style="${getGradeStyle(card.grade)}">[${card.grade}] ${card.name.split('-')[1] || card.name}</div>
+                    <div class="card-label" style="${getGradeStyle(card.grade)}">[${card.grade.toUpperCase()}] ${card.name.split('-')[1] || card.name}</div>
                 `;
                 track.appendChild(item);
             });
@@ -918,7 +920,7 @@ let currentPool = [];
         function initPool() {
             let p = [];
             cardConfig.forEach(c => { 
-                if(c.grade !== "Last") { for(let i=0; i<c.count; i++) p.push(c.id); }
+                if(c.grade.toUpperCase() !== "LAST") { for(let i=0; i<c.count; i++) p.push(c.id); }
             });
             db.ref('pool').set(p);
         }
@@ -1050,7 +1052,7 @@ let currentPool = [];
                         
                         if (drawCount === 1) {
                             let result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
-                            if(isLastDrawTriggered) { result = cardConfig.find(c => c.grade === "Last"); }
+                            if(isLastDrawTriggered) { result = cardConfig.find(c => c.grade.toUpperCase() === "LAST"); }
 
                             img.src = result.url;
                             singleResultBox.style.display = "block"; 
@@ -1069,12 +1071,13 @@ let currentPool = [];
                             });
 
                             if(isLastDrawTriggered) {
-                                const lastAward = cardConfig.find(c => c.grade === "Last");
+                                const lastAward = cardConfig.find(c => c.grade.toUpperCase() === "LAST");
                                 setTimeout(() => {
                                     appendMiniCard(lastAward, "LAST", 0);
                                     nameDisplay.innerHTML = `<span style="${getGradeStyle(lastAward.grade)}">🎉 恭喜獲得 ${lastAward.name}！</span>`;
                                     saveLocalRecord(`[壓軸大獎] ${lastAward.name}`);
                                     sendToGoogleForm(`${name}(Last賞)`, code, lastAward.name);
+                                item.style.transform = "scale(0.65)";
                                 }, 10 * 150 + 200);
                             }
                         }
