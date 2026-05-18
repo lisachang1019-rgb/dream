@@ -35,7 +35,7 @@
         }
         .total-rem { font-size: 32px; font-weight: 900; color: #ff4757; }
         
-        /* 3D 圓環旋轉舞台 (對應概念圖一) */
+        /* 3D 圓環旋轉舞台 */
         .rotate-stage-container {
             display: none; 
             width: 100%;
@@ -77,7 +77,7 @@
             border-radius: 6px;
         }
 
-        /* 【全新進階】五星立體動態傳送舞台 (對應概念圖二、三) */
+        /* 五星立體動態傳送舞台 */
         .showcase-stage {
             display: flex;
             justify-content: center; 
@@ -89,7 +89,6 @@
             width: 100%;
         }
 
-        /* 五個固定身分的立體漂浮卡槽 */
         .stage-slot {
             position: absolute;
             width: 78px;
@@ -122,16 +121,11 @@
             text-align: center;
         }
 
-        /* 依據你的概念草圖：兩側變小、變淡(透明度低)，中間最大、完整最亮 */
-        /* 位置 0：最左邊 (小、淡) */
+        /* 立體傳送帶：中間大、兩側小且淡 */
         .pos-0 { transform: translateX(-160px) scale(0.75); opacity: 0.35; z-index: 1; }
-        /* 位置 1：中左 (中、微淡) */
         .pos-1 { transform: translateX(-80px) scale(0.88); opacity: 0.7; z-index: 2; }
-        /* 位置 2：正中間 (最大、完整清晰) */
         .pos-2 { transform: translateX(0px) scale(1.1); opacity: 1; z-index: 3; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1.5px solid rgba(255,255,255,0.8); }
-        /* 位置 3：中右 (中、微淡) */
         .pos-3 { transform: translateX(80px) scale(0.88); opacity: 0.7; z-index: 2; }
-        /* 位置 4：最右邊 (小、淡，準備登場) */
         .pos-4 { transform: translateX(160px) scale(0.75); opacity: 0.35; z-index: 1; }
 
         /* 單抽結果框 */
@@ -156,7 +150,7 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* 十連抽小卡底座也換回透明玻璃風 */
+        /* 十連抽小卡底座 */
         .mini-card-box {
             width: 18%;
             text-align: center;
@@ -745,73 +739,55 @@ let currentPool = [];
         let isRolling = false;
         let showcaseTimer = null;
         let showcaseIndex = 0;
-        let activeSlotsData = [null, null, null, null, null]; // 追蹤五個Slot目前顯示的卡片
+        let activeSlotsData = [null, null, null, null, null]; 
+        let sortedShowcaseList = []; // 用來存儲嚴格排序後的展示數組
 
-        // 【修改】嚴格分配所有等級對應色碼
+        // 依據規定獲取字體顏色樣式：S紅、A紫、B黃、C藍、D綠、E灰、F白、Last粉
         function getGradeStyle(grade) {
             const upperGrade = grade.toUpperCase();
             let color = "#ffffff";
             let shadow = "0 2px 4px rgba(0,0,0,0.3)";
             
             switch(upperGrade) {
-                case "S":
-                    color = "#ff4757"; // 紅色
-                    shadow = "0 0 6px rgba(255, 71, 87, 0.6)";
-                    break;
-                case "A":
-                    color = "#a55eea"; // 紫色
-                    shadow = "0 0 6px rgba(165, 94, 234, 0.6)";
-                    break;
-                case "B":
-                    color = "#ffa502"; // 黃色
-                    shadow = "0 1px 3px rgba(0,0,0,0.5)";
-                    break;
-                case "C":
-                    color = "#2e86de"; // 藍色
-                    shadow = "0 0 6px rgba(46, 134, 222, 0.6)";
-                    break;
-                case "D":
-                    color = "#2ed573"; // 綠色
-                    shadow = "0 0 6px rgba(46, 213, 115, 0.6)";
-                    break;
-                case "E":
-                    color = "#747d8c"; // 灰色
-                    shadow = "0 1px 3px rgba(0,0,0,0.4)";
-                    break;
-                case "F":
-                    color = "#ffffff"; // 白色
-                    shadow = "0 2px 4px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1)"; // 強調黑邊確保透明底座清晰
-                    break;
-                case "LAST":
-                    color = "#ff7675"; // 粉紅色
-                    shadow = "0 0 8px rgba(255, 118, 117, 0.7)";
-                    break;
+                case "S": color = "#ff4757"; shadow = "0 0 6px rgba(255, 71, 87, 0.6)"; break;
+                case "A": color = "#a55eea"; shadow = "0 0 6px rgba(165, 94, 234, 0.6)"; break;
+                case "B": color = "#ffa502"; shadow = "0 1px 3px rgba(0,0,0,0.5)"; break;
+                case "C": color = "#2e86de"; shadow = "0 0 6px rgba(46, 134, 222, 0.6)"; break;
+                case "D": color = "#2ed573"; shadow = "0 0 6px rgba(46, 213, 115, 0.6)"; break;
+                case "E": color = "#747d8c"; shadow = "0 1px 3px rgba(0,0,0,0.4)"; break;
+                case "F": color = "#ffffff"; shadow = "0 2px 4px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1)"; break;
+                case "LAST": color = "#ff7675"; shadow = "0 0 8px rgba(255, 118, 117, 0.7)"; break;
             }
             return `color: ${color}; text-shadow: ${shadow};`;
         }
 
-        // 【核心重構】實現概念圖二、三：無縫右至左滾動，中大邊小淡入淡出
+        // 【全新修正】重構展示邏輯：確保 S 賞排第一個帶頭往前衝
         function initShowcaseStage() {
-            // 排除Last賞
-            const filteredPool = cardConfig.filter(c => c.grade !== "Last");
+            // 1. 排除 Last 賞，並按照 S -> A -> B -> C -> D -> E -> F 的等級權重嚴格升序排列
+            const gradeOrder = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
+            sortedShowcaseList = [...cardConfig]
+                .filter(c => c.grade !== "Last")
+                .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 99) - (gradeOrder[b.grade.toUpperCase()] || 99));
             
-            // 初始化填滿5個Slot
+            showcaseIndex = 0;
+
+            // 2. 初始化填滿 5 個 Slot 
             for(let i=0; i<5; i++) {
-                activeSlotsData[i] = filteredPool[showcaseIndex];
+                activeSlotsData[i] = sortedShowcaseList[showcaseIndex];
                 updateSlotDOM(i, activeSlotsData[i]);
-                showcaseIndex = (showcaseIndex + 1) % filteredPool.length;
+                showcaseIndex = (showcaseIndex + 1) % sortedShowcaseList.length;
             }
 
+            // 3. 開啟定時傳送帶滾動
             if (showcaseTimer) clearInterval(showcaseTimer);
             showcaseTimer = setInterval(() => {
                 if (isRolling) return;
 
-                // 概念圖流動方向：由右向左滑動
-                // 把最左邊(Slot 0)拿掉，大家往前移，最右邊補新卡
-                const nextCard = filteredPool[showcaseIndex];
-                showcaseIndex = (showcaseIndex + 1) % filteredPool.length;
+                // 獲取下一張即將從右側滑入排隊的卡片
+                const nextCard = sortedShowcaseList[showcaseIndex];
+                showcaseIndex = (showcaseIndex + 1) % sortedShowcaseList.length;
 
-                // 執行轉動動畫特效
+                // 觸發向左移動的傳送帶動畫
                 animateSlotsFlow(nextCard);
             }, 1600);
         }
@@ -825,27 +801,27 @@ let currentPool = [];
             `;
         }
 
+        // 核心滾動動畫：向左遞補，右側補新
         function animateSlotsFlow(nextCard) {
             const wall = document.getElementById('showcase-wall');
             
-            // 1. 抓取目前所有的槽
             const s0 = document.getElementById('slot-0');
             const s1 = document.getElementById('slot-1');
             const s2 = document.getElementById('slot-2');
             const s3 = document.getElementById('slot-3');
             const s4 = document.getElementById('slot-4');
 
-            // 2. 最左邊的 Slot0 完美淡出並移除
+            // 最左邊淡出移除
             s0.style.opacity = "0";
             s0.style.transform = "translateX(-220px) scale(0.5)";
 
-            // 3. 剩餘的順暢向左遞補位置類別 (對應手繪圖由右向左箭頭)
+            // 剩餘順暢左移一格
             s1.className = "stage-slot pos-0"; s1.id = "slot-0";
             s2.className = "stage-slot pos-1"; s2.id = "slot-1";
-            s3.className = "stage-slot pos-2"; s3.id = "slot-2"; // 變為正中央最大
+            s3.className = "stage-slot pos-2"; s3.id = "slot-2"; // 晉升正中央焦點放大
             s4.className = "stage-slot pos-3"; s4.id = "slot-3";
 
-            // 4. 動態在最右邊生成全新的 Slot 4 (由右側小且淡地加入)
+            // 右側外生成全新 Slot4 滑入進場
             const newSlot = document.createElement('div');
             newSlot.className = "stage-slot pos-4";
             newSlot.id = "slot-4";
@@ -858,13 +834,11 @@ let currentPool = [];
             `;
             wall.appendChild(newSlot);
 
-            // 稍微延遲讓瀏覽器渲染動畫
             setTimeout(() => {
                 newSlot.style.opacity = "0.35";
                 newSlot.style.transform = "translateX(160px) scale(0.75)";
             }, 20);
 
-            // 5. 異步清理掉舊的 s0
             setTimeout(() => { s0.remove(); }, 600);
         }
 
@@ -941,8 +915,7 @@ let currentPool = [];
             const code = document.getElementById('user-code').value.trim();
 
             if (!validCodes.includes(code)) {
-                alert("❌ 無效的代碼，請重新確認！");
-                return;
+                alert("❌ 無效的代碼，請重新確認！"); return;
             }
             const firstLetter = code.charAt(0).toUpperCase();
             if (drawCount === 1 && firstLetter !== 'S') {
@@ -1032,11 +1005,7 @@ let currentPool = [];
                         
                         if (drawCount === 1) {
                             let result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
-                            
-                            // 【功能實現】如果是最後一抽，直接把結果改為 Last賞
-                            if(isLastDrawTriggered) {
-                                result = cardConfig.find(c => c.grade === "Last");
-                            }
+                            if(isLastDrawTriggered) { result = cardConfig.find(c => c.grade === "Last"); }
 
                             img.src = result.url;
                             singleResultBox.style.display = "block"; 
@@ -1047,15 +1016,13 @@ let currentPool = [];
                         } else {
                             multiContainer.style.display = "flex";
                             
-                            // 正常的卡片先依序推入展示
                             window.lastDrawResults.forEach((id, index) => {
                                 let result = cardConfig.find(c => c.id === id);
-                                appendMiniCard(result, index, index * 150); // 增加精緻的依序動態排開效果
+                                appendMiniCard(result, index, index * 150);
                                 saveLocalRecord(`[十連抽-${index+1}] ${result.name}`);
                                 sendToGoogleForm(`${name}(十連抽-${index+1})`, code, result.name);
                             });
 
-                            // 【功能實現】如果是最後一抽，等前面10張卡出完後，Last賞才做為壓軸最後一個驚喜登場
                             if(isLastDrawTriggered) {
                                 const lastAward = cardConfig.find(c => c.grade === "Last");
                                 setTimeout(() => {
@@ -1069,15 +1036,16 @@ let currentPool = [];
                         
                         isRolling = false;
                         checkStatus();
+                        initShowcaseStage(); // 重啟並刷新跑馬燈
                     }, 2800); 
                 } else {
                     cancelAnimationFrame(animationFrameId); rotateStage.style.display = "none"; showcaseWall.style.display = "flex";
                     alert("抽獎失敗，請再試一次"); isRolling = false; checkStatus();
+                    initShowcaseStage();
                 }
             });
         }
 
-        // 輔助函式：用來處理十連抽多張與Last賞最後吐出的特效
         function appendMiniCard(card, displayIndex, delay) {
             const multiContainer = document.getElementById('multi-result-container');
             const textStyle = getGradeStyle(card.grade);
