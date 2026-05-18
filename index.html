@@ -6,15 +6,10 @@
     <title>時代少年團一番賞</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;800;900&display=swap" rel="stylesheet">
-    
     <style>
         body { 
-            /* 【修改】全套換上可愛圓體字型 */
-            font-family: 'Noto Sans TC', -apple-system, sans-serif; 
+            font-family: -apple-system, "Helvetica Neue", sans-serif; 
+            /* 【全新修改】背景不使用沉重的黑色，換上夢幻可愛的藍粉漸層 */
             background: linear-gradient(135deg, #e6f2ff 0%, #cce3ff 100%); 
             color: #333; 
             text-align: center; 
@@ -22,7 +17,7 @@
             padding: 20px; 
             min-height: 100vh;
         }
-        .container { max-width: 450px; margin: auto; }
+        .container { max-width: 400px; margin: auto; }
         
         .pool-card { 
             background: rgba(255, 255, 255, 0.4); 
@@ -34,7 +29,7 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
         }
-        .total-rem { font-size: 32px; font-weight: 900; color: #ff4757; }
+        .total-rem { font-size: 32px; font-weight: bold; color: #ff4757; }
         
         /* 3D 圓環旋轉舞台 */
         .rotate-stage-container {
@@ -90,7 +85,7 @@
             position: relative;
         }
 
-        /* 【修改】展示卡片底座換回高質感透明玻璃風 */
+        /* 【修改】展示卡片底座換成高質感透明玻璃風 */
         .showcase-item {
             flex: 0 0 76px; 
             background: rgba(255, 255, 255, 0.45); 
@@ -113,11 +108,14 @@
         }
         .showcase-item .card-label {
             font-size: 11px;
-            margin-top: 5px;
-            font-weight: 800;
+            margin-top: 4px;
+            font-weight: bold;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            /* F賞預設白色，加點淡淡陰影確保在透明底座看得清 */
+            color: #fff; 
+            text-shadow: 0 1px 3px rgba(0,0,0,0.6); 
         }
 
         @keyframes slideInLeft {
@@ -130,7 +128,7 @@
             margin-left: -82px; 
         }
 
-        /* 【修改】開獎單抽框換回全透明粉嫩玻璃風 */
+        /* 【修改】開獎單抽框也換成全透明粉嫩玻璃風 */
         .result-single-box {
             display: none;
             width: 180px;
@@ -152,7 +150,7 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* 【修改】十連抽小卡底座也換回透明玻璃風 */
+        /* 【修改】十連抽小卡底座也換成透明玻璃風 */
         .mini-card-box {
             width: 18%;
             text-align: center;
@@ -169,14 +167,12 @@
             width: 100%; padding: 12px; border-radius: 12px; 
             border: 1px solid rgba(255, 255, 255, 0.6); 
             background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px);
-            color: #333; box-sizing: border-box; font-size: 16px; margin-bottom: 10px;
-            font-family: 'Noto Sans TC', sans-serif;
-            font-weight: 500;
+            color: #333; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; 
         }
         input::placeholder { color: #777; }
         
         .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        .btn { flex: 1; background: #ff4757; color: white; border: none; padding: 16px 10px; font-size: 16px; font-weight: 800; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 0 #cc3a47; transition: 0.1s; font-family: 'Noto Sans TC', sans-serif; }
+        .btn { flex: 1; background: #ff4757; color: white; border: none; padding: 16px 10px; font-size: 16px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 0 #cc3a47; transition: 0.1s; }
         .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #cc3a47; }
         .btn:disabled { background: rgba(0,0,0,0.1); color: #999; box-shadow: none; cursor: not-allowed; transform: none !important; border: 1px solid rgba(0,0,0,0.05); }
         #draw-btn-10 { background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%); box-shadow: 0 4px 0 #cc3a47; }
@@ -201,9 +197,9 @@
     <div id="loading">📡 正在連線雲端獎池...</div>
 
     <div class="container">
-        <h2 style="color: #1a3a60; font-weight: 900;">時代少年團一番賞</h2>
+        <h2 style="color: #1a3a60; font-weight: 800;">時代少年團一番賞</h2>
         <div class="pool-card">
-            <div style="font-size: 14px; color: #666; font-weight: 800;">目前獎箱剩餘</div>
+            <div style="font-size: 14px; color: #666; font-weight: 500;">目前獎箱剩餘</div>
             <div class="total-rem" id="total-count">--</div>
         </div>
         <div class="input-group">
@@ -211,7 +207,7 @@
             <input type="text" id="user-code" placeholder="請輸入抽獎代碼..." oninput="checkStatus()">
         </div>
         
-        <div style="text-align: left; font-size: 13px; color: #1a3a60; font-weight: 900; padding-left: 5px;">🃏 本期賞品展示 (賞品專屬文字顏色登場)</div>
+        <div style="text-align: left; font-size: 13px; color: #1a3a60; font-weight: bold; padding-left: 5px;">🃏 本期賞品展示 (最高S賞依序由右向左登場)</div>
         <div class="showcase-stage" id="showcase-wall"></div>
         
         <div class="rotate-stage-container" id="rotate-stage">
@@ -224,7 +220,7 @@
         
         <div id="multi-result-container"></div>
 
-        <div id="card-name" style="margin-bottom:15px; font-weight:900; height:1.2em; font-size: 22px;"></div>
+        <div id="card-name" style="margin-bottom:15px; font-weight:bold; height:1.2em; color: #ff4757; font-size: 20px;"></div>
         
         <div class="btn-group">
             <button id="draw-btn-10" class="btn" onclick="draw(10)" disabled>十連抽</button>
@@ -232,8 +228,8 @@
         </div>
 
         <div class="history-section">
-            <h4 style="margin: 0 0 10px 0; color: #1a3a60; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px; font-weight:900;">📜 我的抽獎紀錄</h4>
-            <div id="my-history" style="max-height: 200px; overflow-y: auto; color: #555; font-weight:500;">尚未有紀錄</div>
+            <h4 style="margin: 0 0 10px 0; color: #1a3a60; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px;">📜 我的抽獎紀錄</h4>
+            <div id="my-history" style="max-height: 200px; overflow-y: auto; color: #555;">尚未有紀錄</div>
         </div>
     </div>
 
@@ -728,50 +724,6 @@ let currentPool = [];
         let activeDisplayedCards = []; 
         let showcaseTimer = null;
 
-        // 【修改邏輯】依據賞品等級，回傳指定的專屬顏色與超可愛陰影
-        function getGradeStyle(grade) {
-            const upperGrade = grade.toUpperCase();
-            let color = "#ffffff";
-            let shadow = "0 2px 4px rgba(0,0,0,0.15)"; /* 基礎柔和陰影 */
-            
-            switch(upperGrade) {
-                case "S":
-                    color = "#ff4757"; // 紅色
-                    shadow = "0 2px 5px rgba(255, 71, 87, 0.3)";
-                    break;
-                case "A":
-                    color = "#a55eea"; // 紫色
-                    shadow = "0 2px 5px rgba(165, 94, 234, 0.3)";
-                    break;
-                case "B":
-                    color = "#ff9f43"; // 黃色（微調成更清晰的橘黃，避免太淡看不清）
-                    shadow = "0 1px 4px rgba(0,0,0,0.2)";
-                    break;
-                case "C":
-                    color = "#2e86de"; // 藍色
-                    shadow = "0 2px 5px rgba(46, 134, 222, 0.3)";
-                    break;
-                case "D":
-                    color = "#2ed573"; // 綠色
-                    shadow = "0 2px 5px rgba(46, 213, 115, 0.3)";
-                    break;
-                case "E":
-                    color = "#747d8c"; // 灰色
-                    break;
-                case "F":
-                    color = "#ffffff"; // 白色
-                    shadow = "0 2px 4px rgba(0,0,0,0.6), 0 0 2px rgba(0,0,0,0.8)"; // 幫白字加一圈軟萌黑邊，確保在透明底座看得超清楚！
-                    break;
-                case "LAST":
-                    color = "#ff7675"; // 粉紅色
-                    shadow = "0 2px 6px rgba(255, 118, 117, 0.4)";
-                    break;
-                default:
-                    color = "#ffffff";
-            }
-            return `color: ${color}; text-shadow: ${shadow};`;
-        }
-
         // 圖鑑跑馬燈流動
         function startShowcaseSequence() {
             if (showcaseTimer) clearInterval(showcaseTimer);
@@ -779,7 +731,7 @@ let currentPool = [];
             wall.innerHTML = "";
             activeDisplayedCards = [];
 
-            const gradeWeight = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7, "LAST": 8 };
+            const gradeWeight = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
             const sortedConfig = [...cardConfig].sort((a, b) => (gradeWeight[a.grade.toUpperCase()] || 99) - (gradeWeight[b.grade.toUpperCase()] || 99));
 
             let currentIndex = 0;
@@ -787,13 +739,14 @@ let currentPool = [];
             function spawnNextCard() {
                 if (isRolling) return; 
                 const card = sortedConfig[currentIndex];
-                const textStyle = getGradeStyle(card.grade); 
                 
                 const cardDiv = document.createElement('div');
                 cardDiv.className = 'showcase-item';
                 cardDiv.innerHTML = `
                     <img src="${card.url}" alt="${card.name}">
-                    <div class="card-label" style="${textStyle}">[${card.grade}] ${card.name.split('-')[1] || card.name}</div>
+                    <div class="card-label">
+                        <span style="${card.grade === 'S' ? 'color:#ff4757; text-shadow:0 1px 3px rgba(0,0,0,0.3);' : ''}">[${card.grade}] ${card.name.split('-')[1] || card.name}</span>
+                    </div>
                 `;
                 
                 wall.appendChild(cardDiv);
@@ -812,6 +765,7 @@ let currentPool = [];
             showcaseTimer = setInterval(spawnNextCard, 1500);
         }
 
+        // 建立旋轉圓環內部的卡片
         function buildRotationCircle() {
             const vault = document.getElementById('carousel-vault');
             vault.innerHTML = "";
@@ -848,11 +802,7 @@ let currentPool = [];
 
         function initPool() {
             let p = [];
-            cardConfig.forEach(c => { 
-                if(c.grade !== "Last") { 
-                    for(let i=0; i<c.count; i++) p.push(c.id); 
-                }
-            });
+            cardConfig.forEach(c => { for(let i=0; i<c.count; i++) p.push(c.id); });
             db.ref('pool').set(p);
         }
 
@@ -878,6 +828,7 @@ let currentPool = [];
             }
         }
 
+        // 圓環物理引擎
         let animationFrameId;
         let currentAngle = 0;
         let currentSpeed = 2; 
@@ -923,6 +874,9 @@ let currentPool = [];
             const showcaseWall = document.getElementById('showcase-wall');
 
             showcaseWall.style.display = "none";
+            // 重設字體顏色為F賞預設（白色陰影），避免單抽中F時顏色錯誤
+            nameDisplay.style.color = "#fff";
+            nameDisplay.style.textShadow = "0 1px 3px rgba(0,0,0,0.6)";
             nameDisplay.innerText = "";
             multiContainer.innerHTML = "";
             multiContainer.style.display = "none";
@@ -945,8 +899,6 @@ let currentPool = [];
                 checkStatus();
                 return;
             }
-
-            let isLastDrawTriggered = (currentPool.length === drawCount);
 
             db.ref('pool').transaction((p) => {
                 if (p && p.length >= drawCount) {
@@ -1001,33 +953,34 @@ let currentPool = [];
                         showcaseWall.style.display = "flex";    
                         
                         if (drawCount === 1) {
-                            let result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
-                            if(isLastDrawTriggered) {
-                                result = cardConfig.find(c => c.grade === "Last") || result;
-                            }
-
+                            const result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
                             img.src = result.url;
                             singleResultBox.style.display = "block"; 
-                            
-                            // 注入專屬顏色與超可愛圓體字
-                            nameDisplay.innerHTML = `<span style="${getGradeStyle(result.grade)}">${result.name}</span>`;
+                            nameDisplay.innerText = result.name;
+
+                            // 【全新修改】如果是S賞，將開獎文字設為紅色，否則設回白色陰影
+                            if(result.grade === 'S') {
+                                nameDisplay.style.color = "#ff4757";
+                                nameDisplay.style.textShadow = "0 1px 3px rgba(0,0,0,0.3)";
+                            } else {
+                                nameDisplay.style.color = "#fff";
+                                nameDisplay.style.textShadow = "0 1px 3px rgba(0,0,0,0.6)";
+                            }
 
                             saveLocalRecord(result.name);
                             sendToGoogleForm(name, code, result.name);
                         } else {
                             multiContainer.style.display = "flex";
                             window.lastDrawResults.forEach((id, index) => {
-                                let result = cardConfig.find(c => c.id === id);
-                                if(isLastDrawTriggered && index === (drawCount - 1)) {
-                                    result = cardConfig.find(c => c.grade === "Last") || result;
-                                }
-
-                                const textStyle = getGradeStyle(result.grade);
+                                const result = cardConfig.find(c => c.id === id);
                                 const cardDiv = document.createElement('div');
                                 cardDiv.className = 'mini-card-box';
                                 cardDiv.innerHTML = `
                                     <img src="${result.url}" style="width: 100%; border-radius: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
-                                    <div style="font-size: 11px; margin-top: 5px; font-weight:800; ${textStyle}">#${index+1}<br><span>${result.name.split('-')[0]}</span></div>
+                                    <div style="font-size: 10px; margin-top: 5px; 
+                                        ${result.grade === 'S' ? 'color:#ff4757; text-shadow:0 1px 3px rgba(0,0,0,0.3);' : 'color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.6);'}">
+                                        #${index+1}<br><span>${result.name.split('-')[0]}</span>
+                                    </div>
                                 `;
                                 multiContainer.appendChild(cardDiv);
                                 saveLocalRecord(`[十連抽-${index+1}] ${result.name}`);
@@ -1066,7 +1019,7 @@ let currentPool = [];
                 container.innerHTML = "尚未有紀錄";
                 return;
             }
-            container.innerHTML = history.map(h => `<div class="history-item" style="font-weight: 500;">🕒 ${h.time ? h.time : ''} - ${h.name}</div>`).join('');
+            container.innerHTML = history.map(h => `<div class="history-item">🕒 ${h.time ? h.time : ''} - ${h.name}</div>`).join('');
         }
 
         function sendToGoogleForm(name, code, card) {
