@@ -35,13 +35,13 @@
         }
         .total-rem { font-size: 32px; font-weight: 900; color: #ff4757; }
         
-        /* 抽獎時的 3D 圓環旋轉舞台 */
+        /* 3D 圓環旋轉舞台 */
         .rotate-stage-container {
             display: none; 
             width: 100%;
             height: 260px;
             margin: 20px 0;
-            perspective: 1000px; 
+            perspective: 800px; 
             position: relative;
             overflow: hidden;
         }
@@ -50,7 +50,7 @@
             width: 76px;
             height: 115px;
             position: absolute;
-            top: 20%;
+            top: 25%;
             left: 50%;
             margin-left: -38px;
             transform-style: preserve-3d;
@@ -77,60 +77,42 @@
             border-radius: 6px;
         }
 
-        /* 【全新手機優化】獎池展示立體旋轉舞台（解決手機重定向問題） */
+        /* 五星立體動態傳送舞台 */
         .showcase-stage {
             display: flex;
             justify-content: center; 
             align-items: center;
-            height: 220px;
+            height: 190px;
             margin: 15px 0;
-            perspective: 1000px; /* 給予大透視感 */
             position: relative;
             overflow: hidden;
             width: 100%;
         }
 
-        /* 旋轉軌道心臟：利用 CSS 3D 屬性，完全交給手機硬體加速，絕對不卡死 */
-        .showcase-carousel {
-            width: 85px;
-            height: 125px;
+        .stage-slot {
             position: absolute;
-            top: 15%;
-            transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            will-change: transform;
-            transform: rotateX(-4deg) rotateY(0deg);
-        }
-
-        /* 卡片本體：利用動態計算的 angle 繞成完美的圓圈 */
-        .showcase-item {
-            position: absolute;
-            width: 85px;
-            height: 125px;
-            left: 0;
-            top: 0;
-            background: rgba(255, 255, 255, 0.5); 
+            width: 78px;
+            background: rgba(255, 255, 255, 0.45); 
             border: 1px solid rgba(255, 255, 255, 0.6);
             padding: 4px;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             box-sizing: border-box;
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
             display: flex;
             flex-direction: column;
             align-items: center;
-            backface-visibility: hidden; /* 轉到背面的卡片自動隱藏，畫面最乾淨 */
-            transition: opacity 0.6s, filter 0.6s;
         }
-        .showcase-item img {
+        .stage-slot img {
             width: 100%;
-            height: 95px;
+            height: 115px;
             object-fit: cover;
             border-radius: 6px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
-        .showcase-item .card-label {
-            font-size: 10px;
-            margin-top: 4px;
+        .stage-slot .card-label {
+            font-size: 11px;
+            margin-top: 5px;
             font-weight: 800;
             white-space: nowrap;
             overflow: hidden;
@@ -138,6 +120,13 @@
             width: 100%;
             text-align: center;
         }
+
+        /* 立體傳送帶：中間大、兩側小且淡 */
+        .pos-0 { transform: translateX(-160px) scale(0.75); opacity: 0.35; z-index: 1; }
+        .pos-1 { transform: translateX(-80px) scale(0.88); opacity: 0.7; z-index: 2; }
+        .pos-2 { transform: translateX(0px) scale(1.1); opacity: 1; z-index: 3; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1.5px solid rgba(255,255,255,0.8); }
+        .pos-3 { transform: translateX(80px) scale(0.88); opacity: 0.7; z-index: 2; }
+        .pos-4 { transform: translateX(160px) scale(0.75); opacity: 0.35; z-index: 1; }
 
         /* 單抽結果框 */
         .result-single-box {
@@ -230,7 +219,11 @@
         <div style="text-align: left; font-size: 13px; color: #1a3a60; font-weight: 900; padding-left: 5px;">🃏 獎池展示</div>
         
         <div class="showcase-stage" id="showcase-wall">
-            <div class="showcase-carousel" id="showcase-ring"></div>
+            <div class="stage-slot pos-0" id="slot-0"></div>
+            <div class="stage-slot pos-1" id="slot-1"></div>
+            <div class="stage-slot pos-2" id="slot-2"></div>
+            <div class="stage-slot pos-3" id="slot-3"></div>
+            <div class="stage-slot pos-4" id="slot-4"></div>
         </div>
         
         <div class="rotate-stage-container" id="rotate-stage">
@@ -744,11 +737,12 @@
         ];
 let currentPool = [];
         let isRolling = false;
-        let ringTimer = null;
-        let ringAngleStep = 0;   
-        let currentRingIndex = 0; 
-        let cleanShowcaseList = []; 
+        let showcaseTimer = null;
+        let showcaseIndex = 0;
+        let activeSlotsData = [null, null, null, null, null]; 
+        let sortedShowcaseList = []; // 用來存儲嚴格排序後的展示數組
 
+        // 依據規定獲取字體顏色樣式：S紅、A紫、B黃、C藍、D綠、E灰、F白、Last粉
         function getGradeStyle(grade) {
             const upperGrade = grade.toUpperCase();
             let color = "#ffffff";
@@ -767,85 +761,85 @@ let currentPool = [];
             return `color: ${color}; text-shadow: ${shadow};`;
         }
 
-        // 【大改寫】利用手繪圖1的圓環理論，做高階手機優化的 3D 獎池展示
+        // 【全新修正】重構展示邏輯：確保 S 賞排第一個帶頭往前衝
         function initShowcaseStage() {
-            const ring = document.getElementById('showcase-ring');
-            ring.innerHTML = "";
-
-            // 1. 嚴格按照 S -> A -> B... -> F 排序
+            // 1. 排除 Last 賞，並按照 S -> A -> B -> C -> D -> E -> F 的等級權重嚴格升序排列
             const gradeOrder = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
-            cleanShowcaseList = [...cardConfig]
+            sortedShowcaseList = [...cardConfig]
                 .filter(c => c.grade !== "Last")
                 .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 99) - (gradeOrder[b.grade.toUpperCase()] || 99));
             
-            const totalCards = cleanShowcaseList.length;
-            ringAngleStep = 360 / totalCards; // 每張卡片分配的扇形角度
-            
-            // 2. 動態計算最佳半徑 (Radius)，確保手機畫面上，左右兩側的卡片完美呈現「中大、邊小、微淡」
-            const radius = Math.max(140, totalCards * 13); 
+            showcaseIndex = 0;
 
-            // 3. 生成 3D 圓環卡片牆
-            cleanShowcaseList.forEach((card, idx) => {
-                const item = document.createElement('div');
-                item.className = 'showcase-item';
-                item.id = `ring-item-${idx}`;
-                
-                // 讓第 0 個 (S賞) 角度為 0 正對觀眾
-                const cardAngle = idx * ringAngleStep;
-                item.style.transform = `rotateY(${cardAngle}deg) translateZ(${radius}px)`;
+            // 2. 初始化填滿 5 個 Slot 
+            for(let i=0; i<5; i++) {
+                activeSlotsData[i] = sortedShowcaseList[showcaseIndex];
+                updateSlotDOM(i, activeSlotsData[i]);
+                showcaseIndex = (showcaseIndex + 1) % sortedShowcaseList.length;
+            }
 
-                item.innerHTML = `
-                    <img src="${card.url}" alt="${card.name}">
-                    <div class="card-label" style="${getGradeStyle(card.grade)}">[${card.grade}] ${card.name.split('-')[1] || card.name}</div>
-                `;
-                ring.appendChild(item);
-            });
-
-            currentRingIndex = 0;
-            updateRingItemsVisual();
-
-            // 4. 定時旋轉圓環：一個接一個，順序無限向前走
-            if (ringTimer) clearInterval(ringTimer);
-            ringTimer = setInterval(() => {
+            // 3. 開啟定時傳送帶滾動
+            if (showcaseTimer) clearInterval(showcaseTimer);
+            showcaseTimer = setInterval(() => {
                 if (isRolling) return;
 
-                currentRingIndex++;
-                const targetRotation = -currentRingIndex * ringAngleStep;
-                ring.style.transform = `rotateX(-4deg) rotateY(${targetRotation}deg)`;
+                // 獲取下一張即將從右側滑入排隊的卡片
+                const nextCard = sortedShowcaseList[showcaseIndex];
+                showcaseIndex = (showcaseIndex + 1) % sortedShowcaseList.length;
 
-                updateRingItemsVisual();
-            }, 1800);
+                // 觸發向左移動的傳送帶動畫
+                animateSlotsFlow(nextCard);
+            }, 1600);
         }
 
-        // 動態計算哪些卡片現在靠近前方，給予大、亮、完整的透明度，遠處的卡片直接淡化
-        function updateRingItemsVisual() {
-            const total = cleanShowcaseList.length;
-            const activeIdx = currentRingIndex % total;
+        function updateSlotDOM(slotId, card) {
+            const slot = document.getElementById(`slot-${slotId}`);
+            if(!card) return;
+            slot.innerHTML = `
+                <img src="${card.url}" alt="${card.name}">
+                <div class="card-label" style="${getGradeStyle(card.grade)}">[${card.grade}] ${card.name.split('-')[1] || card.name}</div>
+            `;
+        }
 
-            cleanShowcaseList.forEach((_, idx) => {
-                const item = document.getElementById(`ring-item-${idx}`);
-                if (!item) return;
+        // 核心滾動動畫：向左遞補，右側補新
+        function animateSlotsFlow(nextCard) {
+            const wall = document.getElementById('showcase-wall');
+            
+            const s0 = document.getElementById('slot-0');
+            const s1 = document.getElementById('slot-1');
+            const s2 = document.getElementById('slot-2');
+            const s3 = document.getElementById('slot-3');
+            const s4 = document.getElementById('slot-4');
 
-                // 計算每張卡片目前與正中央焦點的相對弧度距離
-                let diff = Math.abs(idx - activeIdx);
-                if (diff > total / 2) diff = total - diff;
+            // 最左邊淡出移除
+            s0.style.opacity = "0";
+            s0.style.transform = "translateX(-220px) scale(0.5)";
 
-                if (diff === 0) {
-                    item.style.opacity = "1";
-                    item.style.filter = "blur(0px)";
-                    item.style.border = "1.5px solid rgba(255,255,255,0.85)";
-                    item.style.boxShadow = "0 8px 25px rgba(0,0,0,0.15)";
-                } else if (diff === 1) {
-                    item.style.opacity = "0.75";
-                    item.style.filter = "blur(0.4px)";
-                    item.style.border = "1px solid rgba(255,255,255,0.4)";
-                } else if (diff === 2) {
-                    item.style.opacity = "0.25";
-                    item.style.filter = "blur(1px)";
-                } else {
-                    item.style.opacity = "0"; // 後半圈的卡片徹底隱藏，不吃手機記憶體
-                }
-            });
+            // 剩餘順暢左移一格
+            s1.className = "stage-slot pos-0"; s1.id = "slot-0";
+            s2.className = "stage-slot pos-1"; s2.id = "slot-1";
+            s3.className = "stage-slot pos-2"; s3.id = "slot-2"; // 晉升正中央焦點放大
+            s4.className = "stage-slot pos-3"; s4.id = "slot-3";
+
+            // 右側外生成全新 Slot4 滑入進場
+            const newSlot = document.createElement('div');
+            newSlot.className = "stage-slot pos-4";
+            newSlot.id = "slot-4";
+            newSlot.style.opacity = "0";
+            newSlot.style.transform = "translateX(220px) scale(0.5)";
+            
+            newSlot.innerHTML = `
+                <img src="${nextCard.url}">
+                <div class="card-label" style="${getGradeStyle(nextCard.grade)}">[${nextCard.grade}] ${nextCard.name.split('-')[1] || nextCard.name}</div>
+            `;
+            wall.appendChild(newSlot);
+
+            setTimeout(() => {
+                newSlot.style.opacity = "0.35";
+                newSlot.style.transform = "translateX(160px) scale(0.75)";
+            }, 20);
+
+            setTimeout(() => { s0.remove(); }, 600);
         }
 
         function buildRotationCircle() {
@@ -1042,7 +1036,7 @@ let currentPool = [];
                         
                         isRolling = false;
                         checkStatus();
-                        initShowcaseStage(); // 重新啟動跑馬燈旋轉舞台
+                        initShowcaseStage(); // 重啟並刷新跑馬燈
                     }, 2800); 
                 } else {
                     cancelAnimationFrame(animationFrameId); rotateStage.style.display = "none"; showcaseWall.style.display = "flex";
@@ -1090,7 +1084,7 @@ let currentPool = [];
             new Image().src = url;
         }
 
-        // 初始化跑馬燈展示
+        // 初始化跑馬燈
         setTimeout(initShowcaseStage, 500);
         renderHistory();
     </script>
