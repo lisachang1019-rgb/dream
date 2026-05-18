@@ -24,7 +24,7 @@
         }
         .container { max-width: 450px; margin: auto; padding-right: 15px; }
         
-        /* 右側固定雙標籤頁面（完美還原手寫手稿） */
+        /* 右側固定雙標籤頁面 */
         .side-tabs {
             position: fixed;
             top: 40px;
@@ -123,7 +123,7 @@
         }
         .total-rem { font-size: 32px; font-weight: 900; color: #ff4757; }
         
-        /* 3D 圓環旋轉舞台 (抽獎時才啟動，安全) */
+        /* 3D 圓環旋轉舞台 */
         .rotate-stage-container {
             display: none; 
             width: 100%;
@@ -147,35 +147,25 @@
         }
         .carousel-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
 
-        /* 🔥 全新安全版展示牆：改為超流暢的原生橫向滑動排版，100% 拒絕當機 */
+        /* ✨ 完美還原：精緻 3D 聚焦展示牆（改為動態 5 節點輕量化運算，iOS 絕對不當機） */
         .showcase-stage {
-            display: flex;
-            gap: 12px;
-            padding: 15px 5px;
-            margin: 10px 0 20px 0;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch; /* 讓 iOS 滑動有高級阻尼感 */
-            scroll-behavior: smooth;
+            display: flex; justify-content: center; align-items: center;
+            height: 200px; margin: 15px 0; position: relative; overflow: hidden; width: 100%;
         }
-        /* 隱藏原生滾動條，維持排版乾淨 */
-        .showcase-stage::-webkit-scrollbar {
-            display: none;
+        .showcase-track {
+            display: flex; position: absolute; left: 50%;
+            transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            will-change: transform;
         }
         .track-item {
-            width: 85px;
-            background: rgba(255, 255, 255, 0.6); 
-            border: 1px solid rgba(255, 255, 255, 0.8); 
-            padding: 6px; 
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06); 
-            box-sizing: border-box;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            flex-shrink: 0;
+            width: 80px; margin: 0 8px; background: rgba(255, 255, 255, 0.5); 
+            border: 1px solid rgba(255, 255, 255, 0.6); padding: 4px; border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box;
+            display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
+            transition: transform 0.6s, opacity 0.6s; will-change: transform, opacity;
         }
-        .track-item img { width: 100%; height: 110px; object-fit: cover; border-radius: 8px; }
-        .track-item .card-label { font-size: 11px; margin-top: 6px; font-weight: 800; text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .track-item img { width: 100%; height: 115px; object-fit: cover; border-radius: 6px; }
+        .track-item .card-label { font-size: 10px; margin-top: 5px; font-weight: 800; text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         /* 單抽結果框 */
         .result-single-box {
@@ -271,9 +261,11 @@
             <input type="text" id="user-code" placeholder="請輸入抽獎代碼..." oninput="checkStatus()">
         </div>
         
-        <div style="text-align: left; font-size: 13px; color: #1a3a60; font-weight: 900; padding-left: 5px;">🃏 獎池展示 (左右滑動看全部)</div>
+        <div style="text-align: left; font-size: 13px; color: #1a3a60; font-weight: 900; padding-left: 5px;">🃏 獎池展示</div>
         
-        <div class="showcase-stage" id="showcase-wall"></div>
+        <div class="showcase-stage" id="showcase-wall">
+            <div class="showcase-track" id="main-track"></div>
+        </div>
         
         <div class="rotate-stage-container" id="rotate-stage">
             <div class="circle-carousel" id="carousel-vault"></div>
@@ -780,9 +772,13 @@
         ];
 let currentPool = [];
         let isRolling = false;
-        let showcaseAutoScroll = null;
+        let showcaseTimer = null;
+        
+        // 🔮 輕量化動態滾動核心變數
+        let sortedCards = [];
+        let virtualIndex = 0; 
+        const VISIBLE_COUNT = 5; 
 
-        /* 彈出視窗控制 */
         function openModal(id) {
             document.getElementById(id).style.display = 'flex';
         }
@@ -794,52 +790,100 @@ let currentPool = [];
 
         function getGradeStyle(grade) {
             const upperGrade = grade.toUpperCase();
-            let color = "#333";
-            let shadow = "none";
+            let color = "#ffffff";
+            let shadow = "0 2px 4px rgba(0,0,0,0.3)";
             
             switch(upperGrade) {
-                case "S": color = "#ff4757"; shadow = "0 0 4px rgba(255, 71, 87, 0.4)"; break;
-                case "A": color = "#a55eea"; shadow = "0 0 4px rgba(165, 94, 234, 0.4)"; break;
-                case "B": color = "#ffa502"; break;
-                case "C": color = "#2e86de"; break;
-                case "D": color = "#2ed573"; break;
-                case "E": color = "#747d8c"; break;
-                case "F": color = "#555555"; break;
-                case "LAST": color = "#ff7675"; shadow = "0 0 6px rgba(255, 118, 117, 0.5)"; break;
+                case "S": color = "#ff4757"; shadow = "0 0 6px rgba(255, 71, 87, 0.6)"; break;
+                case "A": color = "#a55eea"; shadow = "0 0 6px rgba(165, 94, 234, 0.6)"; break;
+                case "B": color = "#ffa502"; shadow = "0 1px 3px rgba(0,0,0,0.5)"; break;
+                case "C": color = "#2e86de"; shadow = "0 0 6px rgba(46, 134, 222, 0.6)"; break;
+                case "D": color = "#2ed573"; shadow = "0 0 6px rgba(46, 213, 115, 0.6)"; break;
+                case "E": color = "#747d8c"; shadow = "0 1px 3px rgba(0,0,0,0.4)"; break;
+                case "F": color = "#ffffff"; shadow = "0 2px 4px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1)"; break;
+                case "LAST": color = "#ff7675"; shadow = "0 0 8px rgba(255, 118, 117, 0.7)"; break;
             }
             return `color: ${color}; text-shadow: ${shadow};`;
         }
 
-        /* 2D 超安全流暢型展示牆初始化 */
+        /* 🔮 超輕量化 3D 展示牆核心：DOM 上永遠只有 5 個卡片節點 */
         function initShowcaseStage() {
-            const wall = document.getElementById('showcase-wall');
-            wall.innerHTML = "";
+            const track = document.getElementById('main-track');
+            track.innerHTML = "";
 
             const gradeOrder = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
-            const basePool = [...cardConfig]
+            sortedCards = [...cardConfig]
                 .filter(c => c.grade !== "Last")
                 .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 99) - (gradeOrder[b.grade.toUpperCase()] || 99));
             
-            basePool.forEach((card) => {
+            virtualIndex = 0;
+
+            // 僅建立 5 個實體 DOM 卡片槽位，iOS 渲染零壓力
+            for (let i = 0; i < VISIBLE_COUNT; i++) {
                 const item = document.createElement('div');
                 item.className = 'track-item';
-                item.innerHTML = `
+                item.id = `track-node-${i}`;
+                track.appendChild(item);
+            }
+
+            renderDynamic3D();
+
+            if (showcaseTimer) clearInterval(showcaseTimer);
+            showcaseTimer = setInterval(() => {
+                if (isRolling) return;
+                
+                // 輕柔切換下一個索引
+                virtualIndex = (virtualIndex + 1) % sortedCards.length;
+                renderDynamic3D();
+            }, 2200);
+        }
+
+        // 動態計算圖片與 3D 聚焦特效
+        function renderDynamic3D() {
+            const track = document.getElementById('main-track');
+            const itemWidth = 96; 
+            // 永遠將虛擬中心錨定在中間的節點上
+            const centerNodeIdx = 2; 
+            const offset = -(centerNodeIdx * itemWidth) - 48;
+            track.style.transform = `translateX(${offset}px)`;
+
+            for (let i = 0; i < VISIBLE_COUNT; i++) {
+                const node = document.getElementById(`track-node-${i}`);
+                if (!node) continue;
+
+                // 計算當前節點對應於卡片數據庫中的哪一張
+                const distance = i - centerNodeIdx;
+                let cardDataIdx = (virtualIndex + distance) % sortedCards.length;
+                if (cardDataIdx < 0) cardDataIdx += sortedCards.length;
+
+                const card = sortedCards[cardDataIdx];
+
+                // 換圖與換標籤 (不重建DOM，只換內容)
+                node.innerHTML = `
                     <img src="${card.url}" alt="${card.name}">
                     <div class="card-label" style="${getGradeStyle(card.grade)}">[${card.grade}] ${card.name.split('-')[1] || card.name}</div>
                 `;
-                wall.appendChild(item);
-            });
 
-            // 啟動定時自動輕緩向右滑動效果（原生滾動，安全不喘氣）
-            if(showcaseAutoScroll) clearInterval(showcaseAutoScroll);
-            showcaseAutoScroll = setInterval(() => {
-                if (isRolling) return;
-                if (wall.scrollLeft >= (wall.scrollWidth - wall.clientWidth - 2)) {
-                    wall.scrollLeft = 0;
+                // 完美還原 3D 放大與兩側淡出聚焦效果
+                if (distance === 0) {
+                    node.style.transform = "scale(1.15) translateY(-6px)";
+                    node.style.opacity = "1";
+                    node.style.zIndex = "5";
+                    node.style.border = "1.5px solid rgba(255,255,255,0.85)";
+                    node.style.boxShadow = "0 10px 25px rgba(0,0,0,0.18)";
+                } else if (Math.abs(distance) === 1) {
+                    node.style.transform = "scale(0.85) translateY(0px)";
+                    node.style.opacity = "0.45";
+                    node.style.zIndex = "3";
+                    node.style.border = "1px solid rgba(255,255,255,0.4)";
+                    node.style.boxShadow = "0 4px 10px rgba(0,0,0,0.05)";
                 } else {
-                    wall.scrollLeft += 1;
+                    node.style.transform = "scale(0.65)";
+                    node.style.opacity = "0.12";
+                    node.style.zIndex = "1";
+                    node.style.border = "1px solid rgba(255,255,255,0.2)";
                 }
-            }, 30);
+            }
         }
 
         function buildRotationCircle() {
