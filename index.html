@@ -6,10 +6,14 @@
     <title>時代少年團一番賞</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;800;900&display=swap" rel="stylesheet">
+    
     <style>
         body { 
-            font-family: -apple-system, "Helvetica Neue", sans-serif; 
-            /* 【全新修改】背景不使用沉重的黑色，換上夢幻可愛的藍粉漸層 */
+            font-family: 'Noto Sans TC', -apple-system, sans-serif; 
             background: linear-gradient(135deg, #e6f2ff 0%, #cce3ff 100%); 
             color: #333; 
             text-align: center; 
@@ -17,7 +21,7 @@
             padding: 20px; 
             min-height: 100vh;
         }
-        .container { max-width: 400px; margin: auto; }
+        .container { max-width: 450px; margin: auto; }
         
         .pool-card { 
             background: rgba(255, 255, 255, 0.4); 
@@ -29,9 +33,9 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
         }
-        .total-rem { font-size: 32px; font-weight: bold; color: #ff4757; }
+        .total-rem { font-size: 32px; font-weight: 900; color: #ff4757; }
         
-        /* 3D 圓環旋轉舞台 */
+        /* 3D 圓環旋轉舞台 (對應概念圖一) */
         .rotate-stage-container {
             display: none; 
             width: 100%;
@@ -73,62 +77,64 @@
             border-radius: 6px;
         }
 
-        /* 常駐展示舞台 */
+        /* 【全新進階】五星立體動態傳送舞台 (對應概念圖二、三) */
         .showcase-stage {
             display: flex;
             justify-content: center; 
-            gap: 6px;
-            height: 175px;
-            margin: 20px 0;
-            padding: 10px 4px;
-            overflow: hidden; 
+            align-items: center;
+            height: 190px;
+            margin: 15px 0;
             position: relative;
+            overflow: hidden;
+            width: 100%;
         }
 
-        /* 【修改】展示卡片底座換成高質感透明玻璃風 */
-        .showcase-item {
-            flex: 0 0 76px; 
+        /* 五個固定身分的立體漂浮卡槽 */
+        .stage-slot {
+            position: absolute;
+            width: 78px;
             background: rgba(255, 255, 255, 0.45); 
             border: 1px solid rgba(255, 255, 255, 0.6);
             padding: 4px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             box-sizing: border-box;
-            opacity: 0;
-            transform: translateX(120px); 
-            animation: slideInLeft 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-            transition: all 0.5s ease;
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .showcase-item img {
+        .stage-slot img {
             width: 100%;
             height: 115px;
             object-fit: cover;
             border-radius: 6px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
-        .showcase-item .card-label {
+        .stage-slot .card-label {
             font-size: 11px;
-            margin-top: 4px;
-            font-weight: bold;
+            margin-top: 5px;
+            font-weight: 800;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            /* F賞預設白色，加點淡淡陰影確保在透明底座看得清 */
-            color: #fff; 
-            text-shadow: 0 1px 3px rgba(0,0,0,0.6); 
+            width: 100%;
+            text-align: center;
         }
 
-        @keyframes slideInLeft {
-            to { opacity: 1; transform: translateX(0); }
-        }
+        /* 依據你的概念草圖：兩側變小、變淡(透明度低)，中間最大、完整最亮 */
+        /* 位置 0：最左邊 (小、淡) */
+        .pos-0 { transform: translateX(-160px) scale(0.75); opacity: 0.35; z-index: 1; }
+        /* 位置 1：中左 (中、微淡) */
+        .pos-1 { transform: translateX(-80px) scale(0.88); opacity: 0.7; z-index: 2; }
+        /* 位置 2：正中間 (最大、完整清晰) */
+        .pos-2 { transform: translateX(0px) scale(1.1); opacity: 1; z-index: 3; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1.5px solid rgba(255,255,255,0.8); }
+        /* 位置 3：中右 (中、微淡) */
+        .pos-3 { transform: translateX(80px) scale(0.88); opacity: 0.7; z-index: 2; }
+        /* 位置 4：最右邊 (小、淡，準備登場) */
+        .pos-4 { transform: translateX(160px) scale(0.75); opacity: 0.35; z-index: 1; }
 
-        .fade-out-left {
-            opacity: 0 !important;
-            transform: translateX(-120px) scale(0.8) !important;
-            margin-left: -82px; 
-        }
-
-        /* 【修改】開獎單抽框也換成全透明粉嫩玻璃風 */
+        /* 單抽結果框 */
         .result-single-box {
             display: none;
             width: 180px;
@@ -150,7 +156,7 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* 【修改】十連抽小卡底座也換成透明玻璃風 */
+        /* 十連抽小卡底座也換回透明玻璃風 */
         .mini-card-box {
             width: 18%;
             text-align: center;
@@ -160,6 +166,13 @@
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             box-sizing: border-box;
+            opacity: 0;
+            transform: scale(0.6);
+            animation: miniPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+        }
+
+        @keyframes miniPop {
+            to { opacity: 1; transform: scale(1); }
         }
 
         .input-group { margin-bottom: 15px; }
@@ -167,12 +180,14 @@
             width: 100%; padding: 12px; border-radius: 12px; 
             border: 1px solid rgba(255, 255, 255, 0.6); 
             background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px);
-            color: #333; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; 
+            color: #333; box-sizing: border-box; font-size: 16px; margin-bottom: 10px;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 500;
         }
         input::placeholder { color: #777; }
         
         .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        .btn { flex: 1; background: #ff4757; color: white; border: none; padding: 16px 10px; font-size: 16px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 0 #cc3a47; transition: 0.1s; }
+        .btn { flex: 1; background: #ff4757; color: white; border: none; padding: 16px 10px; font-size: 16px; font-weight: 800; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 0 #cc3a47; transition: 0.1s; font-family: 'Noto Sans TC', sans-serif; }
         .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #cc3a47; }
         .btn:disabled { background: rgba(0,0,0,0.1); color: #999; box-shadow: none; cursor: not-allowed; transform: none !important; border: 1px solid rgba(0,0,0,0.05); }
         #draw-btn-10 { background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%); box-shadow: 0 4px 0 #cc3a47; }
@@ -197,9 +212,9 @@
     <div id="loading">📡 正在連線雲端獎池...</div>
 
     <div class="container">
-        <h2 style="color: #1a3a60; font-weight: 800;">時代少年團一番賞</h2>
+        <h2 style="color: #1a3a60; font-weight: 900;">時代少年團一番賞</h2>
         <div class="pool-card">
-            <div style="font-size: 14px; color: #666; font-weight: 500;">目前獎箱剩餘</div>
+            <div style="font-size: 14px; color: #666; font-weight: 800;">目前獎箱剩餘</div>
             <div class="total-rem" id="total-count">--</div>
         </div>
         <div class="input-group">
@@ -207,8 +222,15 @@
             <input type="text" id="user-code" placeholder="請輸入抽獎代碼..." oninput="checkStatus()">
         </div>
         
-        <div style="text-align: left; font-size: 13px; color: #1a3a60; font-weight: bold; padding-left: 5px;">🃏 本期賞品展示 (最高S賞依序由右向左登場)</div>
-        <div class="showcase-stage" id="showcase-wall"></div>
+        <div style="text-align: left; font-size: 13px; color: #1a3a60; font-weight: 900; padding-left: 5px;">🃏 獎池展示</div>
+        
+        <div class="showcase-stage" id="showcase-wall">
+            <div class="stage-slot pos-0" id="slot-0"></div>
+            <div class="stage-slot pos-1" id="slot-1"></div>
+            <div class="stage-slot pos-2" id="slot-2"></div>
+            <div class="stage-slot pos-3" id="slot-3"></div>
+            <div class="stage-slot pos-4" id="slot-4"></div>
+        </div>
         
         <div class="rotate-stage-container" id="rotate-stage">
             <div class="circle-carousel" id="carousel-vault"></div>
@@ -220,7 +242,7 @@
         
         <div id="multi-result-container"></div>
 
-        <div id="card-name" style="margin-bottom:15px; font-weight:bold; height:1.2em; color: #ff4757; font-size: 20px;"></div>
+        <div id="card-name" style="margin-bottom:15px; font-weight:900; height:1.2em; font-size: 22px;"></div>
         
         <div class="btn-group">
             <button id="draw-btn-10" class="btn" onclick="draw(10)" disabled>十連抽</button>
@@ -228,8 +250,8 @@
         </div>
 
         <div class="history-section">
-            <h4 style="margin: 0 0 10px 0; color: #1a3a60; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px;">📜 我的抽獎紀錄</h4>
-            <div id="my-history" style="max-height: 200px; overflow-y: auto; color: #555;">尚未有紀錄</div>
+            <h4 style="margin: 0 0 10px 0; color: #1a3a60; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px; font-weight:900;">📜 我的抽獎紀錄</h4>
+            <div id="my-history" style="max-height: 200px; overflow-y: auto; color: #555; font-weight:500;">尚未有紀錄</div>
         </div>
     </div>
 
@@ -721,72 +743,146 @@
         ];
 let currentPool = [];
         let isRolling = false;
-        let activeDisplayedCards = []; 
         let showcaseTimer = null;
+        let showcaseIndex = 0;
+        let activeSlotsData = [null, null, null, null, null]; // 追蹤五個Slot目前顯示的卡片
 
-        // 圖鑑跑馬燈流動
-        function startShowcaseSequence() {
-            if (showcaseTimer) clearInterval(showcaseTimer);
-            const wall = document.getElementById('showcase-wall');
-            wall.innerHTML = "";
-            activeDisplayedCards = [];
-
-            const gradeWeight = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
-            const sortedConfig = [...cardConfig].sort((a, b) => (gradeWeight[a.grade.toUpperCase()] || 99) - (gradeWeight[b.grade.toUpperCase()] || 99));
-
-            let currentIndex = 0;
-
-            function spawnNextCard() {
-                if (isRolling) return; 
-                const card = sortedConfig[currentIndex];
-                
-                const cardDiv = document.createElement('div');
-                cardDiv.className = 'showcase-item';
-                cardDiv.innerHTML = `
-                    <img src="${card.url}" alt="${card.name}">
-                    <div class="card-label">
-                        <span style="${card.grade === 'S' ? 'color:#ff4757; text-shadow:0 1px 3px rgba(0,0,0,0.3);' : ''}">[${card.grade}] ${card.name.split('-')[1] || card.name}</span>
-                    </div>
-                `;
-                
-                wall.appendChild(cardDiv);
-                activeDisplayedCards.push(cardDiv);
-
-                if (activeDisplayedCards.length > 5) {
-                    const firstCard = activeDisplayedCards.shift(); 
-                    firstCard.classList.add('fade-out-left');       
-                    setTimeout(() => { firstCard.remove(); }, 500);  
-                }
-
-                currentIndex = (currentIndex + 1) % sortedConfig.length;
+        // 【修改】嚴格分配所有等級對應色碼
+        function getGradeStyle(grade) {
+            const upperGrade = grade.toUpperCase();
+            let color = "#ffffff";
+            let shadow = "0 2px 4px rgba(0,0,0,0.3)";
+            
+            switch(upperGrade) {
+                case "S":
+                    color = "#ff4757"; // 紅色
+                    shadow = "0 0 6px rgba(255, 71, 87, 0.6)";
+                    break;
+                case "A":
+                    color = "#a55eea"; // 紫色
+                    shadow = "0 0 6px rgba(165, 94, 234, 0.6)";
+                    break;
+                case "B":
+                    color = "#ffa502"; // 黃色
+                    shadow = "0 1px 3px rgba(0,0,0,0.5)";
+                    break;
+                case "C":
+                    color = "#2e86de"; // 藍色
+                    shadow = "0 0 6px rgba(46, 134, 222, 0.6)";
+                    break;
+                case "D":
+                    color = "#2ed573"; // 綠色
+                    shadow = "0 0 6px rgba(46, 213, 115, 0.6)";
+                    break;
+                case "E":
+                    color = "#747d8c"; // 灰色
+                    shadow = "0 1px 3px rgba(0,0,0,0.4)";
+                    break;
+                case "F":
+                    color = "#ffffff"; // 白色
+                    shadow = "0 2px 4px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1)"; // 強調黑邊確保透明底座清晰
+                    break;
+                case "LAST":
+                    color = "#ff7675"; // 粉紅色
+                    shadow = "0 0 8px rgba(255, 118, 117, 0.7)";
+                    break;
             }
-
-            spawnNextCard();
-            showcaseTimer = setInterval(spawnNextCard, 1500);
+            return `color: ${color}; text-shadow: ${shadow};`;
         }
 
-        // 建立旋轉圓環內部的卡片
+        // 【核心重構】實現概念圖二、三：無縫右至左滾動，中大邊小淡入淡出
+        function initShowcaseStage() {
+            // 排除Last賞
+            const filteredPool = cardConfig.filter(c => c.grade !== "Last");
+            
+            // 初始化填滿5個Slot
+            for(let i=0; i<5; i++) {
+                activeSlotsData[i] = filteredPool[showcaseIndex];
+                updateSlotDOM(i, activeSlotsData[i]);
+                showcaseIndex = (showcaseIndex + 1) % filteredPool.length;
+            }
+
+            if (showcaseTimer) clearInterval(showcaseTimer);
+            showcaseTimer = setInterval(() => {
+                if (isRolling) return;
+
+                // 概念圖流動方向：由右向左滑動
+                // 把最左邊(Slot 0)拿掉，大家往前移，最右邊補新卡
+                const nextCard = filteredPool[showcaseIndex];
+                showcaseIndex = (showcaseIndex + 1) % filteredPool.length;
+
+                // 執行轉動動畫特效
+                animateSlotsFlow(nextCard);
+            }, 1600);
+        }
+
+        function updateSlotDOM(slotId, card) {
+            const slot = document.getElementById(`slot-${slotId}`);
+            if(!card) return;
+            slot.innerHTML = `
+                <img src="${card.url}" alt="${card.name}">
+                <div class="card-label" style="${getGradeStyle(card.grade)}">[${card.grade}] ${card.name.split('-')[1] || card.name}</div>
+            `;
+        }
+
+        function animateSlotsFlow(nextCard) {
+            const wall = document.getElementById('showcase-wall');
+            
+            // 1. 抓取目前所有的槽
+            const s0 = document.getElementById('slot-0');
+            const s1 = document.getElementById('slot-1');
+            const s2 = document.getElementById('slot-2');
+            const s3 = document.getElementById('slot-3');
+            const s4 = document.getElementById('slot-4');
+
+            // 2. 最左邊的 Slot0 完美淡出並移除
+            s0.style.opacity = "0";
+            s0.style.transform = "translateX(-220px) scale(0.5)";
+
+            // 3. 剩餘的順暢向左遞補位置類別 (對應手繪圖由右向左箭頭)
+            s1.className = "stage-slot pos-0"; s1.id = "slot-0";
+            s2.className = "stage-slot pos-1"; s2.id = "slot-1";
+            s3.className = "stage-slot pos-2"; s3.id = "slot-2"; // 變為正中央最大
+            s4.className = "stage-slot pos-3"; s4.id = "slot-3";
+
+            // 4. 動態在最右邊生成全新的 Slot 4 (由右側小且淡地加入)
+            const newSlot = document.createElement('div');
+            newSlot.className = "stage-slot pos-4";
+            newSlot.id = "slot-4";
+            newSlot.style.opacity = "0";
+            newSlot.style.transform = "translateX(220px) scale(0.5)";
+            
+            newSlot.innerHTML = `
+                <img src="${nextCard.url}">
+                <div class="card-label" style="${getGradeStyle(nextCard.grade)}">[${nextCard.grade}] ${nextCard.name.split('-')[1] || nextCard.name}</div>
+            `;
+            wall.appendChild(newSlot);
+
+            // 稍微延遲讓瀏覽器渲染動畫
+            setTimeout(() => {
+                newSlot.style.opacity = "0.35";
+                newSlot.style.transform = "translateX(160px) scale(0.75)";
+            }, 20);
+
+            // 5. 異步清理掉舊的 s0
+            setTimeout(() => { s0.remove(); }, 600);
+        }
+
         function buildRotationCircle() {
             const vault = document.getElementById('carousel-vault');
             vault.innerHTML = "";
-            
             const totalCards = 7; 
             const radius = 110;  
-            
             for (let i = 0; i < totalCards; i++) {
-                const randomCard = cardConfig[Math.floor(Math.random() * cardConfig.length)];
+                const randomCard = cardConfig[Math.floor(Math.random() * (cardConfig.length - 1))];
                 const angle = (i * 360) / totalCards;
-                
                 const item = document.createElement('div');
                 item.className = 'carousel-item';
                 item.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
                 item.innerHTML = `<img src="${randomCard.url}">`;
-                
                 vault.appendChild(item);
             }
         }
-
-        startShowcaseSequence();
 
         db.ref('pool').on('value', (snap) => {
             const data = snap.val();
@@ -802,7 +898,9 @@ let currentPool = [];
 
         function initPool() {
             let p = [];
-            cardConfig.forEach(c => { for(let i=0; i<c.count; i++) p.push(c.id); });
+            cardConfig.forEach(c => { 
+                if(c.grade !== "Last") { for(let i=0; i<c.count; i++) p.push(c.id); }
+            });
             db.ref('pool').set(p);
         }
 
@@ -812,23 +910,18 @@ let currentPool = [];
             const code = document.getElementById('user-code').value.trim();
             const btn1 = document.getElementById('draw-btn');
             const btn10 = document.getElementById('draw-btn-10');
-            
             const isDisabled = (currentPool.length === 0 || name === "" || code === "");
             
             if (currentPool.length === 0) {
-                btn1.innerText = "已全數售罄";
-                btn10.innerText = "已全數售罄";
-                btn1.disabled = true;
-                btn10.disabled = true;
+                btn1.innerText = "已全數售罄"; btn10.innerText = "已全數售罄";
+                btn1.disabled = true; btn10.disabled = true;
             } else {
-                btn1.innerText = "單抽";
-                btn10.innerText = `十連抽`;
+                btn1.innerText = "單抽"; btn10.innerText = `十連抽`;
                 btn1.disabled = isDisabled;
                 btn10.disabled = isDisabled || (currentPool.length < 10);
             }
         }
 
-        // 圓環物理引擎
         let animationFrameId;
         let currentAngle = 0;
         let currentSpeed = 2; 
@@ -851,15 +944,12 @@ let currentPool = [];
                 alert("❌ 無效的代碼，請重新確認！");
                 return;
             }
-
             const firstLetter = code.charAt(0).toUpperCase();
             if (drawCount === 1 && firstLetter !== 'S') {
-                alert("❌ 此代碼為「十連抽專用券」，請點擊【十連抽】按鈕！");
-                return;
+                alert("❌ 此代碼為「十連抽專用券」，請點擊【十連抽】按鈕！"); return;
             }
             if (drawCount === 10 && firstLetter !== 'T') {
-                alert("❌ 此代碼為「單抽專用券」，請點擊【單抽】按鈕！");
-                return;
+                alert("❌ 此代碼為「單抽專用券」，請點擊【單抽】按鈕！"); return;
             }
 
             isRolling = true;
@@ -874,9 +964,6 @@ let currentPool = [];
             const showcaseWall = document.getElementById('showcase-wall');
 
             showcaseWall.style.display = "none";
-            // 重設字體顏色為F賞預設（白色陰影），避免單抽中F時顏色錯誤
-            nameDisplay.style.color = "#fff";
-            nameDisplay.style.textShadow = "0 1px 3px rgba(0,0,0,0.6)";
             nameDisplay.innerText = "";
             multiContainer.innerHTML = "";
             multiContainer.style.display = "none";
@@ -884,21 +971,17 @@ let currentPool = [];
             
             buildRotationCircle();
             rotateStage.style.display = "block";
-            
-            currentSpeed = 2; 
-            currentAngle = 0;
+            currentSpeed = 2; currentAngle = 0;
             animateCarousel();
 
             const codeRef = db.ref('usedCodes/' + code);
             const snapshot = await codeRef.get();
             if (snapshot.exists()) {
                 alert("⚠️ 此代碼已被使用過，一組代碼僅限抽獎一次！");
-                isRolling = false;
-                rotateStage.style.display = "none";
-                showcaseWall.style.display = "flex";
-                checkStatus();
-                return;
+                isRolling = false; rotateStage.style.display = "none"; showcaseWall.style.display = "flex"; checkStatus(); return;
             }
+
+            let isLastDrawTriggered = (currentPool.length === drawCount);
 
             db.ref('pool').transaction((p) => {
                 if (p && p.length >= drawCount) {
@@ -914,15 +997,12 @@ let currentPool = [];
                             if (availableDCards.length > 0) {
                                 const pickedId = availableDCards[Math.floor(Math.random() * availableDCards.length)];
                                 window.lastDrawResults.push(pickedId);
-                                const idxInPool = p.indexOf(pickedId);
-                                p.splice(idxInPool, 1);
+                                p.splice(p.indexOf(pickedId), 1);
                                 continue; 
                             }
                         }
 
-                        let finalIdx; let drawnId; let card;
-                        let maxAttempts = 500; let attempts = 0;
-
+                        let finalIdx; let drawnId; let card; let attempts = 0;
                         do {
                             finalIdx = Math.floor(Math.random() * p.length);
                             drawnId = p[finalIdx];
@@ -930,7 +1010,7 @@ let currentPool = [];
                             attempts++;
                             if (p.length > 5 && card && (card.grade === "S" || card.grade === "A")) { continue; }
                             break; 
-                        } while (attempts < maxAttempts);
+                        } while (attempts < 500);
 
                         window.lastDrawResults.push(drawnId);
                         if (card && ["S","A","B","C","D"].includes(card.grade)) { hasHighAward = true; }
@@ -942,9 +1022,7 @@ let currentPool = [];
             }, (err, committed) => {
                 if (committed) {
                     db.ref('usedCodes/' + code).set({
-                        user: name,
-                        time: firebase.database.ServerValue.TIMESTAMP,
-                        count: drawCount
+                        user: name, time: firebase.database.ServerValue.TIMESTAMP, count: drawCount
                     });
 
                     setTimeout(() => {
@@ -953,55 +1031,64 @@ let currentPool = [];
                         showcaseWall.style.display = "flex";    
                         
                         if (drawCount === 1) {
-                            const result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
+                            let result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
+                            
+                            // 【功能實現】如果是最後一抽，直接把結果改為 Last賞
+                            if(isLastDrawTriggered) {
+                                result = cardConfig.find(c => c.grade === "Last");
+                            }
+
                             img.src = result.url;
                             singleResultBox.style.display = "block"; 
-                            nameDisplay.innerText = result.name;
-
-                            // 【全新修改】如果是S賞，將開獎文字設為紅色，否則設回白色陰影
-                            if(result.grade === 'S') {
-                                nameDisplay.style.color = "#ff4757";
-                                nameDisplay.style.textShadow = "0 1px 3px rgba(0,0,0,0.3)";
-                            } else {
-                                nameDisplay.style.color = "#fff";
-                                nameDisplay.style.textShadow = "0 1px 3px rgba(0,0,0,0.6)";
-                            }
+                            nameDisplay.innerHTML = `<span style="${getGradeStyle(result.grade)}">${result.name}</span>`;
 
                             saveLocalRecord(result.name);
                             sendToGoogleForm(name, code, result.name);
                         } else {
                             multiContainer.style.display = "flex";
+                            
+                            // 正常的卡片先依序推入展示
                             window.lastDrawResults.forEach((id, index) => {
-                                const result = cardConfig.find(c => c.id === id);
-                                const cardDiv = document.createElement('div');
-                                cardDiv.className = 'mini-card-box';
-                                cardDiv.innerHTML = `
-                                    <img src="${result.url}" style="width: 100%; border-radius: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
-                                    <div style="font-size: 10px; margin-top: 5px; 
-                                        ${result.grade === 'S' ? 'color:#ff4757; text-shadow:0 1px 3px rgba(0,0,0,0.3);' : 'color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.6);'}">
-                                        #${index+1}<br><span>${result.name.split('-')[0]}</span>
-                                    </div>
-                                `;
-                                multiContainer.appendChild(cardDiv);
+                                let result = cardConfig.find(c => c.id === id);
+                                appendMiniCard(result, index, index * 150); // 增加精緻的依序動態排開效果
                                 saveLocalRecord(`[十連抽-${index+1}] ${result.name}`);
                                 sendToGoogleForm(`${name}(十連抽-${index+1})`, code, result.name);
                             });
+
+                            // 【功能實現】如果是最後一抽，等前面10張卡出完後，Last賞才做為壓軸最後一個驚喜登場
+                            if(isLastDrawTriggered) {
+                                const lastAward = cardConfig.find(c => c.grade === "Last");
+                                setTimeout(() => {
+                                    appendMiniCard(lastAward, "LAST", 0);
+                                    nameDisplay.innerHTML = `<span style="${getGradeStyle(lastAward.grade)}">🎉 恭喜獲得 ${lastAward.name}！</span>`;
+                                    saveLocalRecord(`[壓軸大獎] ${lastAward.name}`);
+                                    sendToGoogleForm(`${name}(Last賞)`, code, lastAward.name);
+                                }, 10 * 150 + 200);
+                            }
                         }
                         
                         isRolling = false;
                         checkStatus();
-                        startShowcaseSequence(); 
                     }, 2800); 
                 } else {
-                    cancelAnimationFrame(animationFrameId);
-                    rotateStage.style.display = "none";
-                    showcaseWall.style.display = "flex";
-                    alert("抽獎失敗，剩餘抽數可能不足，請再試一次");
-                    isRolling = false;
-                    checkStatus();
-                    startShowcaseSequence();
+                    cancelAnimationFrame(animationFrameId); rotateStage.style.display = "none"; showcaseWall.style.display = "flex";
+                    alert("抽獎失敗，請再試一次"); isRolling = false; checkStatus();
                 }
             });
+        }
+
+        // 輔助函式：用來處理十連抽多張與Last賞最後吐出的特效
+        function appendMiniCard(card, displayIndex, delay) {
+            const multiContainer = document.getElementById('multi-result-container');
+            const textStyle = getGradeStyle(card.grade);
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'mini-card-box';
+            cardDiv.style.animationDelay = `${delay}ms`;
+            cardDiv.innerHTML = `
+                <img src="${card.url}" style="width: 100%; border-radius: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+                <div style="font-size: 11px; margin-top: 5px; font-weight:900; ${textStyle}">#${displayIndex === "LAST" ? "Last" : displayIndex+1}<br><span>${card.name.split('-')[0]}</span></div>
+            `;
+            multiContainer.appendChild(cardDiv);
         }
 
         function saveLocalRecord(cardName) {
@@ -1015,11 +1102,8 @@ let currentPool = [];
         function renderHistory() {
             const history = JSON.parse(localStorage.getItem('myDrawHistory')) || [];
             const container = document.getElementById('my-history');
-            if (history.length === 0) {
-                container.innerHTML = "尚未有紀錄";
-                return;
-            }
-            container.innerHTML = history.map(h => `<div class="history-item">🕒 ${h.time ? h.time : ''} - ${h.name}</div>`).join('');
+            if (history.length === 0) { container.innerHTML = "尚未有紀錄"; return; }
+            container.innerHTML = history.map(h => `<div class="history-item" style="font-weight: 500;">🕒 ${h.time ? h.time : ''} - ${h.name}</div>`).join('');
         }
 
         function sendToGoogleForm(name, code, card) {
@@ -1032,6 +1116,8 @@ let currentPool = [];
             new Image().src = url;
         }
 
+        // 初始化跑馬燈
+        setTimeout(initShowcaseStage, 500);
         renderHistory();
     </script>
 </body>
