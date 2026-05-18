@@ -16,7 +16,7 @@
             padding: 20px; 
             min-height: 100vh;
         }
-        .container { max-width: 400px; margin: auto; }
+        .container { max-width: 450px; margin: auto; }
         
         .pool-card { 
             background: rgba(255, 255, 255, 0.4); 
@@ -30,64 +30,67 @@
         }
         .total-rem { font-size: 32px; font-weight: bold; color: #ff4757; }
         
-        .card-area { 
-            width: 260px; 
-            height: 380px; 
-            background: rgba(255, 255, 255, 0.15); 
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 2px solid rgba(255, 255, 255, 0.7); 
-            margin: 20px auto; 
-            border-radius: 24px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            overflow: hidden; 
-            position: relative; 
-            box-shadow: 
-                0 20px 40px rgba(30, 60, 90, 0.15), 
-                inset 0 0 20px rgba(255, 255, 255, 0.6),
-                inset 0 -10px 20px rgba(0, 0, 0, 0.05); 
+        /* 本期賞品圖鑑長條容器 */
+        .showcase-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding: 15px 5px;
+            margin: 20px 0;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            -ms-overflow-style: none;  
+            scrollbar-width: none; 
         }
-        #card-img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            display: none; 
-            border-radius: 20px;
-        }
-        
-        .scroller-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: block; 
-            align-items: center;
-        }
-        
-        .scrolling-card {
-            position: absolute;
-            width: 92%; 
-            height: 94%;
-            top: 3%;
-            left: 4%;
-            object-fit: cover;
-            border-radius: 16px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.12); 
-            transform: translateX(0); 
-            opacity: 0;
-            animation: slideLeft 3s cubic-bezier(0.25, 1, 0.5, 1) forwards; 
-        }
-        
-        @keyframes slideLeft {
-            0% { transform: translateX(80%); opacity: 0; }      
-            15% { transform: translateX(0); opacity: 1; }       
-            85% { transform: translateX(0); opacity: 1; }       
-            100% { transform: translateX(-80%); opacity: 0; }   
+        .showcase-container::-webkit-scrollbar {
+            display: none;
         }
 
+        /* 展示用的單張卡片外盒 */
+        .showcase-item {
+            flex: 0 0 110px; 
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            padding: 6px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-sizing: border-box;
+            transition: transform 0.1s linear; /* 縮短過渡時間讓變形更即時 */
+        }
+        .showcase-item img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .showcase-item .card-label {
+            font-size: 11px;
+            margin-top: 6px;
+            color: #444;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 抽獎結果彈出區域 (單抽用) */
+        .result-single-box {
+            display: none;
+            width: 200px;
+            margin: 15px auto;
+            background: rgba(255, 255, 255, 0.5);
+            border: 2px solid #ff4757;
+            padding: 10px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(255, 71, 87, 0.2);
+        }
+        .result-single-box img {
+            width: 100%;
+            border-radius: 12px;
+        }
+
+        /* 十連抽個別卡片玻璃底座 */
         .mini-card-box {
             width: 18%;
             text-align: center;
@@ -147,6 +150,31 @@
         }
         .history-item { padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 13px; color: #ff5e6c; font-weight: 500; }
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 1000; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
+        
+        /* 【全新調整】慢速洗牌動畫（擺幅較大、速度較緩） */
+        @keyframes slowShake {
+            0% { transform: translate(2px, 2px) rotate(0deg); }
+            25% { transform: translate(-3px, -4px) rotate(-1.5deg); }
+            50% { transform: translate(4px, -1px) rotate(1.5deg); }
+            75% { transform: translate(-2px, 3px) rotate(-1deg); }
+            100% { transform: translate(2px, 2px) rotate(0deg); }
+        }
+        .shaking-slow {
+            animation: slowShake 0.3s infinite ease-in-out;
+        }
+
+        /* 【全新調整】極速洗牌動畫（超密集震動、瘋狂洗牌感） */
+        @keyframes fastShake {
+            0% { transform: translate(1px, -1px) rotate(0deg); }
+            20% { transform: translate(-2px, 2px) rotate(-1deg); }
+            40% { transform: translate(2px, -2px) rotate(1deg); }
+            60% { transform: translate(-1px, -1px) rotate(0deg); }
+            80% { transform: translate(2px, 2px) rotate(1deg); }
+            100% { transform: translate(1px, -1px) rotate(-1deg); }
+        }
+        .shaking-fast {
+            animation: fastShake 0.08s infinite linear;
+        }
     </style>
 </head>
 <body>
@@ -163,8 +191,10 @@
             <input type="text" id="user-code" placeholder="請輸入抽獎代碼..." oninput="checkStatus()">
         </div>
         
-        <div class="card-area" id="display-box">
-            <div id="scroller-container" class="scroller-container"></div>
+        <div style="text-align: left; font-size: 13px; color: #666; font-weight: bold; padding-left: 5px;">🃏 本期賞品圖鑑 (左右滑動查看)</div>
+        <div class="showcase-container" id="showcase-wall"></div>
+        
+        <div class="result-single-box" id="single-result-box">
             <img id="card-img" src="">
         </div>
         
@@ -672,7 +702,17 @@
 
  let currentPool = [];
         let isRolling = false;
-        let backgroundScrollInterval = null; 
+
+        function renderShowcaseWall() {
+            const wall = document.getElementById('showcase-wall');
+            wall.innerHTML = cardConfig.map(card => `
+                <div class="showcase-item" id="item-card-${card.id}">
+                    <img src="${card.url}" alt="${card.name}">
+                    <div class="card-label">${card.name.split('-')[0]}</div>
+                </div>
+            `).join('');
+        }
+        renderShowcaseWall();
 
         db.ref('pool').on('value', (snap) => {
             const data = snap.val();
@@ -685,34 +725,6 @@
                 checkStatus();
             }
         });
-
-        function startBackgroundScroll() {
-            if (backgroundScrollInterval) return;
-            const scroller = document.getElementById('scroller-container');
-            
-            const gradeOrder = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
-            const sortedCards = [...cardConfig].sort((a, b) => {
-                return (gradeOrder[a.grade] || 99) - (gradeOrder[b.grade] || 99);
-            });
-
-            let currentIndex = 0;
-            
-            backgroundScrollInterval = setInterval(() => {
-                if (sortedCards.length === 0) return;
-                
-                let targetCard = sortedCards[currentIndex];
-                const slideImg = document.createElement('img');
-                slideImg.src = targetCard.url;
-                slideImg.className = 'scrolling-card';
-                scroller.appendChild(slideImg);
-                
-                setTimeout(() => { slideImg.remove(); }, 3000);
-                
-                currentIndex = (currentIndex + 1) % sortedCards.length;
-            }, 3200); 
-        }
-
-        startBackgroundScroll();
 
         function initPool() {
             let p = [];
@@ -766,22 +778,16 @@
             document.getElementById('draw-btn').disabled = true;
             document.getElementById('draw-btn-10').disabled = true;
 
-            clearInterval(backgroundScrollInterval);
-            backgroundScrollInterval = null;
-
             const img = document.getElementById('card-img');
             const nameDisplay = document.getElementById('card-name');
             const multiContainer = document.getElementById('multi-result-container');
-            const displayBox = document.getElementById('display-box');
-            const scroller = document.getElementById('scroller-container');
+            const singleResultBox = document.getElementById('single-result-box');
+            const wall = document.getElementById('showcase-wall');
 
             nameDisplay.innerText = "";
             multiContainer.innerHTML = "";
             multiContainer.style.display = "none";
-            displayBox.style.display = "flex";
-            img.style.display = "none"; 
-            scroller.innerHTML = "";
-            scroller.style.display = "block"; 
+            singleResultBox.style.display = "none";
 
             const codeRef = db.ref('usedCodes/' + code);
             const snapshot = await codeRef.get();
@@ -789,39 +795,25 @@
                 alert("⚠️ 此代碼已被使用過，一組代碼僅限抽獎一次！");
                 isRolling = false;
                 checkStatus();
-                startBackgroundScroll(); 
                 return;
             }
 
-            const specialCards = cardConfig.filter(c => c.grade === "S" || c.grade === "A");
-            let showSpecial = true;
+            // 【全新修改】控制「由慢到快」的洗牌視覺節奏
+            wall.classList.add('shaking-slow'); // 1. 一開始先慢速搖晃
             
-            let rollInterval = setInterval(() => {
-                let randomCard = (showSpecial && specialCards.length > 0) 
-                    ? specialCards[Math.floor(Math.random() * specialCards.length)]
-                    : cardConfig[Math.floor(Math.random() * cardConfig.length)];
-                
-                const slideImg = document.createElement('img');
-                slideImg.src = randomCard.url;
-                slideImg.className = 'scrolling-card';
-                slideImg.style.animation = 'slideLeft 0.35s linear forwards'; 
-                scroller.appendChild(slideImg);
-                
-                setTimeout(() => { slideImg.remove(); }, 350);
-                showSpecial = !showSpecial;
-            }, 180); 
+            setTimeout(() => {
+                if(isRolling) {
+                    wall.classList.remove('shaking-slow');
+                    wall.classList.add('shaking-fast'); // 2. 0.6秒後切換為瘋狂加速洗牌！
+                }
+            }, 600);
 
-            // 【全新修改】核心鎖定機制：在雲端事務處理中加入 30% 限制條件
             db.ref('pool').transaction((p) => {
                 if (p && p.length >= drawCount) {
                     window.lastDrawResults = []; 
                     let hasHighAward = false;    
-
-                    // 計算初始總張數（18張），及其 30% 門檻（18 * 0.3 = 5.4 ➜ 即剩餘 5 張以下才解鎖）
-                    const initialTotalCount = 631; 
                     
                     for (let i = 0; i < drawCount; i++) {
-                        // 保底機制（十連抽最後一抽）
                         if (drawCount === 10 && i === 9 && !hasHighAward) {
                             let availableDCards = p.filter(id => {
                                 let card = cardConfig.find(c => c.id === id);
@@ -836,11 +828,10 @@
                             }
                         }
 
-                        // 進行強制鎖定過濾：
                         let finalIdx;
                         let drawnId;
                         let card;
-                        let maxAttempts = 500; // 防止無窮迴圈的保險機制
+                        let maxAttempts = 500; 
                         let attempts = 0;
 
                         do {
@@ -849,11 +840,10 @@
                             card = cardConfig.find(c => c.id === drawnId);
                             attempts++;
                             
-                            // 核心判定：如果當前剩餘張數 > 5 張 (大於30%)，且不幸抽到 S 或 A，就強制重新抽取！
-                            if (p.length > 190 && card && (card.grade === "S" || card.grade === "A")) {
-                                continue; // 重新選一張
+                            if (p.length > 5 && card && (card.grade === "S" || card.grade === "A")) {
+                                continue; 
                             }
-                            break; // 符合條件，跳出選卡
+                            break; 
                         } while (attempts < maxAttempts);
 
                         window.lastDrawResults.push(drawnId);
@@ -875,21 +865,25 @@
                         count: drawCount
                     });
 
+                    // 總長維持 1.8 秒開獎，完美的「慢 0.6s ➔ 快 1.2s ➔ 瞬間定格」
                     setTimeout(() => {
-                        clearInterval(rollInterval); 
-                        scroller.style.display = "none"; 
-                        scroller.innerHTML = "";
+                        wall.classList.remove('shaking-slow');
+                        wall.classList.remove('shaking-fast'); // 停止所有晃動效果
                         
                         if (drawCount === 1) {
                             const result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
                             img.src = result.url;
-                            img.style.display = "block"; 
+                            singleResultBox.style.display = "block"; 
                             nameDisplay.innerText = result.name;
                             
+                            const targetElement = document.getElementById(`item-card-${result.id}`);
+                            if(targetElement) {
+                                wall.scrollTo({ left: targetElement.offsetLeft - wall.offsetWidth/2 + 55, behavior: 'smooth' });
+                            }
+
                             saveLocalRecord(result.name);
                             sendToGoogleForm(name, code, result.name);
                         } else {
-                            displayBox.style.display = "none"; 
                             multiContainer.style.display = "flex";
                             
                             window.lastDrawResults.forEach((id, index) => {
@@ -910,14 +904,13 @@
                         
                         isRolling = false;
                         checkStatus();
-                    }, 3000); 
+                    }, 1800); 
                 } else {
-                    clearInterval(rollInterval);
-                    scroller.style.display = "none";
+                    wall.classList.remove('shaking-slow');
+                    wall.classList.remove('shaking-fast');
                     alert("抽獎失敗，剩餘抽數可能不足，請再試一次");
                     isRolling = false;
                     checkStatus();
-                    startBackgroundScroll(); 
                 }
             });
         }
