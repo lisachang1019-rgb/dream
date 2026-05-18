@@ -21,7 +21,7 @@
             padding: 20px; 
             min-height: 100vh;
         }
-        .container { max-width: 450px; margin: auto; }
+        .container { max-width: 450px; margin: auto; position: relative; }
         
         .pool-card { 
             background: rgba(255, 255, 255, 0.4); 
@@ -77,7 +77,7 @@
             border-radius: 6px;
         }
 
-        /* 【核心重構】全新的傳送軌道外框 */
+        /* 傳送軌道外框 */
         .showcase-stage {
             display: flex;
             justify-content: center; 
@@ -89,7 +89,7 @@
             width: 100%;
         }
 
-        /* 傳送帶容器：直接使用 transform 達成順暢、無限向左滾動 */
+        /* 傳送帶容器 */
         .showcase-track {
             display: flex;
             position: absolute;
@@ -99,7 +99,7 @@
             will-change: transform;
         }
 
-        /* 傳送帶上的每一張卡片，利用動態 JS 控制立體樣式 */
+        /* 傳送帶上的每一張卡片 */
         .track-item {
             width: 80px;
             margin: 0 5px;
@@ -206,10 +206,136 @@
         }
         .history-item { padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 13px; color: #ff5e6c; font-weight: 500; }
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 1000; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
+
+        /* ================= 新增：右上角懸浮標籤樣式 ================= */
+        .side-tabs {
+            position: fixed;
+            right: 12px;
+            top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 99;
+        }
+        .side-tab-btn {
+            background: rgba(26, 58, 96, 0.85);
+            backdrop-filter: blur(4px);
+            color: #ffffff;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            padding: 8px 6px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            writing-mode: vertical-lr; /* 達成手繪稿的直書文字效果 */
+            letter-spacing: 2px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+        }
+        .side-tab-btn:active {
+            transform: scale(0.95);
+            background: rgba(26, 58, 96, 1);
+        }
+
+        /* ================= 新增：彈出視窗（Modal）樣式 ================= */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            width: 85%;
+            max-width: 380px;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            text-align: left;
+            box-sizing: border-box;
+            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+        }
+        @keyframes modalPop {
+            0% { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e6f2ff;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .modal-title { font-size: 18px; font-weight: 900; color: #1a3a60; }
+        .modal-close { 
+            background: #ff4757; color: white; border: none; 
+            width: 28px; height: 28px; border-radius: 50%; 
+            font-size: 14px; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-body {
+            max-height: 350px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #444;
+        }
+        .modal-body ul { padding-left: 20px; margin: 8px 0; }
+        /* 大會紀錄專用名單排版 */
+        .record-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        .record-user { font-weight: 800; color: #1a3a60; }
+        .record-prize { font-weight: 800; color: #ff4757; }
     </style>
 </head>
 <body>
     <div id="loading">📡 正在連線雲端獎池...</div>
+
+    <div class="side-tabs">
+        <button class="side-tab-btn" onclick="openModal('rules-modal')">規則</button>
+        <button class="side-tab-btn" onclick="openModal('records-modal')">紀錄</button>
+    </div>
+
+    <div class="modal-overlay" id="rules-modal" onclick="closeModal(event, 'rules-modal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">📜 活動規則說明</div>
+                <button class="modal-close" onclick="document.getElementById('rules-modal').style.display='none'">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>歡迎參加<strong>時代少年團一番賞</strong>抽獎活動！請詳閱以下說明：</p>
+                <ul>
+                    <li><strong>抽獎資格：</strong>請正確輸入您的社群聯絡 ID（IG 或 FB）以及專屬抽獎代碼。</li>
+                    <li><strong>代碼限制：</strong>一組代碼限使用一次，送出後該代碼即刻失效。</li>
+                    <li><strong>單抽券：</strong>開頭為 <code>S</code> 的代碼，僅能點選「單抽」。</li>
+                    <li><strong>十連抽券：</strong>開頭為 <code>T</code> 的代碼，僅能點選「十連抽」，且保底 D 賞以上獎項！</li>
+                    <li><strong>Last賞：</strong>當抽走最後一抽時，將會額外自動獲得壓軸的 Last 賞娃娃！</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="records-modal" onclick="closeModal(event, 'records-modal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">🏆 大會實時中獎紀錄</div>
+                <button class="modal-close" onclick="document.getElementById('records-modal').style.display='none'">✕</button>
+            </div>
+            <div class="modal-body" id="global-records-pool">
+                <div style="text-align:center; color:#888; padding:20px 0;">載入紀錄中...</div>
+            </div>
+        </div>
+    </div>
 
     <div class="container">
         <h2 style="color: #1a3a60; font-weight: 900;">時代少年團一番賞</h2>
@@ -740,10 +866,9 @@
 let currentPool = [];
         let isRolling = false;
         let showcaseTimer = null;
-        let currentFocusIndex = 0; // 當前正中央放大的卡片索引
-        let trackCards = [];      // 軌道內渲染的所有卡片數據
+        let currentFocusIndex = 0; 
+        let trackCards = [];      
 
-        // 獲取字體顏色：S紅、A紫、B黃、C藍、D綠、E灰、F白、Last粉
         function getGradeStyle(grade) {
             const upperGrade = grade.toUpperCase();
             let color = "#ffffff";
@@ -762,22 +887,17 @@ let currentPool = [];
             return `color: ${color}; text-shadow: ${shadow};`;
         }
 
-        // 【全新算法】建立真正無限長度、一個接一個順序往前推的軌道
         function initShowcaseStage() {
             const track = document.getElementById('main-track');
             track.innerHTML = "";
-
-            // 1. 嚴格按 S -> A -> B -> C -> D -> E -> F 的順序將所有展示卡排成一長列
             const gradeOrder = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
             const basePool = [...cardConfig]
                 .filter(c => c.grade !== "Last")
                 .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 99) - (gradeOrder[b.grade.toUpperCase()] || 99));
             
-            // 2. 為了做到無限循環、不穿幫，我們將這個長陣列重複複製 3 次，拼成一個超級長火車
             trackCards = [...basePool, ...basePool, ...basePool];
-            currentFocusIndex = 0; // 從第一個（也就是 S 賞）開始打頭陣
+            currentFocusIndex = 0; 
 
-            // 3. 生成 DOM 節點
             trackCards.forEach((card, idx) => {
                 const item = document.createElement('div');
                 item.className = 'track-item';
@@ -789,23 +909,18 @@ let currentPool = [];
                 track.appendChild(item);
             });
 
-            // 4. 更新初始位置與立體效果
             updateTrackPosition();
 
-            // 5. 設定定時器：由右向左，一個接一個順序往前移動
             if (showcaseTimer) clearInterval(showcaseTimer);
             showcaseTimer = setInterval(() => {
                 if (isRolling) return;
-
                 currentFocusIndex++;
                 
-                // 當移動到第二組的末尾時，瞬間無縫拉回第一組對應位置，達成100%完美的無限循環往前
                 if (currentFocusIndex >= basePool.length * 2) {
-                    track.style.transition = 'none'; // 關閉動畫
-                    currentFocusIndex = basePool.length; // 閃現回中間組
+                    track.style.transition = 'none'; 
+                    currentFocusIndex = basePool.length; 
                     updateTrackPosition();
                     
-                    // 稍微延遲讓瀏覽器反應，隨即補上正常的向前動畫
                     setTimeout(() => {
                         if (isRolling) return;
                         track.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
@@ -819,45 +934,36 @@ let currentPool = [];
             }, 1800);
         }
 
-        // 核心動態渲染：計算每個卡片與正中央焦點的距離，實現「中大邊小變淡」的概念圖特效
         function updateTrackPosition() {
             const track = document.getElementById('main-track');
-            const itemWidth = 90; // 包含 margin 的寬度 (80 + 5 + 5)
-            
-            // 將軌道向左偏移，使得當前 currentFocusIndex 卡片完美居中
-            // 減去 45px 是為了扣掉焦點卡片自身一半的寬度
+            const itemWidth = 90; 
             const offset = -(currentFocusIndex * itemWidth) - 45;
             track.style.transform = `translateX(${offset}px)`;
 
-            // 為軌道上的所有卡片動態刷新 3D 視覺比重
             trackCards.forEach((_, idx) => {
                 const item = document.getElementById(`track-item-${idx}`);
                 if (!item) return;
 
-                const distance = idx - currentFocusIndex; // 計算與正中央焦點卡片的格子距離
+                const distance = idx - currentFocusIndex; 
 
                 if (distance === 0) {
-                    // 正中央：最大、完整清晰
                     item.style.transform = "scale(1.15) translateY(-5px)";
                     item.style.opacity = "1";
                     item.style.zIndex = "5";
                     item.style.border = "1.5px solid rgba(255,255,255,0.85)";
                     item.style.boxShadow = "0 10px 25px rgba(0,0,0,0.15)";
                 } else if (Math.abs(distance) === 1) {
-                    // 左右兩側第一格：中、微淡
                     item.style.transform = "scale(0.9)";
                     item.style.opacity = "0.7";
                     item.style.zIndex = "3";
                     item.style.border = "1px solid rgba(255,255,255,0.4)";
                     item.style.boxShadow = "0 4px 10px rgba(0,0,0,0.05)";
                 } else if (Math.abs(distance) === 2) {
-                    // 左右兩側第二格：小、淡
                     item.style.transform = "scale(0.75)";
                     item.style.opacity = "0.3";
                     item.style.zIndex = "1";
                     item.style.border = "1px solid rgba(255,255,255,0.2)";
                 } else {
-                    // 其餘太遠的直接隱藏，節省效能
                     item.style.opacity = "0";
                     item.style.transform = "scale(0.6)";
                 }
@@ -890,6 +996,36 @@ let currentPool = [];
                 document.getElementById('total-count').innerText = currentPool.length + " 抽";
                 checkStatus();
             }
+        });
+
+        // 監聽全局已被使用的代碼，用來即時算進「大會紀錄」彈窗中
+        db.ref('usedCodes').on('value', (snap) => {
+            const data = snap.val();
+            const container = document.getElementById('global-records-pool');
+            if (!data) {
+                container.innerHTML = `<div style="text-align:center; color:#888; padding:20px 0;">目前大會尚無抽獎紀錄</div>`;
+                return;
+            }
+            
+            // 將所有紀錄打包並排序（最新抽出的排前面）
+            let recordsList = [];
+            Object.keys(data).forEach(codeKey => {
+                const info = data[codeKey];
+                // 如果是十連抽，可能包含多筆資訊，或這裡我們簡化呈現主用戶抽取紀錄
+                recordsList.push({
+                    user: info.user || '匿名玩家',
+                    time: info.time || 0,
+                    count: info.count || 1
+                });
+            });
+            recordsList.sort((a,b) => b.time - a.time);
+
+            container.innerHTML = recordsList.map(r => `
+                <div class="record-item">
+                    <span class="record-user">👤 ${r.user}</span>
+                    <span class="record-prize">已消耗了 ${r.count} 抽 🎟️</span>
+                </div>
+            `).join('');
         });
 
         function initPool() {
@@ -1058,7 +1194,7 @@ let currentPool = [];
                         
                         isRolling = false;
                         checkStatus();
-                        initShowcaseStage(); // 重置並重啟無限滾動軌道
+                        initShowcaseStage(); 
                     }, 2800); 
                 } else {
                     cancelAnimationFrame(animationFrameId); rotateStage.style.display = "none"; showcaseWall.style.display = "flex";
@@ -1106,7 +1242,17 @@ let currentPool = [];
             new Image().src = url;
         }
 
-        // 初始化跑馬燈展示
+        /* ================= 新增：控制彈出視窗的 JS 邏輯 ================= */
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        function closeModal(event, modalId) {
+            // 當點擊視窗外部（半透明黑底）時才關閉視窗
+            if (event.target === document.getElementById(modalId)) {
+                document.getElementById(modalId).style.display = 'none';
+            }
+        }
+
         setTimeout(initShowcaseStage, 500);
         renderHistory();
     </script>
