@@ -9,7 +9,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght=500;800;900&display=swap" rel="stylesheet">
     
     <style>
         body { 
@@ -801,7 +801,7 @@ let currentPool = [];
                 case "D": color = "#2ed573"; shadow = "0 0 6px rgba(46, 213, 115, 0.6)"; break;
                 case "E": color = "#747d8c"; shadow = "0 1px 3px rgba(0,0,0,0.4)"; break;
                 case "F": color = "#ffffff"; shadow = "0 2px 4px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1)"; break;
-                case "LAST": color = "#ffb6c1"; shadow = "0 0 8px rgba(255, 118, 117, 0.7)"; break;
+                case "LAST": color = "#ffb6c1"; shadow = "0 0 8px rgba(255, 182, 193, 0.9), 1px 1px 2px rgba(0,0,0,0.4)"; break;
             }
             return `color: ${color}; text-shadow: ${shadow};`;
         }
@@ -810,10 +810,9 @@ let currentPool = [];
             const track = document.getElementById('main-track');
             track.innerHTML = "";
 
-            // 自訂排序權重，將 Last 放在最前面（權重設定為 0）
+            // 調整權重：將 LAST 放在最前面（權重最小）
             const gradeOrder = { "LAST": 0, "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
             
-            // 包含 Last賞 在內全部進行排序，不進行過濾
             const basePool = [...cardConfig]
                 .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 99) - (gradeOrder[b.grade.toUpperCase()] || 99));
             
@@ -1077,7 +1076,6 @@ let currentPool = [];
                                     nameDisplay.innerHTML = `<span style="${getGradeStyle(lastAward.grade)}">🎉 恭喜獲得 ${lastAward.name}！</span>`;
                                     saveLocalRecord(`[壓軸大獎] ${lastAward.name}`);
                                     sendToGoogleForm(`${name}(Last賞)`, code, lastAward.name);
-                                item.style.transform = "scale(0.65)";
                                 }, 10 * 150 + 200);
                             }
                         }
