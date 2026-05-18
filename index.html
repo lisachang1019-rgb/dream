@@ -50,10 +50,14 @@
             border: 1px solid rgba(255,255,255,0.3);
             border-right: none;
         }
-        .side-tab:active { transform: translateX(-3px); }
-        #tab-history { background: #1a3a60; }
+        .side-tab:active {
+            transform: translateX(-3px);
+        }
+        #tab-history {
+            background: #1a3a60;
+        }
 
-        /* 彈出視窗外框 (Modal) */
+        /* 彈出視窗超美外框 (Modal) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -91,12 +95,24 @@
             justify-content: space-between;
             align-items: center;
         }
-        .modal-close { font-size: 20px; cursor: pointer; color: #aaa; font-weight: bold; }
-        .modal-body { max-height: 250px; overflow-y: auto; font-size: 14px; line-height: 1.6; color: #555; }
+        .modal-close {
+            font-size: 20px;
+            cursor: pointer;
+            color: #aaa;
+            font-weight: bold;
+        }
+        .modal-close:hover { color: #333; }
+        .modal-body {
+            max-height: 250px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+        }
 
-        /* 一番賞排版 */
+        /* 一番賞基礎排版 */
         .pool-card { 
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.4); 
             backdrop-filter: blur(10px); 
             -webkit-backdrop-filter: blur(10px);
             padding: 15px; 
@@ -109,7 +125,7 @@
         
         /* 3D 圓環旋轉舞台 */
         .rotate-stage-container {
-            display: none;
+            display: none; 
             width: 100%;
             height: 260px;
             margin: 20px 0;
@@ -118,88 +134,44 @@
             overflow: hidden;
         }
         .circle-carousel {
-            width: 76px;
-            height: 115px;
+            width: 76px; height: 115px;
             position: absolute; top: 25%; left: 50%;
             margin-left: -38px;
             transform-style: preserve-3d;
-            transform: rotateX(-10deg) rotateY(0deg);
+            transform: rotateX(-10deg) rotateY(0deg); 
         }
         .carousel-item {
-            position: absolute;
-            width: 76px; height: 115px; left: 0; top: 0;
+            position: absolute; width: 76px; height: 115px; left: 0; top: 0;
             background: #fff; border-radius: 8px; padding: 3px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); box-sizing: border-box;
         }
         .carousel-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
 
-        /* ✨ 精緻 3D 流暢聚焦展示牆 */
+        /* ✨ 精緻 3D 聚焦展示牆 */
         .showcase-stage {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 220px;
-            margin: 15px 0;
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+            display: flex; justify-content: center; align-items: center;
+            height: 200px; margin: 15px 0; position: relative; overflow: hidden; width: 100%;
         }
         .showcase-track {
-            display: flex;
-            position: absolute;
-            left: 50%;
-            transform-style: preserve-3d;
-            /* 將極速變換改成硬體加速平滑過渡 */
-            transition: transform 0.2s linear;
+            display: flex; position: absolute; left: 50%;
+            transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
             will-change: transform;
         }
         .track-item {
-            width: 85px;
-            margin: 0 10px;
-            background: rgba(255, 255, 255, 0.6); 
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            padding: 5px;
-            border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.05);
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex-shrink: 0;
-            transition: transform 0.3s ease, opacity 0.3s ease, filter 0.3s ease;
-            will-change: transform, opacity;
-            opacity: 0.4;
-            filter: blur(1px) grayscale(30%);
-            transform: scale(0.85);
+            width: 80px; margin: 0 8px; background: rgba(255, 255, 255, 0.5); 
+            border: 1px solid rgba(255, 255, 255, 0.6); padding: 4px; border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box;
+            display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
+            transition: transform 0.6s, opacity 0.6s; will-change: transform, opacity;
         }
-        /* 當前聚焦的中間卡片樣式 */
-        .track-item.focused {
-            opacity: 1;
-            filter: none;
-            transform: scale(1.1) translateZ(20px);
-            box-shadow: 0 12px 25px rgba(26, 58, 96, 0.2);
-            background: white;
-            border: 2px solid #1a3a60;
-        }
-        .track-item img { width: 100%; height: 115px; object-fit: cover; border-radius: 8px; }
-        .track-item .card-label { 
-            font-size: 11px; margin-top: 6px; font-weight: 800;
-            text-align: center; width: 100%; overflow: hidden; 
-            text-overflow: ellipsis; white-space: nowrap;
-            color: #1a3a60;
-        }
+        .track-item img { width: 100%; height: 115px; object-fit: cover; border-radius: 6px; }
+        .track-item .card-label { font-size: 10px; margin-top: 5px; font-weight: 800; text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         /* 單抽結果框 */
         .result-single-box {
-            display: none;
-            width: 180px; margin: 15px auto;
+            display: none; width: 180px; margin: 15px auto;
             background: rgba(255, 255, 255, 0.5); border: 3px solid #2cf35e; 
-            padding: 10px; border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(44, 243, 94, 0.2);
+            padding: 10px; border-radius: 16px; box-shadow: 0 10px 25px rgba(44, 243, 94, 0.2);
             animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .result-single-box img { width: 100%; border-radius: 12px; }
@@ -207,12 +179,11 @@
 
         /* 十連抽滑動框 */
         #multi-result-container { 
-            display: none;
-            flex-wrap: nowrap; gap: 10px; justify-content: flex-start; 
+            display: none; flex-wrap: nowrap; gap: 10px; justify-content: flex-start; 
             margin: 20px auto; width: 100%; background: rgba(255, 255, 255, 0.3); 
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.5); padding: 15px 12px; border-radius: 16px; 
-            box-sizing: border-box; overflow-x: auto; -webkit-overflow-scrolling: touch;
+            box-sizing: border-box; overflow-x: auto; -webkit-overflow-scrolling: touch; 
         }
         #multi-result-container::-webkit-scrollbar { height: 5px; }
         #multi-result-container::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 10px; }
@@ -220,8 +191,7 @@
         .mini-card-box {
             width: 95px; flex-shrink: 0; text-align: center;
             background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.6);
-            padding: 5px; border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box;
+            padding: 5px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box;
             opacity: 0; transform: scale(0.6); animation: miniPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
         }
         @keyframes miniPop { to { opacity: 1; transform: scale(1); } }
@@ -234,16 +204,9 @@
             font-family: 'Noto Sans TC', sans-serif; font-weight: 500;
         }
         .btn-group { display: flex; gap: 10px; margin-top: 5px; }
-        .btn { 
-            flex: 1; background: #ff4757; color: white; border: none;
-            padding: 16px 10px; font-size: 16px; font-weight: 800; border-radius: 50px; cursor: pointer; 
-            box-shadow: 0 4px 0 #cc3a47; transition: 0.1s; font-family: 'Noto Sans TC', sans-serif; 
-        }
+        .btn { flex: 1; background: #ff4757; color: white; border: none; padding: 16px 10px; font-size: 16px; font-weight: 800; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 0 #cc3a47; transition: 0.1s; font-family: 'Noto Sans TC', sans-serif; }
         .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #cc3a47; }
-        .btn:disabled { 
-            background: rgba(0,0,0,0.1); color: #999; box-shadow: none; 
-            cursor: not-allowed; transform: none !important; border: 1px solid rgba(0,0,0,0.05); 
-        }
+        .btn:disabled { background: rgba(0,0,0,0.1); color: #999; box-shadow: none; cursor: not-allowed; transform: none !important; border: 1px solid rgba(0,0,0,0.05); }
         #draw-btn-10 { background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%); box-shadow: 0 4px 0 #cc3a47; }
         
         .history-item { padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 13px; color: #ff5e6c; font-weight: 500; text-align: left;}
@@ -262,11 +225,11 @@
         <div class="modal-box" onclick="event.stopPropagation()">
             <div class="modal-header">
                 <span>📋 活動抽獎規則</span>
-                <span class="modal-close" onclick="closeModal(null, 'rule-modal')">×</span>
+                <span class="modal-close" onclick="document.getElementById('rule-modal').style.display='none'">×</span>
             </div>
             <div class="modal-body">
                 <b>【一番賞抽獎說明】</b><br>
-                1. 請先確實輸入您的 IG 或 FB 帳號與專專屬抽獎代碼。<br>
+                1. 請先確實輸入您的 IG 或 FB 帳號與專屬抽獎代碼。<br>
                 2. 本次活動代碼分為「單抽券(S開頭)」與「十連抽券(T開頭)」，請對應按鈕使用。<br>
                 3. 每組抽獎代碼皆為一次性使用，一經抽取即作廢。<br>
                 4. 抽獎結果將即時同步登錄至後台，保障抽獎公平性。<br>
@@ -279,9 +242,11 @@
         <div class="modal-box" onclick="event.stopPropagation()">
             <div class="modal-header">
                 <span>📜 我的抽獎紀錄</span>
-                <span class="modal-close" onclick="closeModal(null, 'history-modal')">×</span>
+                <span class="modal-close" onclick="document.getElementById('history-modal').style.display='none'">×</span>
             </div>
-            <div class="modal-body" id="my-history">尚未有紀錄</div>
+            <div class="modal-body" id="my-history">
+                尚未有紀錄
+            </div>
         </div>
     </div>
 
@@ -291,18 +256,17 @@
             <div style="font-size: 14px; color: #666; font-weight: 800;">目前獎箱剩餘</div>
             <div class="total-rem" id="total-count">--</div>
         </div>
-
         <div class="input-group">
             <input type="text" id="user-name" placeholder="請輸入IG or FB..." oninput="checkStatus()">
             <input type="text" id="user-code" placeholder="請輸入抽獎代碼..." oninput="checkStatus()">
         </div>
-
-        <div style="text-align: left; font-size: 13px; color: #1a3a60; font-weight: 900; padding-left: 5px;">🃏 頂級熱門獎池展示 (Top 30)</div>
+        
+        <div style="text-align: left; font-size: 13px; color: #1a3a60; font-weight: 900; padding-left: 5px;">🃏 獎池展示</div>
         
         <div class="showcase-stage" id="showcase-wall">
             <div class="showcase-track" id="main-track"></div>
         </div>
-
+        
         <div class="rotate-stage-container" id="rotate-stage">
             <div class="circle-carousel" id="carousel-vault"></div>
         </div>
@@ -310,9 +274,10 @@
         <div class="result-single-box" id="single-result-box">
             <img id="card-img" src="">
         </div>
+        
         <div id="multi-result-container"></div>
         <div id="card-name" style="margin-bottom:15px; font-weight:900; height:1.2em; font-size: 22px;"></div>
-
+        
         <div class="btn-group">
             <button id="draw-btn-10" class="btn" onclick="draw(10)" disabled>十連抽</button>
             <button id="draw-btn" class="btn" onclick="draw(1)" disabled>請完整輸入資料</button>
@@ -320,8 +285,6 @@
     </div>
 
     <script>
-        // --- 1. Firebase 核心配置 ---
-        // (請換成你自己的真實 Firebase Config 參數)
         const firebaseConfig = {
             apiKey: "AIzaSyAxQR4TtkvkAXqjiF_A5k5Mri9Rejtpbu4",
             authDomain: "dream-9d0bc.firebaseapp.com",
@@ -807,258 +770,339 @@
 {id:421, grade:"S", name:"S賞-3 4.0娃娃", count:1, url:"https://i.postimg.cc/LXbthVwT/IMG-E4064.jpg"},
 {id:422, grade:"last", name:"last賞-3 3.0娃娃", count:1, url:"https://i.postimg.cc/nzP4M1gT/IMG-E4065.jpg"},
         ];
-let localPool = {};
+let currentPool = [];
         let isRolling = false;
+        let showcaseTimer = null;
+        
+        let sortedCards = [];
+        let virtualIndex = 0; 
+        const VISIBLE_COUNT = 5; 
 
-        // --- 4. 展示牆流暢自動滾動核心變數 ---
-        let currentScrollX = 0;
-        let scrollSpeed = 0.5; // 每幀移動的像素，數值越小越慢、越流暢
-        let autoScrollInterval = null;
-        const ITEM_WIDTH = 105; // 寬度85 + 左右外邊距10*2
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+            if(id === 'history-modal') renderHistory();
+        }
+        function closeModal(event, id) {
+            if (event.target.classList.contains('modal-overlay') || event.target.classList.contains('modal-close')) {
+                document.getElementById(id).style.display = 'none';
+            }
+        }
 
-        // --- 5. 初始化與資料監聽 ---
-        db.ref('pool').on('value', (snapshot) => {
-            localPool = snapshot.val() || {};
-            let total = Object.values(localPool).reduce((a, b) => a + b, 0);
-            document.getElementById('total-count').innerText = total + " 抽";
-            document.getElementById('loading').style.display = 'none';
+        function getGradeStyle(grade) {
+            const upperGrade = grade.toUpperCase();
+            let color = "#ffffff";
+            let shadow = "0 2px 4px rgba(0,0,0,0.3)";
             
-            // 每次 Firebase 更新時重新繪製前 30 名展示牆
-            renderTop30Showcase();
-        });
+            switch(upperGrade) {
+                case "S": color = "#ff4757"; shadow = "0 0 6px rgba(255, 71, 87, 0.6)"; break;
+                case "A": color = "#a55eea"; shadow = "0 0 6px rgba(165, 94, 234, 0.6)"; break;
+                case "B": color = "#ffa502"; shadow = "0 1px 3px rgba(0,0,0,0.5)"; break;
+                case "C": color = "#2e86de"; shadow = "0 0 6px rgba(46, 134, 222, 0.6)"; break;
+                case "D": color = "#2ed573"; shadow = "0 0 6px rgba(46, 213, 115, 0.6)"; break;
+                case "E": color = "#747d8c"; shadow = "0 1px 3px rgba(0,0,0,0.4)"; break;
+                case "F": color = "#ffffff"; shadow = "0 2px 4px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1)"; break;
+                case "LAST": color = "#ff7675"; shadow = "0 0 8px rgba(255, 118, 117, 0.7)"; break;
+            }
+            return `color: ${color}; text-shadow: ${shadow};`;
+        }
 
-        // --- 核心功能：篩選最高賞前 30 名並生成無縫滾動軌道 ---
-        function renderTop30Showcase() {
+        function initShowcaseStage() {
             const track = document.getElementById('main-track');
             track.innerHTML = "";
-            clearInterval(autoScrollInterval);
 
-            // 1. 根據 cardConfig 的順序，篩選出 Firebase 剩餘量 > 0 的品項
-            let activeAwards = [];
-            cardConfig.forEach(config => {
-                const remCount = localPool[config.name] || 0;
-                if (remCount > 0) {
-                    activeAwards.push({ ...config, count: remCount });
-                }
-            });
+            const gradeOrder = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
+            sortedCards = [...cardConfig]
+                .filter(c => c.grade.toUpperCase() !== "LAST")
+                .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 99) - (gradeOrder[b.grade.toUpperCase()] || 99));
+            
+            virtualIndex = 0;
 
-            // 2. 只保留前 30 個最高賞品項
-            let top30Awards = activeAwards.slice(0, 30);
-
-            if (top30Awards.length === 0) {
-                track.innerHTML = "<div style='color:#666; font-weight:800; width:100%; text-align:center;'>獎項已全數抽完！</div>";
-                return;
-            }
-
-            // 3. 為了達成「無縫循環」滾動，我們將這 30 個品項複製 3 份串接起來
-            const loopAwards = [...top30Awards, ...top30Awards, ...top30Awards];
-
-            loopAwards.forEach((card) => {
+            for (let i = 0; i < VISIBLE_COUNT; i++) {
                 const item = document.createElement('div');
                 item.className = 'track-item';
-                item.innerHTML = `
-                    <img src="${card.img}" alt="${card.name}">
-                    <div class="card-label">[剩${card.count}] ${card.name.split(' ')[0]}</div>
-                `;
+                item.id = `track-node-${i}`;
                 track.appendChild(item);
-            });
+            }
 
-            // 4. 啟動極流暢無縫自動滾動與中間聚焦偵測
-            startSmoothScroll(top30Awards.length);
+            renderDynamic3D();
+
+            if (showcaseTimer) clearInterval(showcaseTimer);
+            showcaseTimer = setInterval(() => {
+                if (isRolling) return;
+                virtualIndex = (virtualIndex + 1) % sortedCards.length;
+                renderDynamic3D();
+            }, 2200);
         }
 
-        // --- 核心功能：無縫無限橫向滾動與 3D 聚焦邏輯 ---
-        function startSmoothScroll(itemCount) {
+        function renderDynamic3D() {
             const track = document.getElementById('main-track');
-            const totalWidth = itemCount * ITEM_WIDTH; // 一組資料的總寬度
-            currentScrollX = 0;
+            const itemWidth = 96; 
+            const centerNodeIdx = 2; 
+            const offset = -(centerNodeIdx * itemWidth) - 48;
+            track.style.transform = `translateX(${offset}px)`;
 
-            autoScrollInterval = setInterval(() => {
-                if (isRolling) return; // 正在抽獎轉動時，暫停背景展示滾動
+            for (let i = 0; i < VISIBLE_COUNT; i++) {
+                const node = document.getElementById(`track-node-${i}`);
+                if (!node) continue;
 
-                currentScrollX -= scrollSpeed;
-                
-                // 當跑滿一組商品的寬度時，瞬間拉回起點，達成完美無縫循環
-                if (Math.abs(currentScrollX) >= totalWidth) {
-                    currentScrollX = 0;
+                const distance = i - centerNodeIdx;
+                let cardDataIdx = (virtualIndex + distance) % sortedCards.length;
+                if (cardDataIdx < 0) cardDataIdx += sortedCards.length;
+
+                const card = sortedCards[cardDataIdx];
+
+                node.innerHTML = `
+                    <img src="${card.url}" alt="${card.name}">
+                    <div class="card-label" style="${getGradeStyle(card.grade)}">[${card.grade}] ${card.name.split('-')[1] || card.name}</div>
+                `;
+
+                if (distance === 0) {
+                    node.style.transform = "scale(1.15) translateY(-6px)";
+                    node.style.opacity = "1";
+                    node.style.zIndex = "5";
+                    node.style.border = "1.5px solid rgba(255,255,255,0.85)";
+                    node.style.boxShadow = "0 10px 25px rgba(0,0,0,0.18)";
+                } else if (Math.abs(distance) === 1) {
+                    node.style.transform = "scale(0.85) translateY(0px)";
+                    node.style.opacity = "0.45";
+                    node.style.zIndex = "3";
+                    node.style.border = "1px solid rgba(255,255,255,0.4)";
+                    node.style.boxShadow = "0 4px 10px rgba(0,0,0,0.05)";
+                } else {
+                    node.style.transform = "scale(0.65)";
+                    node.style.opacity = "0.12";
+                    node.style.zIndex = "1";
+                    node.style.border = "1px solid rgba(255,255,255,0.2)";
                 }
-
-                track.style.transform = `translateX(${currentScrollX}px)`;
-
-                // 偵測哪一張卡片正處於外框舞台的正中央，給予精緻焦點放大特效
-                const items = track.getElementsByClassName('track-item');
-                const stageCenter = window.innerWidth / 2;
-
-                for (let item of items) {
-                    const rect = item.getBoundingClientRect();
-                    const itemCenter = rect.left + rect.width / 2;
-                    
-                    // 如果卡片中心點距離螢幕中心小於 50px，視為聚焦
-                    if (Math.abs(itemCenter - stageCenter) < 55) {
-                        item.classList.add('focused');
-                    } else {
-                        item.classList.remove('focused');
-                    }
-                }
-            }, 16); // ~60fps 高流暢刷新率
+            }
         }
 
-        // --- 6. 狀態檢查與驗證 ---
+        function buildRotationCircle() {
+            const vault = document.getElementById('carousel-vault');
+            vault.innerHTML = "";
+            const totalCards = 7; 
+            const radius = 110;  
+            for (let i = 0; i < totalCards; i++) {
+                const randomCard = cardConfig[Math.floor(Math.random() * (cardConfig.length - 1))];
+                const angle = (i * 360) / totalCards;
+                const item = document.createElement('div');
+                item.className = 'carousel-item';
+                item.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
+                item.innerHTML = `<img src="${randomCard.url}">`;
+                vault.appendChild(item);
+            }
+        }
+
+        db.ref('pool').on('value', (snap) => {
+            const data = snap.val();
+            if (!data || data.length === 0) {
+                initPool(); 
+            } else {
+                currentPool = data;
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('total-count').innerText = currentPool.length + " 抽";
+                checkStatus();
+            }
+        });
+
+        function initPool() {
+            let p = [];
+            cardConfig.forEach(c => { 
+                if(c.grade.toUpperCase() !== "LAST") { for(let i=0; i<c.count; i++) p.push(c.id); }
+            });
+            db.ref('pool').set(p);
+        }
+
         function checkStatus() {
             if (isRolling) return;
             const name = document.getElementById('user-name').value.trim();
             const code = document.getElementById('user-code').value.trim();
-            const btn = document.getElementById('draw-btn');
+            const btn1 = document.getElementById('draw-btn');
             const btn10 = document.getElementById('draw-btn-10');
-
-            if (!name) {
-                btn.disabled = true; btn10.disabled = true;
-                btn.innerText = "請完整輸入資料"; return;
-            }
-            if (!code) {
-                btn.disabled = true; btn10.disabled = true;
-                btn.innerText = "請輸入抽獎代碼"; return;
-            }
-            if (!validCodes.includes(code)) {
-                btn.disabled = true; btn10.disabled = true;
-                btn.innerText = "代碼無效或已過期"; return;
-            }
-
-            if (code.startsWith('T')) {
-                btn.disabled = true; btn10.disabled = false;
-                btn.innerText = "請使用十連抽";
-            } else if (code.startsWith('S')) {
-                btn.disabled = false; btn10.disabled = true;
-                btn.innerText = "開抽（單抽）";
+            const isDisabled = (currentPool.length === 0 || name === "" || code === "");
+            
+            if (currentPool.length === 0) {
+                btn1.innerText = "已全數售罄"; btn10.innerText = "已全數售罄";
+                btn1.disabled = true; btn10.disabled = true;
+            } else {
+                btn1.innerText = "單抽"; btn10.innerText = `十連抽`;
+                btn1.disabled = isDisabled;
+                btn10.disabled = isDisabled || (currentPool.length < 10);
             }
         }
 
-        // --- 7. 彈窗控制功能 ---
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; renderHistory(); }
-        function closeModal(e, id) { if (!e || e.target === document.getElementById(id)) { document.getElementById(id).style.display = 'none'; } }
+        let animationFrameId;
+        let currentAngle = 0;
+        let currentSpeed = 2; 
 
-        // --- 8. 抽獎動畫核心引擎 ---
-        function draw(num) {
+        function animateCarousel() {
+            if (!isRolling) return;
+            const vault = document.getElementById('carousel-vault');
+            currentAngle += currentSpeed;
+            vault.style.transform = `rotateX(-10deg) rotateY(${currentAngle}deg)`;
+            if (currentSpeed < 25) { currentSpeed += 0.12; }
+            animationFrameId = requestAnimationFrame(animateCarousel);
+        }
+
+        async function draw(drawCount) {
             if (isRolling) return;
+            const name = document.getElementById('user-name').value.trim();
+            const code = document.getElementById('user-code').value.trim();
+
+            if (!validCodes.includes(code)) {
+                alert("❌ 無效的代碼，請重新確認！"); return;
+            }
+            const firstLetter = code.charAt(0).toUpperCase();
+            if (drawCount === 1 && firstLetter !== 'S') {
+                alert("❌ 此代碼為「十連抽專用券」，請點擊【十連抽】按鈕！"); return;
+            }
+            if (drawCount === 10 && firstLetter !== 'T') {
+                alert("❌ 此代碼為「單抽專用券」，請點擊【單抽】按鈕！"); return;
+            }
+
             isRolling = true;
             document.getElementById('draw-btn').disabled = true;
             document.getElementById('draw-btn-10').disabled = true;
 
-            // 隱藏展示牆與歷史結果，顯示 3D 旋轉輪盤舞台
-            document.getElementById('showcase-wall').style.display = 'none';
-            document.getElementById('single-result-box').style.display = 'none';
-            document.getElementById('multi-result-container').style.display = 'none';
-            document.getElementById('card-name').innerText = "";
-            
+            const img = document.getElementById('card-img');
+            const nameDisplay = document.getElementById('card-name');
+            const multiContainer = document.getElementById('multi-result-container');
+            const singleResultBox = document.getElementById('single-result-box');
             const rotateStage = document.getElementById('rotate-stage');
-            const carousel = document.getElementById('carousel-vault');
-            rotateStage.style.display = 'block';
-            carousel.innerHTML = "";
+            const showcaseWall = document.getElementById('showcase-wall');
 
-            // 動態塞入 12 張假卡進行高速 3D 輪盤旋轉效果
-            const sampleCards = cardConfig.slice(0, 12);
-            sampleCards.forEach((c, index) => {
-                const item = document.createElement('div');
-                item.className = 'carousel-item';
-                item.style.transform = `rotateY(${index * 30}deg) translateZ(160px)`;
-                item.innerHTML = `<img src="${c.img}">`;
-                carousel.appendChild(item);
-            });
+            showcaseWall.style.display = "none";
+            nameDisplay.innerText = "";
+            multiContainer.innerHTML = "";
+            multiContainer.style.display = "none";
+            singleResultBox.style.display = "none";
+            
+            buildRotationCircle();
+            rotateStage.style.display = "block";
+            currentSpeed = 2; currentAngle = 0;
+            animateCarousel();
 
-            // 開始高速旋轉動畫
-            let angle = 0;
-            let spinSpeed = 25;
-            const spinInterval = setInterval(() => {
-                angle += spinSpeed;
-                carousel.style.transform = `rotateX(-10deg) rotateY(${angle}deg)`;
-                if (spinSpeed > 2) spinSpeed *= 0.95; // 逐漸減速
-            }, 30);
-
-            // 自資料庫計算抽獎結果
-            let availableList = [];
-            Object.keys(localPool).forEach(name => {
-                for (let i = 0; i < localPool[name]; i++) { availableList.push(name); }
-            });
-
-            if (availableList.length === 0) {
-                clearInterval(spinInterval);
-                alert("抱歉！獎箱已被抽空！");
-                isRolling = false; checkStatus(); return;
+            const codeRef = db.ref('usedCodes/' + code);
+            const snapshot = await codeRef.get();
+            if (snapshot.exists()) {
+                alert("⚠️ 此代碼已被使用過，一組代碼僅限抽獎一次！");
+                isRolling = false; rotateStage.style.display = "none"; showcaseWall.style.display = "flex"; checkStatus(); return;
             }
 
-            let results = [];
-            let drawCount = Math.min(num, availableList.length);
-            for (let i = 0; i < drawCount; i++) {
-                let randIndex = Math.floor(Math.random() * availableList.length);
-                let picked = availableList.splice(randIndex, 1)[0];
-                results.push(picked);
-            }
+            let isLastDrawTriggered = (currentPool.length === drawCount);
 
-            // 更新 Firebase 雲端資料庫
-            let updates = {};
-            results.forEach(name => {
-                updates[`/pool/${name}`] = localPool[name] - 1;
-            });
-            db.ref().update(updates);
-
-            // 1.5秒後旋轉停下，切換至開獎結果視窗
-            setTimeout(() => {
-                clearInterval(spinInterval);
-                rotateStage.style.display = 'none';
-                document.getElementById('showcase-wall').style.display = 'flex'; // 重新喚醒展示牆
-                
-                const username = document.getElementById('user-name').value.trim();
-                const code = document.getElementById('user-code').value.trim();
-
-                if (num === 1) {
-                    // 單抽開獎結果展示
-                    const awardName = results[0];
-                    const configObj = cardConfig.find(c => c.name === awardName);
+            db.ref('pool').transaction((p) => {
+                if (p && p.length >= drawCount) {
+                    window.lastDrawResults = []; 
+                    let hasHighAward = false;    
                     
-                    const singleBox = document.getElementById('single-result-box');
-                    document.getElementById('card-img').src = configObj.img;
-                    singleBox.style.display = 'block';
-                    document.getElementById('card-name').innerText = `🎉 恭喜抽中：${awardName}`;
-                    
-                    saveLocalRecord(awardName);
-                    sendToGoogleForm(username, code, awardName);
-                } else {
-                    // 十連抽開獎結果橫向滑動排版展示
-                    const multiContainer = document.getElementById('multi-result-container');
-                    multiContainer.innerHTML = "";
-                    multiContainer.style.display = 'flex';
+                    for (let i = 0; i < drawCount; i++) {
+                        // 修正：十連抽保底機制，若前 9 抽無大獎，第 10 抽強制提供保底 (尋找卡池內還存在的最高等獎)
+                        if (drawCount === 10 && i === 9 && !hasHighAward) {
+                            let availableHighCards = p.filter(id => {
+                                let card = cardConfig.find(c => c.id === id);
+                                return card && ["S", "A", "B", "C", "D"].includes(card.grade.toUpperCase());
+                            });
+                            if (availableHighCards.length > 0) {
+                                const pickedId = availableHighCards[Math.floor(Math.random() * availableHighCards.length)];
+                                window.lastDrawResults.push(pickedId);
+                                p.splice(p.indexOf(pickedId), 1);
+                                continue; 
+                            }
+                        }
 
-                    results.forEach((awardName, i) => {
-                        const configObj = cardConfig.find(c => c.name === awardName);
-                        const box = document.createElement('div');
-                        box.className = 'mini-card-box';
-                        box.style.animationDelay = `${i * 0.1}s`; // 精緻階梯式依序彈出
-                        box.innerHTML = `
-                            <img src="${configObj.img}" style="width:100%; border-radius:6px; height:100px; object-fit:cover;">
-                            <div style="font-size:11px; font-weight:800; margin-top:4px; color:#1a3a60; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${awardName.split(' ')[0]}</div>
-                        `;
-                        multiContainer.appendChild(box);
-                        saveLocalRecord(awardName);
-                    });
-                    
-                    document.getElementById('card-name').innerText = `✨ 十連抽完成！請向右滑動查看所有獎項`;
-                    sendToGoogleForm(username, code, results.join(', '));
+                        let finalIdx; let drawnId; let card; let attempts = 0;
+                        do {
+                            finalIdx = Math.floor(Math.random() * p.length);
+                            drawnId = p[finalIdx];
+                            card = cardConfig.find(c => c.id === drawnId);
+                            attempts++;
+                            
+                            // 修正：終極安全防狙擊大獎邏輯
+                            if (card && ["S", "A"].includes(card.grade.toUpperCase())) {
+                                let originalCount = cardConfig.find(c => c.id === drawnId).count;
+                                if (p.length > originalCount) { continue; }
+                            }
+                            break; 
+                        } while (attempts < 500);
+
+                        window.lastDrawResults.push(drawnId);
+                        if (card && ["S","A","B","C","D"].includes(card.grade.toUpperCase())) { hasHighAward = true; }
+                        p.splice(finalIdx, 1);
+                    }
+                    return p;
                 }
+                return;
+            }, (err, committed) => {
+                if (committed) {
+                    db.ref('usedCodes/' + code).set({
+                        user: name, time: firebase.database.ServerValue.TIMESTAMP, count: drawCount
+                    });
 
-                // 抽完後作廢該代碼並清空輸入框
-                const codeIndex = validCodes.indexOf(code);
-                if (codeIndex > -1) validCodes.splice(codeIndex, 1);
-                document.getElementById('user-code').value = "";
+                    setTimeout(() => {
+                        cancelAnimationFrame(animationFrameId); 
+                        rotateStage.style.display = "none";     
+                        showcaseWall.style.display = "flex";    
+                        
+                        if (drawCount === 1) {
+                            let result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
+                            if(isLastDrawTriggered) { result = cardConfig.find(c => c.grade.toUpperCase() === "LAST"); }
 
-                isRolling = false;
-                checkStatus();
-            }, 1500);
+                            img.src = result.url;
+                            singleResultBox.style.display = "block"; 
+                            nameDisplay.innerHTML = `<span style="${getGradeStyle(result.grade)}">${result.name}</span>`;
+
+                            saveLocalRecord(result.name);
+                            sendToGoogleForm(name, code, result.name);
+                        } else {
+                            multiContainer.style.display = "flex";
+                            
+                            window.lastDrawResults.forEach((id, index) => {
+                                let result = cardConfig.find(c => c.id === id);
+                                appendMiniCard(result, index, index * 150);
+                                saveLocalRecord(`[十連抽-${index+1}] ${result.name}`);
+                                sendToGoogleForm(`${name}(十連抽-${index+1})`, code, result.name);
+                            });
+
+                            if(isLastDrawTriggered) {
+                                const lastAward = cardConfig.find(c => c.grade.toUpperCase() === "LAST");
+                                setTimeout(() => {
+                                    appendMiniCard(lastAward, "LAST", 0);
+                                    nameDisplay.innerHTML = `<span style="${getGradeStyle(lastAward.grade)}">🎉 恭喜獲得 ${lastAward.name}！</span>`;
+                                    saveLocalRecord(`[壓軸大獎] ${lastAward.name}`);
+                                    sendToGoogleForm(`${name}(Last賞)`, code, lastAward.name);
+                                }, 10 * 150 + 200);
+                            }
+                        }
+                        
+                        isRolling = false;
+                        checkStatus();
+                        initShowcaseStage(); 
+                    }, 2800); 
+                } else {
+                    cancelAnimationFrame(animationFrameId); rotateStage.style.display = "none"; showcaseWall.style.display = "flex";
+                    alert("抽獎失敗，請再試一次"); isRolling = false; checkStatus();
+                    initShowcaseStage();
+                }
+            });
         }
 
-        // --- 9. 本地瀏覽器抽獎紀錄緩存 ---
+        function appendMiniCard(card, displayIndex, delay) {
+            const multiContainer = document.getElementById('multi-result-container');
+            const textStyle = getGradeStyle(card.grade);
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'mini-card-box';
+            cardDiv.style.animationDelay = `${delay}ms`;
+            cardDiv.innerHTML = `
+                <img src="${card.url}" style="width: 100%; border-radius: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
+                <div style="font-size: 11px; margin-top: 5px; font-weight:900; ${textStyle}">#${displayIndex === "LAST" ? "Last" : displayIndex+1}<br><span>${card.name.split('-')[0]}</span></div>
+            `;
+            multiContainer.appendChild(cardDiv);
+        }
+
         function saveLocalRecord(cardName) {
             let history = JSON.parse(localStorage.getItem('myDrawHistory')) || [];
-            if (history[0] === "尚未有紀錄") history = [];
+            if(history.length > 0 && history[0] === "尚未有紀錄") history = [];
             history.unshift({ name: cardName, time: new Date().toLocaleTimeString() });
             localStorage.setItem('myDrawHistory', JSON.stringify(history));
         }
@@ -1067,23 +1111,28 @@ let localPool = {};
             const history = JSON.parse(localStorage.getItem('myDrawHistory')) || [];
             const container = document.getElementById('my-history');
             if (history.length === 0) { container.innerHTML = "尚未有紀錄"; return; }
-            container.innerHTML = history.map(h => `<div class=\"history-item\">🕒 ${h.time ? h.time : ''} - ${h.name}</div>`).join('');
+            container.innerHTML = history.map(h => `<div class="history-item">🕒 ${h.time ? h.time : ''} - ${h.name}</div>`).join('');
         }
 
-        // --- 10. 背景自動同步至 Google 表單 (請抽換成你自己的真實 Form URL 與 entry ID) ---
         function sendToGoogleForm(username, code, awardName) {
+            // 請替換下方的 Form 網址以及對應的 entry.xxxx 標籤
             const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfD_uYkY_0b_p6gU8W6-B5rK39z8Fz29R0b8qW_xxxxxxxxx/formResponse";
             const formData = new FormData();
-            formData.append("entry.1111111111", username); 
-            formData.append("entry.2222222222", code);     
-            formData.append("entry.3333333333", awardName); 
+            formData.append("entry.1111111111", username); // 請替換真實 entry id
+            formData.append("entry.2222222222", code);     // 請替換真實 entry id
+            formData.append("entry.3333333333", awardName); // 請替換真實 entry id
 
             fetch(formUrl, {
                 method: "POST",
                 mode: "no-cors",
                 body: formData
-            }).catch(err => console.log("表單同步成功(預期跨網域回傳)：", err));
+            }).catch(err => console.log("Google Form 紀錄失敗，但 Firebase 已同步成功。", err));
         }
+
+        // 頁面初次載入執行
+        window.onload = function() {
+            initShowcaseStage();
+        };
     </script>
 </body>
 </html>
