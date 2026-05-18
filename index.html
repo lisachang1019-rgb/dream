@@ -123,7 +123,7 @@
         }
         .total-rem { font-size: 32px; font-weight: 900; color: #ff4757; }
         
-        /* 3D 圓環旋轉舞台 */
+        /* 3D 圓環旋轉舞台 (抽獎時才啟動，安全) */
         .rotate-stage-container {
             display: none; 
             width: 100%;
@@ -147,25 +147,35 @@
         }
         .carousel-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
 
-        /* 展示牆 (已徹底移除導致手機當機的 -webkit-mask-image 語法) */
+        /* 🔥 全新安全版展示牆：改為超流暢的原生橫向滑動排版，100% 拒絕當機 */
         .showcase-stage {
-            display: flex; justify-content: center; align-items: center;
-            height: 200px; margin: 15px 0; position: relative; overflow: hidden; width: 100%;
+            display: flex;
+            gap: 12px;
+            padding: 15px 5px;
+            margin: 10px 0 20px 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* 讓 iOS 滑動有高級阻尼感 */
+            scroll-behavior: smooth;
         }
-        .showcase-track {
-            display: flex; position: absolute; left: 50%;
-            transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-            will-change: transform;
+        /* 隱藏原生滾動條，維持排版乾淨 */
+        .showcase-stage::-webkit-scrollbar {
+            display: none;
         }
         .track-item {
-            width: 80px; margin: 0 8px; background: rgba(255, 255, 255, 0.5); 
-            border: 1px solid rgba(255, 255, 255, 0.6); padding: 4px; border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box;
-            display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
-            transition: transform 0.6s, opacity 0.6s; will-change: transform, opacity;
+            width: 85px;
+            background: rgba(255, 255, 255, 0.6); 
+            border: 1px solid rgba(255, 255, 255, 0.8); 
+            padding: 6px; 
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06); 
+            box-sizing: border-box;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            flex-shrink: 0;
         }
-        .track-item img { width: 100%; height: 115px; object-fit: cover; border-radius: 6px; }
-        .track-item .card-label { font-size: 10px; margin-top: 5px; font-weight: 800; text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .track-item img { width: 100%; height: 110px; object-fit: cover; border-radius: 8px; }
+        .track-item .card-label { font-size: 11px; margin-top: 6px; font-weight: 800; text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         /* 單抽結果框 */
         .result-single-box {
@@ -261,11 +271,9 @@
             <input type="text" id="user-code" placeholder="請輸入抽獎代碼..." oninput="checkStatus()">
         </div>
         
-        <div style="text-align: left; font-size: 13px; color: #1a3a60; font-weight: 900; padding-left: 5px;">🃏 獎池展示</div>
+        <div style="text-align: left; font-size: 13px; color: #1a3a60; font-weight: 900; padding-left: 5px;">🃏 獎池展示 (左右滑動看全部)</div>
         
-        <div class="showcase-stage" id="showcase-wall">
-            <div class="showcase-track" id="main-track"></div>
-        </div>
+        <div class="showcase-stage" id="showcase-wall"></div>
         
         <div class="rotate-stage-container" id="rotate-stage">
             <div class="circle-carousel" id="carousel-vault"></div>
@@ -772,9 +780,7 @@
         ];
 let currentPool = [];
         let isRolling = false;
-        let showcaseTimer = null;
-        let currentFocusIndex = 0; 
-        let trackCards = [];      
+        let showcaseAutoScroll = null;
 
         /* 彈出視窗控制 */
         function openModal(id) {
@@ -788,101 +794,52 @@ let currentPool = [];
 
         function getGradeStyle(grade) {
             const upperGrade = grade.toUpperCase();
-            let color = "#ffffff";
-            let shadow = "0 2px 4px rgba(0,0,0,0.3)";
+            let color = "#333";
+            let shadow = "none";
             
             switch(upperGrade) {
-                case "S": color = "#ff4757"; shadow = "0 0 6px rgba(255, 71, 87, 0.6)"; break;
-                case "A": color = "#a55eea"; shadow = "0 0 6px rgba(165, 94, 234, 0.6)"; break;
-                case "B": color = "#ffa502"; shadow = "0 1px 3px rgba(0,0,0,0.5)"; break;
-                case "C": color = "#2e86de"; shadow = "0 0 6px rgba(46, 134, 222, 0.6)"; break;
-                case "D": color = "#2ed573"; shadow = "0 0 6px rgba(46, 213, 115, 0.6)"; break;
-                case "E": color = "#747d8c"; shadow = "0 1px 3px rgba(0,0,0,0.4)"; break;
-                case "F": color = "#ffffff"; shadow = "0 2px 4px rgba(0,0,0,0.8), 0 0 2px rgba(0,0,0,1)"; break;
-                case "LAST": color = "#ff7675"; shadow = "0 0 8px rgba(255, 118, 117, 0.7)"; break;
+                case "S": color = "#ff4757"; shadow = "0 0 4px rgba(255, 71, 87, 0.4)"; break;
+                case "A": color = "#a55eea"; shadow = "0 0 4px rgba(165, 94, 234, 0.4)"; break;
+                case "B": color = "#ffa502"; break;
+                case "C": color = "#2e86de"; break;
+                case "D": color = "#2ed573"; break;
+                case "E": color = "#747d8c"; break;
+                case "F": color = "#555555"; break;
+                case "LAST": color = "#ff7675"; shadow = "0 0 6px rgba(255, 118, 117, 0.5)"; break;
             }
             return `color: ${color}; text-shadow: ${shadow};`;
         }
 
+        /* 2D 超安全流暢型展示牆初始化 */
         function initShowcaseStage() {
-            const track = document.getElementById('main-track');
-            track.innerHTML = "";
+            const wall = document.getElementById('showcase-wall');
+            wall.innerHTML = "";
 
             const gradeOrder = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
             const basePool = [...cardConfig]
                 .filter(c => c.grade !== "Last")
                 .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 99) - (gradeOrder[b.grade.toUpperCase()] || 99));
             
-            trackCards = [...basePool, ...basePool, ...basePool];
-            currentFocusIndex = basePool.length; 
-
-            trackCards.forEach((card, idx) => {
+            basePool.forEach((card) => {
                 const item = document.createElement('div');
                 item.className = 'track-item';
-                item.id = `track-item-${idx}`;
                 item.innerHTML = `
                     <img src="${card.url}" alt="${card.name}">
                     <div class="card-label" style="${getGradeStyle(card.grade)}">[${card.grade}] ${card.name.split('-')[1] || card.name}</div>
                 `;
-                track.appendChild(item);
+                wall.appendChild(item);
             });
 
-            updateTrackPosition();
-
-            if (showcaseTimer) clearInterval(showcaseTimer);
-            showcaseTimer = setInterval(() => {
+            // 啟動定時自動輕緩向右滑動效果（原生滾動，安全不喘氣）
+            if(showcaseAutoScroll) clearInterval(showcaseAutoScroll);
+            showcaseAutoScroll = setInterval(() => {
                 if (isRolling) return;
-                currentFocusIndex++;
-                if (currentFocusIndex >= basePool.length * 2) {
-                    track.style.transition = 'none'; 
-                    currentFocusIndex = basePool.length; 
-                    updateTrackPosition();
-                    requestAnimationFrame(() => {
-                        if (isRolling) return;
-                        track.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
-                        currentFocusIndex++;
-                        updateTrackPosition();
-                    });
+                if (wall.scrollLeft >= (wall.scrollWidth - wall.clientWidth - 2)) {
+                    wall.scrollLeft = 0;
                 } else {
-                    track.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
-                    updateTrackPosition();
+                    wall.scrollLeft += 1;
                 }
-            }, 2000);
-        }
-
-        function updateTrackPosition() {
-            const track = document.getElementById('main-track');
-            const itemWidth = 96; 
-            const offset = -(currentFocusIndex * itemWidth) - 48;
-            track.style.transform = `translateX(${offset}px)`;
-
-            trackCards.forEach((_, idx) => {
-                const item = document.getElementById(`track-item-${idx}`);
-                if (!item) return;
-                const distance = idx - currentFocusIndex; 
-
-                if (distance === 0) {
-                    item.style.transform = "scale(1.15) translateY(-5px)";
-                    item.style.opacity = "1";
-                    item.style.zIndex = "5";
-                    item.style.border = "1.5px solid rgba(255,255,255,0.85)";
-                    item.style.boxShadow = "0 10px 25px rgba(0,0,0,0.15)";
-                } else if (Math.abs(distance) === 1) {
-                    item.style.transform = "scale(0.85)";
-                    item.style.opacity = "0.5";
-                    item.style.zIndex = "3";
-                    item.style.border = "1px solid rgba(255,255,255,0.4)";
-                    item.style.boxShadow = "0 4px 10px rgba(0,0,0,0.05)";
-                } else if (Math.abs(distance) === 2) {
-                    item.style.transform = "scale(0.65)";
-                    item.style.opacity = "0.15";
-                    item.style.zIndex = "1";
-                    item.style.border = "1px solid rgba(255,255,255,0.2)";
-                } else {
-                    item.style.opacity = "0";
-                    item.style.transform = "scale(0.5)";
-                }
-            });
+            }, 30);
         }
 
         function buildRotationCircle() {
@@ -1107,11 +1064,6 @@ let currentPool = [];
             if(history.length > 0 && history[0] === "尚未有紀錄") history = [];
             history.unshift({ name: cardName, time: new Date().toLocaleTimeString() });
             localStorage.setItem('myDrawHistory', JSON.stringify(history));
-            renderHistory();
-        }
-
-        function removeLocalRecord() {
-            localStorage.removeItem('myDrawHistory');
             renderHistory();
         }
 
