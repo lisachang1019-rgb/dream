@@ -87,7 +87,6 @@
             position: relative;
             overflow: hidden;
             width: 100%;
-            /* 讓左右兩端自然變淡透明 */
             -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);
             mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);
         }
@@ -159,7 +158,7 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* 十連抽大容器：支援左右滑動 */
+        /* 【方案 A】十連抽大容器：強制不折行並支援手機左右滑動 */
         #multi-result-container { 
             display: none; 
             flex-wrap: nowrap; 
@@ -186,7 +185,7 @@
             border-radius: 10px;
         }
 
-        /* 十連抽小卡底座 */
+        /* 【方案 A】十連抽小卡底座：固定寬度，禁止被手機螢幕壓扁 */
         .mini-card-box {
             width: 95px; 
             flex-shrink: 0; 
@@ -785,7 +784,7 @@ let currentPool = [];
             return `color: ${color}; text-shadow: ${shadow};`;
         }
 
-        /* 穩定安全的展示牆渲染邏輯（拔除可能引發手機死機的無窮 setTimeout） */
+        /* 記憶體優化版：抽離不安全的定時器，改用穩定的重繪機制防止手機崩潰 */
         function initShowcaseStage() {
             const track = document.getElementById('main-track');
             track.innerHTML = "";
@@ -795,9 +794,8 @@ let currentPool = [];
                 .filter(c => c.grade !== "Last")
                 .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 99) - (gradeOrder[b.grade.toUpperCase()] || 99));
             
-            // 複製多組基礎獎池，做成可以左右循環滾動的假象
             trackCards = [...basePool, ...basePool, ...basePool];
-            currentFocusIndex = basePool.length; // 從中間那一組開始顯示
+            currentFocusIndex = basePool.length; 
 
             trackCards.forEach((card, idx) => {
                 const item = document.createElement('div');
@@ -818,13 +816,11 @@ let currentPool = [];
 
                 currentFocusIndex++;
                 
-                // 到達第三組末端時，無感重設回第二組開頭，確保記憶體安全不崩潰
                 if (currentFocusIndex >= basePool.length * 2) {
                     track.style.transition = 'none'; 
                     currentFocusIndex = basePool.length; 
                     updateTrackPosition();
                     
-                    // 讓瀏覽器喘息一幀後再繼續平滑滾動
                     requestAnimationFrame(() => {
                         if (isRolling) return;
                         track.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
@@ -840,7 +836,7 @@ let currentPool = [];
 
         function updateTrackPosition() {
             const track = document.getElementById('main-track');
-            const itemWidth = 96; // 80px 寬度 + 16px 邊距
+            const itemWidth = 96; 
             
             const offset = -(currentFocusIndex * itemWidth) - 48;
             track.style.transform = `translateX(${offset}px)`;
@@ -851,7 +847,7 @@ let currentPool = [];
 
                 const distance = idx - currentFocusIndex; 
 
-                // 完美實踐手稿：中間大（1.15倍）、兩邊小（0.85/0.65倍）、越遠越淡（opacity）
+                // 完美重現手稿：中間大、兩邊小、越遠越淡
                 if (distance === 0) {
                     item.style.transform = "scale(1.15) translateY(-5px)";
                     item.style.opacity = "1";
