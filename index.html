@@ -22,7 +22,7 @@
             min-height: 100vh;
             position: relative;
         }
-        .container { max-width: 450px; margin: auto; padding-right: 15px; }
+        .container { max-width: 450px; margin: auto; padding-right: 15px; box-sizing: border-box; }
         
         /* 右側固定雙標籤頁面 */
         .side-tabs {
@@ -147,7 +147,7 @@
         }
         .carousel-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
 
-        /* ✨ 完美還原：精緻 3D 聚焦展示牆（改為動態 5 節點輕量化運算，iOS 絕對不當機） */
+        /* ✨ 精緻 3D 聚焦展示牆 */
         .showcase-stage {
             display: flex; justify-content: center; align-items: center;
             height: 200px; margin: 15px 0; position: relative; overflow: hidden; width: 100%;
@@ -209,7 +209,7 @@
         .btn:disabled { background: rgba(0,0,0,0.1); color: #999; box-shadow: none; cursor: not-allowed; transform: none !important; border: 1px solid rgba(0,0,0,0.05); }
         #draw-btn-10 { background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%); box-shadow: 0 4px 0 #cc3a47; }
         
-        .history-item { padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 13px; color: #ff5e6c; font-weight: 500; }
+        .history-item { padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 13px; color: #ff5e6c; font-weight: 500; text-align: left;}
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 1001; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
     </style>
 </head>
@@ -774,16 +774,16 @@ let currentPool = [];
         let isRolling = false;
         let showcaseTimer = null;
         
-        // 🔮 輕量化動態滾動核心變數
         let sortedCards = [];
         let virtualIndex = 0; 
         const VISIBLE_COUNT = 5; 
 
         function openModal(id) {
             document.getElementById(id).style.display = 'flex';
+            if(id === 'history-modal') renderHistory();
         }
         function closeModal(event, id) {
-            if (event.target.classList.contains('modal-overlay')) {
+            if (event.target.classList.contains('modal-overlay') || event.target.classList.contains('modal-close')) {
                 document.getElementById(id).style.display = 'none';
             }
         }
@@ -806,19 +806,17 @@ let currentPool = [];
             return `color: ${color}; text-shadow: ${shadow};`;
         }
 
-        /* 🔮 超輕量化 3D 展示牆核心：DOM 上永遠只有 5 個卡片節點 */
         function initShowcaseStage() {
             const track = document.getElementById('main-track');
             track.innerHTML = "";
 
             const gradeOrder = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
             sortedCards = [...cardConfig]
-                .filter(c => c.grade !== "Last")
+                .filter(c => c.grade.toUpperCase() !== "LAST")
                 .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 99) - (gradeOrder[b.grade.toUpperCase()] || 99));
             
             virtualIndex = 0;
 
-            // 僅建立 5 個實體 DOM 卡片槽位，iOS 渲染零壓力
             for (let i = 0; i < VISIBLE_COUNT; i++) {
                 const item = document.createElement('div');
                 item.className = 'track-item';
@@ -831,18 +829,14 @@ let currentPool = [];
             if (showcaseTimer) clearInterval(showcaseTimer);
             showcaseTimer = setInterval(() => {
                 if (isRolling) return;
-                
-                // 輕柔切換下一個索引
                 virtualIndex = (virtualIndex + 1) % sortedCards.length;
                 renderDynamic3D();
             }, 2200);
         }
 
-        // 動態計算圖片與 3D 聚焦特效
         function renderDynamic3D() {
             const track = document.getElementById('main-track');
             const itemWidth = 96; 
-            // 永遠將虛擬中心錨定在中間的節點上
             const centerNodeIdx = 2; 
             const offset = -(centerNodeIdx * itemWidth) - 48;
             track.style.transform = `translateX(${offset}px)`;
@@ -851,20 +845,17 @@ let currentPool = [];
                 const node = document.getElementById(`track-node-${i}`);
                 if (!node) continue;
 
-                // 計算當前節點對應於卡片數據庫中的哪一張
                 const distance = i - centerNodeIdx;
                 let cardDataIdx = (virtualIndex + distance) % sortedCards.length;
                 if (cardDataIdx < 0) cardDataIdx += sortedCards.length;
 
                 const card = sortedCards[cardDataIdx];
 
-                // 換圖與換標籤 (不重建DOM，只換內容)
                 node.innerHTML = `
                     <img src="${card.url}" alt="${card.name}">
                     <div class="card-label" style="${getGradeStyle(card.grade)}">[${card.grade}] ${card.name.split('-')[1] || card.name}</div>
                 `;
 
-                // 完美還原 3D 放大與兩側淡出聚焦效果
                 if (distance === 0) {
                     node.style.transform = "scale(1.15) translateY(-6px)";
                     node.style.opacity = "1";
@@ -917,7 +908,7 @@ let currentPool = [];
         function initPool() {
             let p = [];
             cardConfig.forEach(c => { 
-                if(c.grade !== "Last") { for(let i=0; i<c.count; i++) p.push(c.id); }
+                if(c.grade.toUpperCase() !== "LAST") { for(let i=0; i<c.count; i++) p.push(c.id); }
             });
             db.ref('pool').set(p);
         }
@@ -1006,13 +997,14 @@ let currentPool = [];
                     let hasHighAward = false;    
                     
                     for (let i = 0; i < drawCount; i++) {
+                        // 修正：十連抽保底機制，若前 9 抽無大獎，第 10 抽強制提供保底 (尋找卡池內還存在的最高等獎)
                         if (drawCount === 10 && i === 9 && !hasHighAward) {
-                            let availableDCards = p.filter(id => {
+                            let availableHighCards = p.filter(id => {
                                 let card = cardConfig.find(c => c.id === id);
-                                return card && card.grade === "D";
+                                return card && ["S", "A", "B", "C", "D"].includes(card.grade.toUpperCase());
                             });
-                            if (availableDCards.length > 0) {
-                                const pickedId = availableDCards[Math.floor(Math.random() * availableDCards.length)];
+                            if (availableHighCards.length > 0) {
+                                const pickedId = availableHighCards[Math.floor(Math.random() * availableHighCards.length)];
                                 window.lastDrawResults.push(pickedId);
                                 p.splice(p.indexOf(pickedId), 1);
                                 continue; 
@@ -1025,12 +1017,17 @@ let currentPool = [];
                             drawnId = p[finalIdx];
                             card = cardConfig.find(c => c.id === drawnId);
                             attempts++;
-                            if (p.length > 5 && card && (card.grade === "S" || card.grade === "A")) { continue; }
+                            
+                            // 修正：終極安全防狙擊大獎邏輯
+                            if (card && ["S", "A"].includes(card.grade.toUpperCase())) {
+                                let originalCount = cardConfig.find(c => c.id === drawnId).count;
+                                if (p.length > originalCount) { continue; }
+                            }
                             break; 
                         } while (attempts < 500);
 
                         window.lastDrawResults.push(drawnId);
-                        if (card && ["S","A","B","C","D"].includes(card.grade)) { hasHighAward = true; }
+                        if (card && ["S","A","B","C","D"].includes(card.grade.toUpperCase())) { hasHighAward = true; }
                         p.splice(finalIdx, 1);
                     }
                     return p;
@@ -1049,7 +1046,7 @@ let currentPool = [];
                         
                         if (drawCount === 1) {
                             let result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
-                            if(isLastDrawTriggered) { result = cardConfig.find(c => c.grade === "Last"); }
+                            if(isLastDrawTriggered) { result = cardConfig.find(c => c.grade.toUpperCase() === "LAST"); }
 
                             img.src = result.url;
                             singleResultBox.style.display = "block"; 
@@ -1068,7 +1065,7 @@ let currentPool = [];
                             });
 
                             if(isLastDrawTriggered) {
-                                const lastAward = cardConfig.find(c => c.grade === "Last");
+                                const lastAward = cardConfig.find(c => c.grade.toUpperCase() === "LAST");
                                 setTimeout(() => {
                                     appendMiniCard(lastAward, "LAST", 0);
                                     nameDisplay.innerHTML = `<span style="${getGradeStyle(lastAward.grade)}">🎉 恭喜獲得 ${lastAward.name}！</span>`;
@@ -1108,28 +1105,34 @@ let currentPool = [];
             if(history.length > 0 && history[0] === "尚未有紀錄") history = [];
             history.unshift({ name: cardName, time: new Date().toLocaleTimeString() });
             localStorage.setItem('myDrawHistory', JSON.stringify(history));
-            renderHistory();
         }
 
         function renderHistory() {
             const history = JSON.parse(localStorage.getItem('myDrawHistory')) || [];
             const container = document.getElementById('my-history');
             if (history.length === 0) { container.innerHTML = "尚未有紀錄"; return; }
-            container.innerHTML = history.map(h => `<div class="history-item" style="font-weight: 500;">🕒 ${h.time ? h.time : ''} - ${h.name}</div>`).join('');
+            container.innerHTML = history.map(h => `<div class="history-item">🕒 ${h.time ? h.time : ''} - ${h.name}</div>`).join('');
         }
 
-        function sendToGoogleForm(name, code, card) {
-            const FORM_ID = "1FAIpQLSdZO-5VoffM6QduOcJ8kvEXVyFR0mdF-qtX3zQkGxqc0h7NTA";
-            const url = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse?` + 
-                        `entry.66319557=${encodeURIComponent(name)}&` + 
-                        `entry.14544484=${encodeURIComponent(code)}&` + 
-                        `entry.2002653907=${encodeURIComponent(card)}&` + 
-                        `submit=Submit`;
-            new Image().src = url;
+        function sendToGoogleForm(username, code, awardName) {
+            // 請替換下方的 Form 網址以及對應的 entry.xxxx 標籤
+            const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfD_uYkY_0b_p6gU8W6-B5rK39z8Fz29R0b8qW_xxxxxxxxx/formResponse";
+            const formData = new FormData();
+            formData.append("entry.1111111111", username); // 請替換真實 entry id
+            formData.append("entry.2222222222", code);     // 請替換真實 entry id
+            formData.append("entry.3333333333", awardName); // 請替換真實 entry id
+
+            fetch(formUrl, {
+                method: "POST",
+                mode: "no-cors",
+                body: formData
+            }).catch(err => console.log("Google Form 紀錄失敗，但 Firebase 已同步成功。", err));
         }
 
-        setTimeout(initShowcaseStage, 500);
-        renderHistory();
+        // 頁面初次載入執行
+        window.onload = function() {
+            initShowcaseStage();
+        };
     </script>
 </body>
 </html>
