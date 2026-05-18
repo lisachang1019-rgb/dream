@@ -77,41 +77,54 @@
             border-radius: 6px;
         }
 
-        /* 五星立體動態傳送舞台 */
+        /* 【核心重構】全新的傳送軌道外框 */
         .showcase-stage {
             display: flex;
             justify-content: center; 
             align-items: center;
-            height: 190px;
+            height: 200px;
             margin: 15px 0;
             position: relative;
             overflow: hidden;
             width: 100%;
         }
 
-        .stage-slot {
+        /* 傳送帶容器：直接使用 transform 達成順暢、無限向左滾動 */
+        .showcase-track {
+            display: flex;
             position: absolute;
-            width: 78px;
+            left: 50%;
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            will-change: transform;
+        }
+
+        /* 傳送帶上的每一張卡片，利用動態 JS 控制立體樣式 */
+        .track-item {
+            width: 80px;
+            margin: 0 5px;
             background: rgba(255, 255, 255, 0.45); 
             border: 1px solid rgba(255, 255, 255, 0.6);
             padding: 4px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             box-sizing: border-box;
-            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
             display: flex;
             flex-direction: column;
             align-items: center;
+            flex-shrink: 0;
+            transition: transform 0.5s, opacity 0.5s;
+            will-change: transform, opacity;
         }
-        .stage-slot img {
+        .track-item img {
             width: 100%;
             height: 115px;
             object-fit: cover;
             border-radius: 6px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
-        .stage-slot .card-label {
-            font-size: 11px;
+        .track-item .card-label {
+            font-size: 10px;
             margin-top: 5px;
             font-weight: 800;
             white-space: nowrap;
@@ -120,13 +133,6 @@
             width: 100%;
             text-align: center;
         }
-
-        /* 立體傳送帶：中間大、兩側小且淡 */
-        .pos-0 { transform: translateX(-160px) scale(0.75); opacity: 0.35; z-index: 1; }
-        .pos-1 { transform: translateX(-80px) scale(0.88); opacity: 0.7; z-index: 2; }
-        .pos-2 { transform: translateX(0px) scale(1.1); opacity: 1; z-index: 3; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1.5px solid rgba(255,255,255,0.8); }
-        .pos-3 { transform: translateX(80px) scale(0.88); opacity: 0.7; z-index: 2; }
-        .pos-4 { transform: translateX(160px) scale(0.75); opacity: 0.35; z-index: 1; }
 
         /* 單抽結果框 */
         .result-single-box {
@@ -219,11 +225,7 @@
         <div style="text-align: left; font-size: 13px; color: #1a3a60; font-weight: 900; padding-left: 5px;">🃏 獎池展示</div>
         
         <div class="showcase-stage" id="showcase-wall">
-            <div class="stage-slot pos-0" id="slot-0"></div>
-            <div class="stage-slot pos-1" id="slot-1"></div>
-            <div class="stage-slot pos-2" id="slot-2"></div>
-            <div class="stage-slot pos-3" id="slot-3"></div>
-            <div class="stage-slot pos-4" id="slot-4"></div>
+            <div class="showcase-track" id="main-track"></div>
         </div>
         
         <div class="rotate-stage-container" id="rotate-stage">
@@ -738,11 +740,10 @@
 let currentPool = [];
         let isRolling = false;
         let showcaseTimer = null;
-        let showcaseIndex = 0;
-        let activeSlotsData = [null, null, null, null, null]; 
-        let sortedShowcaseList = []; // 用來存儲嚴格排序後的展示數組
+        let currentFocusIndex = 0; // 當前正中央放大的卡片索引
+        let trackCards = [];      // 軌道內渲染的所有卡片數據
 
-        // 依據規定獲取字體顏色樣式：S紅、A紫、B黃、C藍、D綠、E灰、F白、Last粉
+        // 獲取字體顏色：S紅、A紫、B黃、C藍、D綠、E灰、F白、Last粉
         function getGradeStyle(grade) {
             const upperGrade = grade.toUpperCase();
             let color = "#ffffff";
@@ -761,85 +762,106 @@ let currentPool = [];
             return `color: ${color}; text-shadow: ${shadow};`;
         }
 
-        // 【全新修正】重構展示邏輯：確保 S 賞排第一個帶頭往前衝
+        // 【全新算法】建立真正無限長度、一個接一個順序往前推的軌道
         function initShowcaseStage() {
-            // 1. 排除 Last 賞，並按照 S -> A -> B -> C -> D -> E -> F 的等級權重嚴格升序排列
+            const track = document.getElementById('main-track');
+            track.innerHTML = "";
+
+            // 1. 嚴格按 S -> A -> B -> C -> D -> E -> F 的順序將所有展示卡排成一長列
             const gradeOrder = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
-            sortedShowcaseList = [...cardConfig]
+            const basePool = [...cardConfig]
                 .filter(c => c.grade !== "Last")
                 .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 99) - (gradeOrder[b.grade.toUpperCase()] || 99));
             
-            showcaseIndex = 0;
+            // 2. 為了做到無限循環、不穿幫，我們將這個長陣列重複複製 3 次，拼成一個超級長火車
+            trackCards = [...basePool, ...basePool, ...basePool];
+            currentFocusIndex = 0; // 從第一個（也就是 S 賞）開始打頭陣
 
-            // 2. 初始化填滿 5 個 Slot 
-            for(let i=0; i<5; i++) {
-                activeSlotsData[i] = sortedShowcaseList[showcaseIndex];
-                updateSlotDOM(i, activeSlotsData[i]);
-                showcaseIndex = (showcaseIndex + 1) % sortedShowcaseList.length;
-            }
+            // 3. 生成 DOM 節點
+            trackCards.forEach((card, idx) => {
+                const item = document.createElement('div');
+                item.className = 'track-item';
+                item.id = `track-item-${idx}`;
+                item.innerHTML = `
+                    <img src="${card.url}" alt="${card.name}">
+                    <div class="card-label" style="${getGradeStyle(card.grade)}">[${card.grade}] ${card.name.split('-')[1] || card.name}</div>
+                `;
+                track.appendChild(item);
+            });
 
-            // 3. 開啟定時傳送帶滾動
+            // 4. 更新初始位置與立體效果
+            updateTrackPosition();
+
+            // 5. 設定定時器：由右向左，一個接一個順序往前移動
             if (showcaseTimer) clearInterval(showcaseTimer);
             showcaseTimer = setInterval(() => {
                 if (isRolling) return;
 
-                // 獲取下一張即將從右側滑入排隊的卡片
-                const nextCard = sortedShowcaseList[showcaseIndex];
-                showcaseIndex = (showcaseIndex + 1) % sortedShowcaseList.length;
-
-                // 觸發向左移動的傳送帶動畫
-                animateSlotsFlow(nextCard);
-            }, 1600);
+                currentFocusIndex++;
+                
+                // 當移動到第二組的末尾時，瞬間無縫拉回第一組對應位置，達成100%完美的無限循環往前
+                if (currentFocusIndex >= basePool.length * 2) {
+                    track.style.transition = 'none'; // 關閉動畫
+                    currentFocusIndex = basePool.length; // 閃現回中間組
+                    updateTrackPosition();
+                    
+                    // 稍微延遲讓瀏覽器反應，隨即補上正常的向前動畫
+                    setTimeout(() => {
+                        if (isRolling) return;
+                        track.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+                        currentFocusIndex++;
+                        updateTrackPosition();
+                    }, 20);
+                } else {
+                    track.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+                    updateTrackPosition();
+                }
+            }, 1800);
         }
 
-        function updateSlotDOM(slotId, card) {
-            const slot = document.getElementById(`slot-${slotId}`);
-            if(!card) return;
-            slot.innerHTML = `
-                <img src="${card.url}" alt="${card.name}">
-                <div class="card-label" style="${getGradeStyle(card.grade)}">[${card.grade}] ${card.name.split('-')[1] || card.name}</div>
-            `;
-        }
-
-        // 核心滾動動畫：向左遞補，右側補新
-        function animateSlotsFlow(nextCard) {
-            const wall = document.getElementById('showcase-wall');
+        // 核心動態渲染：計算每個卡片與正中央焦點的距離，實現「中大邊小變淡」的概念圖特效
+        function updateTrackPosition() {
+            const track = document.getElementById('main-track');
+            const itemWidth = 90; // 包含 margin 的寬度 (80 + 5 + 5)
             
-            const s0 = document.getElementById('slot-0');
-            const s1 = document.getElementById('slot-1');
-            const s2 = document.getElementById('slot-2');
-            const s3 = document.getElementById('slot-3');
-            const s4 = document.getElementById('slot-4');
+            // 將軌道向左偏移，使得當前 currentFocusIndex 卡片完美居中
+            // 減去 45px 是為了扣掉焦點卡片自身一半的寬度
+            const offset = -(currentFocusIndex * itemWidth) - 45;
+            track.style.transform = `translateX(${offset}px)`;
 
-            // 最左邊淡出移除
-            s0.style.opacity = "0";
-            s0.style.transform = "translateX(-220px) scale(0.5)";
+            // 為軌道上的所有卡片動態刷新 3D 視覺比重
+            trackCards.forEach((_, idx) => {
+                const item = document.getElementById(`track-item-${idx}`);
+                if (!item) return;
 
-            // 剩餘順暢左移一格
-            s1.className = "stage-slot pos-0"; s1.id = "slot-0";
-            s2.className = "stage-slot pos-1"; s2.id = "slot-1";
-            s3.className = "stage-slot pos-2"; s3.id = "slot-2"; // 晉升正中央焦點放大
-            s4.className = "stage-slot pos-3"; s4.id = "slot-3";
+                const distance = idx - currentFocusIndex; // 計算與正中央焦點卡片的格子距離
 
-            // 右側外生成全新 Slot4 滑入進場
-            const newSlot = document.createElement('div');
-            newSlot.className = "stage-slot pos-4";
-            newSlot.id = "slot-4";
-            newSlot.style.opacity = "0";
-            newSlot.style.transform = "translateX(220px) scale(0.5)";
-            
-            newSlot.innerHTML = `
-                <img src="${nextCard.url}">
-                <div class="card-label" style="${getGradeStyle(nextCard.grade)}">[${nextCard.grade}] ${nextCard.name.split('-')[1] || nextCard.name}</div>
-            `;
-            wall.appendChild(newSlot);
-
-            setTimeout(() => {
-                newSlot.style.opacity = "0.35";
-                newSlot.style.transform = "translateX(160px) scale(0.75)";
-            }, 20);
-
-            setTimeout(() => { s0.remove(); }, 600);
+                if (distance === 0) {
+                    // 正中央：最大、完整清晰
+                    item.style.transform = "scale(1.15) translateY(-5px)";
+                    item.style.opacity = "1";
+                    item.style.zIndex = "5";
+                    item.style.border = "1.5px solid rgba(255,255,255,0.85)";
+                    item.style.boxShadow = "0 10px 25px rgba(0,0,0,0.15)";
+                } else if (Math.abs(distance) === 1) {
+                    // 左右兩側第一格：中、微淡
+                    item.style.transform = "scale(0.9)";
+                    item.style.opacity = "0.7";
+                    item.style.zIndex = "3";
+                    item.style.border = "1px solid rgba(255,255,255,0.4)";
+                    item.style.boxShadow = "0 4px 10px rgba(0,0,0,0.05)";
+                } else if (Math.abs(distance) === 2) {
+                    // 左右兩側第二格：小、淡
+                    item.style.transform = "scale(0.75)";
+                    item.style.opacity = "0.3";
+                    item.style.zIndex = "1";
+                    item.style.border = "1px solid rgba(255,255,255,0.2)";
+                } else {
+                    // 其餘太遠的直接隱藏，節省效能
+                    item.style.opacity = "0";
+                    item.style.transform = "scale(0.6)";
+                }
+            });
         }
 
         function buildRotationCircle() {
@@ -1036,7 +1058,7 @@ let currentPool = [];
                         
                         isRolling = false;
                         checkStatus();
-                        initShowcaseStage(); // 重啟並刷新跑馬燈
+                        initShowcaseStage(); // 重置並重啟無限滾動軌道
                     }, 2800); 
                 } else {
                     cancelAnimationFrame(animationFrameId); rotateStage.style.display = "none"; showcaseWall.style.display = "flex";
@@ -1084,7 +1106,7 @@ let currentPool = [];
             new Image().src = url;
         }
 
-        // 初始化跑馬燈
+        // 初始化跑馬燈展示
         setTimeout(initShowcaseStage, 500);
         renderHistory();
     </script>
