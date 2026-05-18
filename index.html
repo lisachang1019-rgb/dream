@@ -6,9 +6,15 @@
     <title>時代少年團一番賞</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;800;900&display=swap" rel="stylesheet">
+    
     <style>
         body { 
-            font-family: -apple-system, "Helvetica Neue", sans-serif; 
+            /* 【修改】全套換上可愛圓體字型 */
+            font-family: 'Noto Sans TC', -apple-system, sans-serif; 
             background: linear-gradient(135deg, #e6f2ff 0%, #cce3ff 100%); 
             color: #333; 
             text-align: center; 
@@ -28,7 +34,7 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
         }
-        .total-rem { font-size: 32px; font-weight: bold; color: #ff4757; }
+        .total-rem { font-size: 32px; font-weight: 900; color: #ff4757; }
         
         /* 3D 圓環旋轉舞台 */
         .rotate-stage-container {
@@ -84,14 +90,14 @@
             position: relative;
         }
 
-        /* 展示卡片樣式 */
+        /* 【修改】展示卡片底座換回高質感透明玻璃風 */
         .showcase-item {
             flex: 0 0 76px; 
-            background: rgba(40, 44, 52, 0.75); /* 改為微深色半透明底座，讓淺色/白色字體更顯眼耀眼 */
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.45); 
+            border: 1px solid rgba(255, 255, 255, 0.6);
             padding: 4px;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             box-sizing: border-box;
             opacity: 0;
             transform: translateX(120px); 
@@ -103,12 +109,12 @@
             height: 115px;
             object-fit: cover;
             border-radius: 6px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
         .showcase-item .card-label {
-            font-size: 10px;
-            margin-top: 4px;
-            font-weight: bold;
+            font-size: 11px;
+            margin-top: 5px;
+            font-weight: 800;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -124,16 +130,16 @@
             margin-left: -82px; 
         }
 
-        /* 開獎單抽框 */
+        /* 【修改】開獎單抽框換回全透明粉嫩玻璃風 */
         .result-single-box {
             display: none;
             width: 180px;
             margin: 15px auto;
-            background: rgba(40, 44, 52, 0.85); /* 深色背景，襯托絢麗顏色 */
+            background: rgba(255, 255, 255, 0.5); 
             border: 3px solid #2cf35e; 
             padding: 10px;
             border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(44, 243, 94, 0.3);
+            box-shadow: 0 10px 25px rgba(44, 243, 94, 0.2);
             animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .result-single-box img {
@@ -146,15 +152,15 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* 十連抽底座 */
+        /* 【修改】十連抽小卡底座也換回透明玻璃風 */
         .mini-card-box {
             width: 18%;
             text-align: center;
-            background: rgba(40, 44, 52, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             padding: 4px;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             box-sizing: border-box;
         }
 
@@ -163,12 +169,14 @@
             width: 100%; padding: 12px; border-radius: 12px; 
             border: 1px solid rgba(255, 255, 255, 0.6); 
             background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px);
-            color: #333; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; 
+            color: #333; box-sizing: border-box; font-size: 16px; margin-bottom: 10px;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 500;
         }
         input::placeholder { color: #777; }
         
         .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        .btn { flex: 1; background: #ff4757; color: white; border: none; padding: 16px 10px; font-size: 16px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 0 #cc3a47; transition: 0.1s; }
+        .btn { flex: 1; background: #ff4757; color: white; border: none; padding: 16px 10px; font-size: 16px; font-weight: 800; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 0 #cc3a47; transition: 0.1s; font-family: 'Noto Sans TC', sans-serif; }
         .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #cc3a47; }
         .btn:disabled { background: rgba(0,0,0,0.1); color: #999; box-shadow: none; cursor: not-allowed; transform: none !important; border: 1px solid rgba(0,0,0,0.05); }
         #draw-btn-10 { background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%); box-shadow: 0 4px 0 #cc3a47; }
@@ -193,9 +201,9 @@
     <div id="loading">📡 正在連線雲端獎池...</div>
 
     <div class="container">
-        <h2 style="color: #1a3a60; font-weight: 800;">時代少年團一番賞</h2>
+        <h2 style="color: #1a3a60; font-weight: 900;">時代少年團一番賞</h2>
         <div class="pool-card">
-            <div style="font-size: 14px; color: #666; font-weight: 500;">目前獎箱剩餘</div>
+            <div style="font-size: 14px; color: #666; font-weight: 800;">目前獎箱剩餘</div>
             <div class="total-rem" id="total-count">--</div>
         </div>
         <div class="input-group">
@@ -203,7 +211,7 @@
             <input type="text" id="user-code" placeholder="請輸入抽獎代碼..." oninput="checkStatus()">
         </div>
         
-        <div style="text-align: left; font-size: 13px; color: #666; font-weight: bold; padding-left: 5px;">🃏 本期賞品展示 (賞品專屬文字顏色登場)</div>
+        <div style="text-align: left; font-size: 13px; color: #1a3a60; font-weight: 900; padding-left: 5px;">🃏 本期賞品展示 (賞品專屬文字顏色登場)</div>
         <div class="showcase-stage" id="showcase-wall"></div>
         
         <div class="rotate-stage-container" id="rotate-stage">
@@ -216,7 +224,7 @@
         
         <div id="multi-result-container"></div>
 
-        <div id="card-name" style="margin-bottom:15px; font-weight:bold; height:1.2em; font-size: 20px;"></div>
+        <div id="card-name" style="margin-bottom:15px; font-weight:900; height:1.2em; font-size: 22px;"></div>
         
         <div class="btn-group">
             <button id="draw-btn-10" class="btn" onclick="draw(10)" disabled>十連抽</button>
@@ -224,8 +232,8 @@
         </div>
 
         <div class="history-section">
-            <h4 style="margin: 0 0 10px 0; color: #1a3a60; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px;">📜 我的抽獎紀錄</h4>
-            <div id="my-history" style="max-height: 200px; overflow-y: auto; color: #555;">尚未有紀錄</div>
+            <h4 style="margin: 0 0 10px 0; color: #1a3a60; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px; font-weight:900;">📜 我的抽獎紀錄</h4>
+            <div id="my-history" style="max-height: 200px; overflow-y: auto; color: #555; font-weight:500;">尚未有紀錄</div>
         </div>
     </div>
 
@@ -720,37 +728,43 @@ let currentPool = [];
         let activeDisplayedCards = []; 
         let showcaseTimer = null;
 
-        // 【全新功能】依據賞品等級，回傳指定的專屬顏色樣式
+        // 【修改邏輯】依據賞品等級，回傳指定的專屬顏色與超可愛陰影
         function getGradeStyle(grade) {
             const upperGrade = grade.toUpperCase();
             let color = "#ffffff";
-            let shadow = "none";
+            let shadow = "0 2px 4px rgba(0,0,0,0.15)"; /* 基礎柔和陰影 */
             
             switch(upperGrade) {
                 case "S":
                     color = "#ff4757"; // 紅色
+                    shadow = "0 2px 5px rgba(255, 71, 87, 0.3)";
                     break;
                 case "A":
                     color = "#a55eea"; // 紫色
+                    shadow = "0 2px 5px rgba(165, 94, 234, 0.3)";
                     break;
                 case "B":
-                    color = "#ffa502"; // 黃色
+                    color = "#ff9f43"; // 黃色（微調成更清晰的橘黃，避免太淡看不清）
+                    shadow = "0 1px 4px rgba(0,0,0,0.2)";
                     break;
                 case "C":
                     color = "#2e86de"; // 藍色
+                    shadow = "0 2px 5px rgba(46, 134, 222, 0.3)";
                     break;
                 case "D":
                     color = "#2ed573"; // 綠色
+                    shadow = "0 2px 5px rgba(46, 213, 115, 0.3)";
                     break;
                 case "E":
                     color = "#747d8c"; // 灰色
                     break;
                 case "F":
                     color = "#ffffff"; // 白色
-                    shadow = "0 1px 3px rgba(0,0,0,0.8)"; // 幫白字加陰影避免看不清
+                    shadow = "0 2px 4px rgba(0,0,0,0.6), 0 0 2px rgba(0,0,0,0.8)"; // 幫白字加一圈軟萌黑邊，確保在透明底座看得超清楚！
                     break;
                 case "LAST":
                     color = "#ff7675"; // 粉紅色
+                    shadow = "0 2px 6px rgba(255, 118, 117, 0.4)";
                     break;
                 default:
                     color = "#ffffff";
@@ -773,7 +787,7 @@ let currentPool = [];
             function spawnNextCard() {
                 if (isRolling) return; 
                 const card = sortedConfig[currentIndex];
-                const textStyle = getGradeStyle(card.grade); // 抓取字體顏色
+                const textStyle = getGradeStyle(card.grade); 
                 
                 const cardDiv = document.createElement('div');
                 cardDiv.className = 'showcase-item';
@@ -798,7 +812,6 @@ let currentPool = [];
             showcaseTimer = setInterval(spawnNextCard, 1500);
         }
 
-        // 初始化建立旋轉圓環內部的卡片（隨機挑選7張排成一圈）
         function buildRotationCircle() {
             const vault = document.getElementById('carousel-vault');
             vault.innerHTML = "";
@@ -836,7 +849,7 @@ let currentPool = [];
         function initPool() {
             let p = [];
             cardConfig.forEach(c => { 
-                if(c.grade !== "Last") { // Last賞通常是最後一抽送，不進常規抽獎池
+                if(c.grade !== "Last") { 
                     for(let i=0; i<c.count; i++) p.push(c.id); 
                 }
             });
@@ -865,7 +878,6 @@ let currentPool = [];
             }
         }
 
-        // 圓環物理引擎
         let animationFrameId;
         let currentAngle = 0;
         let currentSpeed = 2; 
@@ -934,7 +946,6 @@ let currentPool = [];
                 return;
             }
 
-            // 判斷是否為最後一抽（抽完後池子歸零），如果是則觸發 Last賞
             let isLastDrawTriggered = (currentPool.length === drawCount);
 
             db.ref('pool').transaction((p) => {
@@ -991,8 +1002,6 @@ let currentPool = [];
                         
                         if (drawCount === 1) {
                             let result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
-                            
-                            // 如果剛好是最後一抽，強制變更為 Last賞
                             if(isLastDrawTriggered) {
                                 result = cardConfig.find(c => c.grade === "Last") || result;
                             }
@@ -1000,7 +1009,7 @@ let currentPool = [];
                             img.src = result.url;
                             singleResultBox.style.display = "block"; 
                             
-                            // 動態注入顏色樣式
+                            // 注入專屬顏色與超可愛圓體字
                             nameDisplay.innerHTML = `<span style="${getGradeStyle(result.grade)}">${result.name}</span>`;
 
                             saveLocalRecord(result.name);
@@ -1009,8 +1018,6 @@ let currentPool = [];
                             multiContainer.style.display = "flex";
                             window.lastDrawResults.forEach((id, index) => {
                                 let result = cardConfig.find(c => c.id === id);
-                                
-                                // 十連抽的最後一張如果是最後一抽，觸發 Last賞
                                 if(isLastDrawTriggered && index === (drawCount - 1)) {
                                     result = cardConfig.find(c => c.grade === "Last") || result;
                                 }
@@ -1020,7 +1027,7 @@ let currentPool = [];
                                 cardDiv.className = 'mini-card-box';
                                 cardDiv.innerHTML = `
                                     <img src="${result.url}" style="width: 100%; border-radius: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
-                                    <div style="font-size: 10px; margin-top: 5px; ${textStyle}">#${index+1}<br><span>${result.name.split('-')[0]}</span></div>
+                                    <div style="font-size: 11px; margin-top: 5px; font-weight:800; ${textStyle}">#${index+1}<br><span>${result.name.split('-')[0]}</span></div>
                                 `;
                                 multiContainer.appendChild(cardDiv);
                                 saveLocalRecord(`[十連抽-${index+1}] ${result.name}`);
@@ -1059,7 +1066,7 @@ let currentPool = [];
                 container.innerHTML = "尚未有紀錄";
                 return;
             }
-            container.innerHTML = history.map(h => `<div class="history-item">🕒 ${h.time ? h.time : ''} - ${h.name}</div>`).join('');
+            container.innerHTML = history.map(h => `<div class="history-item" style="font-weight: 500;">🕒 ${h.time ? h.time : ''} - ${h.name}</div>`).join('');
         }
 
         function sendToGoogleForm(name, code, card) {
