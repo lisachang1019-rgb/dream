@@ -788,6 +788,7 @@ let currentPool = [];
             }
         }
 
+        // 修改等級樣式：保留 LAST 賞的馬卡龍粉配置（結算或中獎時使用）
         function getGradeStyle(grade) {
             const upperGrade = grade.toUpperCase();
             let color = "#ffffff";
@@ -810,11 +811,13 @@ let currentPool = [];
             const track = document.getElementById('main-track');
             track.innerHTML = "";
 
-            // 調整權重：將 LAST 放在最前面（權重最小）
-            const gradeOrder = { "LAST": 0, "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
+            // 調整權重：把 LAST 賞排到最後（權重99），S賞排到最前（權重0）
+            const gradeOrder = { "S": 0, "A": 1, "B": 2, "C": 3, "D": 4, "E": 5, "F": 6, "LAST": 99 };
             
+            // 過濾並排序：不把 LAST 賞放進跑馬燈輪播牆（保持神秘）
             const basePool = [...cardConfig]
-                .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 99) - (gradeOrder[b.grade.toUpperCase()] || 99));
+                .filter(item => item.grade.toUpperCase() !== "LAST")
+                .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 88) - (gradeOrder[b.grade.toUpperCase()] || 88));
             
             trackCards = [...basePool, ...basePool, ...basePool];
             currentFocusIndex = basePool.length; 
