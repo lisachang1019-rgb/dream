@@ -77,29 +77,28 @@
             border-radius: 6px;
         }
 
-        /* 完美符合手繪草圖：立體五星傳送展示舞台 */
+        /* 放大版：立體五星傳送展示舞台 */
         .showcase-stage {
             display: flex;
             justify-content: center; 
             align-items: center;
-            height: 210px;
+            height: 240px; /* 配合圖片放大調高舞台 */
             margin: 15px 0;
             position: relative;
             overflow: hidden;
             width: 100%;
-            perspective: 1000px; /* 增加立體深度感 */
+            perspective: 1200px; 
         }
 
         .stage-slot {
             position: absolute;
-            width: 82px;
+            width: 100px; /* 寬度從 82px 放大到 100px */
             background: rgba(255, 255, 255, 0.6); 
             border: 1px solid rgba(255, 255, 255, 0.8);
             padding: 5px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
             box-sizing: border-box;
-            /* 這是流暢滑動的關鍵，使用 cubic-bezier 讓平移像傳送帶一樣優雅 */
             transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.7s ease, z-index 0.7s ease;
             display: flex;
             flex-direction: column;
@@ -108,14 +107,14 @@
         }
         .stage-slot img {
             width: 100%;
-            height: 120px;
+            height: 145px; /* 高度從 120px 放大到 145px */
             object-fit: cover;
-            border-radius: 6px;
+            border-radius: 8px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
         .stage-slot .card-label {
             font-size: 11px;
-            margin-top: 5px;
+            margin-top: 6px;
             font-weight: 800;
             white-space: nowrap;
             overflow: hidden;
@@ -124,12 +123,12 @@
             text-align: center;
         }
 
-        /* 完美對應手繪圖的 5 個立體定位：從右往左滑動，中間最大、最亮，兩側變小、變淡 */
-        .pos-0 { transform: translateX(-155px) translateZ(-60px) scale(0.75); opacity: 0.25; z-index: 1; }
-        .pos-1 { transform: translateX(-80px) translateZ(-30px) scale(0.88); opacity: 0.65; z-index: 2; }
-        .pos-2 { transform: translateX(0px) translateZ(30px) scale(1.12); opacity: 1; z-index: 5; box-shadow: 0 12px 28px rgba(0,0,0,0.15); border: 2px solid rgba(255,255,255,0.95); }
-        .pos-3 { transform: translateX(80px) translateZ(-30px) scale(0.88); opacity: 0.65; z-index: 2; }
-        .pos-4 { transform: translateX(155px) translateZ(-60px) scale(0.75); opacity: 0.25; z-index: 1; }
+        /* 配合大圖重新計算的立體間距：確保不撞車、維持完美弧度 */
+        .pos-0 { transform: translateX(-165px) translateZ(-80px) scale(0.72); opacity: 0.2; z-index: 1; }
+        .pos-1 { transform: translateX(-85px) translateZ(-40px) scale(0.88); opacity: 0.65; z-index: 2; }
+        .pos-2 { transform: translateX(0px) translateZ(40px) scale(1.15); opacity: 1; z-index: 5; box-shadow: 0 14px 32px rgba(0,0,0,0.15); border: 2px solid rgba(255,255,255,0.95); }
+        .pos-3 { transform: translateX(85px) translateZ(-40px) scale(0.88); opacity: 0.65; z-index: 2; }
+        .pos-4 { transform: translateX(165px) translateZ(-80px) scale(0.72); opacity: 0.2; z-index: 1; }
 
         /* 單抽結果框 */
         .result-single-box {
@@ -743,7 +742,7 @@ let currentPool = [];
         let showcaseTimer = null;
         let showcaseVirtualIndex = 0; 
         let sortedShowcaseList = []; 
-        let slotPositions = [0, 1, 2, 3, 4]; // 五個框各自對應的 CSS 位置級別
+        let slotPositions = [0, 1, 2, 3, 4]; 
 
         function getGradeStyle(grade) {
             const upperGrade = grade.toUpperCase();
@@ -763,14 +762,12 @@ let currentPool = [];
             return `color: ${color}; text-shadow: ${shadow};`;
         }
 
-        // 核心重構：全新的不卡死、完美循環舞台初始化
+        // 修正：完全依照上方 cardConfig 數組的順序來循環播放
         function initShowcaseStage() {
-            const gradeOrder = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
-            sortedShowcaseList = [...cardConfig]
-                .filter(c => c.grade !== "Last")
-                .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 99) - (gradeOrder[b.grade.toUpperCase()] || 99));
+            // 過濾掉 Last賞 之後，直接使用原始陣列順序，不進行任何隨機或重新排序
+            sortedShowcaseList = cardConfig.filter(c => c.grade !== "Last");
             
-            // 固定初始化 5 個框的內容
+            // 固定初始化 5 個實體框的內容
             for(let i = 0; i < 5; i++) {
                 updateSlotContent(i, sortedShowcaseList[i % sortedShowcaseList.length]);
                 const slotDom = document.getElementById(`slot-${i}`);
@@ -782,11 +779,11 @@ let currentPool = [];
 
             if (showcaseTimer) clearInterval(showcaseTimer);
             
-            // 完美的圓環無限滑動定時器
+            // 順暢平移定時器
             showcaseTimer = setInterval(() => {
                 if (isRolling) return;
 
-                // 讓每個框的位置 class 往前推一格 (達成從右到左平移效果)
+                // 讓 5 個框的位置往左推移
                 for (let i = 0; i < 5; i++) {
                     let nextPos = (slotPositions[i] + 4) % 5; 
                     slotPositions[i] = nextPos;
@@ -794,7 +791,7 @@ let currentPool = [];
                     const slotDom = document.getElementById(`slot-${i}`);
                     slotDom.className = `stage-slot pos-${nextPos}`;
 
-                    // 如果這個框此時退到了最左邊隱形區 (pos-0)，立刻塞入下一張未來的卡片內容
+                    // 當框框退到最左邊準備重新出發 (pos-4) 時，塞入清單中的下一張小卡
                     if (nextPos === 4) {
                         updateSlotContent(i, sortedShowcaseList[showcaseVirtualIndex]);
                     }
