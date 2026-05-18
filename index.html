@@ -147,12 +147,10 @@
         }
         .carousel-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
 
-        /* 展示牆 */
+        /* 展示牆 (已徹底移除導致手機當機的 -webkit-mask-image 語法) */
         .showcase-stage {
             display: flex; justify-content: center; align-items: center;
             height: 200px; margin: 15px 0; position: relative; overflow: hidden; width: 100%;
-            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);
-            mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);
         }
         .showcase-track {
             display: flex; position: absolute; left: 50%;
@@ -1109,6 +1107,11 @@ let currentPool = [];
             if(history.length > 0 && history[0] === "尚未有紀錄") history = [];
             history.unshift({ name: cardName, time: new Date().toLocaleTimeString() });
             localStorage.setItem('myDrawHistory', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function removeLocalRecord() {
+            localStorage.removeItem('myDrawHistory');
             renderHistory();
         }
 
