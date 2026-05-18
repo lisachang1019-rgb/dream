@@ -30,43 +30,60 @@
         }
         .total-rem { font-size: 32px; font-weight: bold; color: #ff4757; }
         
-        /* 本期賞品圖鑑長條容器 */
-        .showcase-container {
-            display: flex;
-            overflow-x: auto;
-            gap: 12px;
-            padding: 15px 5px;
-            margin: 20px 0;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            -ms-overflow-style: none;  
-            scrollbar-width: none; 
-        }
-        .showcase-container::-webkit-scrollbar {
+        /* 盲抽切換焦點大框 */
+        .blind-roll-box {
             display: none;
+            width: 140px;
+            height: 200px;
+            margin: 15px auto;
+            border-radius: 16px;
+            border: 3px solid #ff4757;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(255, 71, 87, 0.3);
+            background: #fff;
+        }
+        .blind-roll-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        /* 展示用的單張卡片外盒 */
+        /* 【修改】容納滿滿 5 張小卡的舞台容器，微調間距讓手機完美並排 */
+        .showcase-stage {
+            display: flex;
+            justify-content: center; /* 居中讓5張卡片看起來對稱漂亮 */
+            gap: 6px;
+            height: 175px;
+            margin: 20px 0;
+            padding: 10px 4px;
+            overflow: hidden; 
+            position: relative;
+        }
+
+        /* 【修改】微調卡片寬度 (76px)，確保 5 張卡能完美塞進一般手機螢幕寬度 */
         .showcase-item {
-            flex: 0 0 110px; 
+            flex: 0 0 76px; 
             background: rgba(255, 255, 255, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.6);
-            padding: 6px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 4px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             box-sizing: border-box;
-            transition: transform 0.1s linear; /* 縮短過渡時間讓變形更即時 */
+            opacity: 0;
+            transform: translateX(120px); 
+            animation: slideInLeft 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            transition: all 0.5s ease;
         }
         .showcase-item img {
             width: 100%;
-            height: 160px;
+            height: 115px;
             object-fit: cover;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
         .showcase-item .card-label {
-            font-size: 11px;
-            margin-top: 6px;
+            font-size: 10px;
+            margin-top: 4px;
             color: #444;
             font-weight: 600;
             white-space: nowrap;
@@ -74,16 +91,31 @@
             text-overflow: ellipsis;
         }
 
-        /* 抽獎結果彈出區域 (單抽用) */
+        /* 由右向左登場的動畫 */
+        @keyframes slideInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* 第一張卡片滑出舞台並消失的樣式 */
+        .fade-out-left {
+            opacity: 0 !important;
+            transform: translateX(-120px) scale(0.8) !important;
+            margin-left: -82px; /* 擠壓 76px + 6px gap 空間讓後面的卡片平滑補位 */
+        }
+
+        /* 抽獎結果彈出區域 */
         .result-single-box {
             display: none;
-            width: 200px;
+            width: 180px;
             margin: 15px auto;
             background: rgba(255, 255, 255, 0.5);
-            border: 2px solid #ff4757;
+            border: 3px solid #2cf35e; 
             padding: 10px;
             border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(255, 71, 87, 0.2);
+            box-shadow: 0 10px 25px rgba(44, 243, 94, 0.2);
         }
         .result-single-box img {
             width: 100%;
@@ -150,31 +182,6 @@
         }
         .history-item { padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 13px; color: #ff5e6c; font-weight: 500; }
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 1000; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
-        
-        /* 【全新調整】慢速洗牌動畫（擺幅較大、速度較緩） */
-        @keyframes slowShake {
-            0% { transform: translate(2px, 2px) rotate(0deg); }
-            25% { transform: translate(-3px, -4px) rotate(-1.5deg); }
-            50% { transform: translate(4px, -1px) rotate(1.5deg); }
-            75% { transform: translate(-2px, 3px) rotate(-1deg); }
-            100% { transform: translate(2px, 2px) rotate(0deg); }
-        }
-        .shaking-slow {
-            animation: slowShake 0.3s infinite ease-in-out;
-        }
-
-        /* 【全新調整】極速洗牌動畫（超密集震動、瘋狂洗牌感） */
-        @keyframes fastShake {
-            0% { transform: translate(1px, -1px) rotate(0deg); }
-            20% { transform: translate(-2px, 2px) rotate(-1deg); }
-            40% { transform: translate(2px, -2px) rotate(1deg); }
-            60% { transform: translate(-1px, -1px) rotate(0deg); }
-            80% { transform: translate(2px, 2px) rotate(1deg); }
-            100% { transform: translate(1px, -1px) rotate(-1deg); }
-        }
-        .shaking-fast {
-            animation: fastShake 0.08s infinite linear;
-        }
     </style>
 </head>
 <body>
@@ -191,9 +198,13 @@
             <input type="text" id="user-code" placeholder="請輸入抽獎代碼..." oninput="checkStatus()">
         </div>
         
-        <div style="text-align: left; font-size: 13px; color: #666; font-weight: bold; padding-left: 5px;">🃏 本期賞品圖鑑 (左右滑動查看)</div>
-        <div class="showcase-container" id="showcase-wall"></div>
+        <div style="text-align: left; font-size: 13px; color: #666; font-weight: bold; padding-left: 5px;">🃏 本期賞品展示 (最高S賞依序由右向左登場)</div>
+        <div class="showcase-stage" id="showcase-wall"></div>
         
+        <div class="blind-roll-box" id="blind-box">
+            <img id="blind-img" src="" alt="隨機切換中">
+        </div>
+
         <div class="result-single-box" id="single-result-box">
             <img id="card-img" src="">
         </div>
@@ -699,20 +710,51 @@
 {id:421, grade:"S", name:"S賞-3 4.0娃娃", count:1, url:"https://i.postimg.cc/LXbthVwT/IMG-E4064.jpg"},
 {id:422, grade:"last", name:"last賞-3 3.0娃娃", count:1, url:"https://i.postimg.cc/nzP4M1gT/IMG-E4065.jpg"},
         ];
-
- let currentPool = [];
+let currentPool = [];
         let isRolling = false;
+        let activeDisplayedCards = []; 
 
-        function renderShowcaseWall() {
+        // 【修改核心邏輯】舞台上展示 5 張卡片，第 6 張進來時第 1 張才移除
+        function startShowcaseSequence() {
             const wall = document.getElementById('showcase-wall');
-            wall.innerHTML = cardConfig.map(card => `
-                <div class="showcase-item" id="item-card-${card.id}">
+            wall.innerHTML = "";
+            activeDisplayedCards = [];
+
+            const gradeWeight = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
+            const sortedConfig = [...cardConfig].sort((a, b) => (gradeWeight[a.grade] || 99) - (gradeWeight[b.grade] || 99));
+
+            let currentIndex = 0;
+
+            function spawnNextCard() {
+                if (isRolling) return; 
+                
+                const card = sortedConfig[currentIndex];
+                
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'showcase-item';
+                cardDiv.innerHTML = `
                     <img src="${card.url}" alt="${card.name}">
-                    <div class="card-label">${card.name.split('-')[0]}</div>
-                </div>
-            `).join('');
+                    <div class="card-label"><span style="color:#ff4757;font-weight:bold;">[${card.grade}]</span> ${card.name.split('-')[1] || card.name}</div>
+                `;
+                
+                wall.appendChild(cardDiv);
+                activeDisplayedCards.push(cardDiv);
+
+                // 當長度大於 5 張時（即第 6 張推進來），才拔除最左側第 1 張
+                if (activeDisplayedCards.length > 5) {
+                    const firstCard = activeDisplayedCards.shift(); 
+                    firstCard.classList.add('fade-out-left');       
+                    setTimeout(() => { firstCard.remove(); }, 500);  
+                }
+
+                currentIndex = (currentIndex + 1) % sortedConfig.length;
+                setTimeout(spawnNextCard, 1500);
+            }
+
+            spawnNextCard();
         }
-        renderShowcaseWall();
+
+        startShowcaseSequence();
 
         db.ref('pool').on('value', (snap) => {
             const data = snap.val();
@@ -754,6 +796,21 @@
             }
         }
 
+        let rollTimeout;
+        function runVariableSpeedRoll(currentSpeed) {
+            if (!isRolling) return;
+            
+            const blindImg = document.getElementById('blind-img');
+            const randomCard = cardConfig[Math.floor(Math.random() * cardConfig.length)];
+            blindImg.src = randomCard.url;
+
+            let nextSpeed = Math.max(30, currentSpeed * 0.85);
+            
+            rollTimeout = setTimeout(() => {
+                runVariableSpeedRoll(nextSpeed);
+            }, currentSpeed);
+        }
+
         async function draw(drawCount) {
             if (isRolling) return;
             const name = document.getElementById('user-name').value.trim();
@@ -782,31 +839,26 @@
             const nameDisplay = document.getElementById('card-name');
             const multiContainer = document.getElementById('multi-result-container');
             const singleResultBox = document.getElementById('single-result-box');
-            const wall = document.getElementById('showcase-wall');
+            const blindBox = document.getElementById('blind-box');
 
             nameDisplay.innerText = "";
             multiContainer.innerHTML = "";
             multiContainer.style.display = "none";
             singleResultBox.style.display = "none";
+            
+            blindBox.style.display = "block";
 
             const codeRef = db.ref('usedCodes/' + code);
             const snapshot = await codeRef.get();
             if (snapshot.exists()) {
                 alert("⚠️ 此代碼已被使用過，一組代碼僅限抽獎一次！");
                 isRolling = false;
+                blindBox.style.display = "none";
                 checkStatus();
                 return;
             }
 
-            // 【全新修改】控制「由慢到快」的洗牌視覺節奏
-            wall.classList.add('shaking-slow'); // 1. 一開始先慢速搖晃
-            
-            setTimeout(() => {
-                if(isRolling) {
-                    wall.classList.remove('shaking-slow');
-                    wall.classList.add('shaking-fast'); // 2. 0.6秒後切換為瘋狂加速洗牌！
-                }
-            }, 600);
+            runVariableSpeedRoll(350);
 
             db.ref('pool').transaction((p) => {
                 if (p && p.length >= drawCount) {
@@ -865,21 +917,15 @@
                         count: drawCount
                     });
 
-                    // 總長維持 1.8 秒開獎，完美的「慢 0.6s ➔ 快 1.2s ➔ 瞬間定格」
                     setTimeout(() => {
-                        wall.classList.remove('shaking-slow');
-                        wall.classList.remove('shaking-fast'); // 停止所有晃動效果
+                        clearTimeout(rollTimeout); 
+                        blindBox.style.display = "none"; 
                         
                         if (drawCount === 1) {
                             const result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
                             img.src = result.url;
                             singleResultBox.style.display = "block"; 
                             nameDisplay.innerText = result.name;
-                            
-                            const targetElement = document.getElementById(`item-card-${result.id}`);
-                            if(targetElement) {
-                                wall.scrollTo({ left: targetElement.offsetLeft - wall.offsetWidth/2 + 55, behavior: 'smooth' });
-                            }
 
                             saveLocalRecord(result.name);
                             sendToGoogleForm(name, code, result.name);
@@ -904,13 +950,15 @@
                         
                         isRolling = false;
                         checkStatus();
-                    }, 1800); 
+                        setTimeout(startShowcaseSequence, 1000);
+                    }, 2500); 
                 } else {
-                    wall.classList.remove('shaking-slow');
-                    wall.classList.remove('shaking-fast');
+                    clearTimeout(rollTimeout);
+                    blindBox.style.display = "none";
                     alert("抽獎失敗，剩餘抽數可能不足，請再試一次");
                     isRolling = false;
                     checkStatus();
+                    startShowcaseSequence();
                 }
             });
         }
