@@ -20,9 +20,97 @@
             margin: 0; 
             padding: 20px; 
             min-height: 100vh;
+            position: relative;
         }
-        .container { max-width: 450px; margin: auto; }
+        .container { max-width: 450px; margin: auto; padding-right: 15px; }
         
+        /* 右側固定雙標籤頁面（完美還原手寫手稿） */
+        .side-tabs {
+            position: fixed;
+            top: 40px;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 999;
+        }
+        .side-tab {
+            background: #ff4757;
+            color: white;
+            padding: 10px 6px;
+            font-size: 13px;
+            font-weight: 900;
+            border-radius: 8px 0 0 8px;
+            box-shadow: -2px 4px 10px rgba(0,0,0,0.15);
+            cursor: pointer;
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            letter-spacing: 2px;
+            transition: transform 0.2s, background 0.2s;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-right: none;
+        }
+        .side-tab:active {
+            transform: translateX(-3px);
+        }
+        #tab-history {
+            background: #1a3a60;
+        }
+
+        /* 彈出視窗超美外框 (Modal) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-box {
+            background: white;
+            width: 85%;
+            max-width: 360px;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            text-align: left;
+            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+            box-sizing: border-box;
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-header {
+            font-size: 18px;
+            font-weight: 900;
+            color: #1a3a60;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e6f2ff;
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-close {
+            font-size: 20px;
+            cursor: pointer;
+            color: #aaa;
+            font-weight: bold;
+        }
+        .modal-close:hover { color: #333; }
+        .modal-body {
+            max-height: 250px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        /* 一番賞基礎排版 */
         .pool-card { 
             background: rgba(255, 255, 255, 0.4); 
             backdrop-filter: blur(10px); 
@@ -45,197 +133,127 @@
             position: relative;
             overflow: hidden;
         }
-        
         .circle-carousel {
-            width: 76px;
-            height: 115px;
-            position: absolute;
-            top: 25%;
-            left: 50%;
+            width: 76px; height: 115px;
+            position: absolute; top: 25%; left: 50%;
             margin-left: -38px;
             transform-style: preserve-3d;
             transform: rotateX(-10deg) rotateY(0deg); 
         }
-
         .carousel-item {
-            position: absolute;
-            width: 76px;
-            height: 115px;
-            left: 0;
-            top: 0;
-            background: #fff;
-            border-radius: 8px;
-            padding: 3px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            box-sizing: border-box;
-            backface-visibility: visible;
+            position: absolute; width: 76px; height: 115px; left: 0; top: 0;
+            background: #fff; border-radius: 8px; padding: 3px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); box-sizing: border-box;
         }
-        .carousel-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 6px;
-        }
+        .carousel-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
 
-        /* 傳送軌道外框：加入遮罩落實手稿兩邊漸淡效果 */
+        /* 展示牆 */
         .showcase-stage {
-            display: flex;
-            justify-content: center; 
-            align-items: center;
-            height: 200px;
-            margin: 15px 0;
-            position: relative;
-            overflow: hidden;
-            width: 100%;
+            display: flex; justify-content: center; align-items: center;
+            height: 200px; margin: 15px 0; position: relative; overflow: hidden; width: 100%;
             -webkit-mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);
             mask-image: linear-gradient(to right, transparent 0%, black 20%, black 80%, transparent 100%);
         }
-
-        /* 傳送帶容器 */
         .showcase-track {
-            display: flex;
-            position: absolute;
-            left: 50%;
-            transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex; position: absolute; left: 50%;
+            transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
             will-change: transform;
         }
-
-        /* 傳送帶上的每一張卡片 */
         .track-item {
-            width: 80px;
-            margin: 0 8px;
-            background: rgba(255, 255, 255, 0.5); 
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            padding: 4px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex-shrink: 0;
-            transition: transform 0.6s, opacity 0.6s;
-            will-change: transform, opacity;
+            width: 80px; margin: 0 8px; background: rgba(255, 255, 255, 0.5); 
+            border: 1px solid rgba(255, 255, 255, 0.6); padding: 4px; border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box;
+            display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
+            transition: transform 0.6s, opacity 0.6s; will-change: transform, opacity;
         }
-        .track-item img {
-            width: 100%;
-            height: 115px;
-            object-fit: cover;
-            border-radius: 6px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-        .track-item .card-label {
-            font-size: 10px;
-            margin-top: 5px;
-            font-weight: 800;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            width: 100%;
-            text-align: center;
-        }
+        .track-item img { width: 100%; height: 115px; object-fit: cover; border-radius: 6px; }
+        .track-item .card-label { font-size: 10px; margin-top: 5px; font-weight: 800; text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         /* 單抽結果框 */
         .result-single-box {
-            display: none;
-            width: 180px;
-            margin: 15px auto;
-            background: rgba(255, 255, 255, 0.5); 
-            border: 3px solid #2cf35e; 
-            padding: 10px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(44, 243, 94, 0.2);
+            display: none; width: 180px; margin: 15px auto;
+            background: rgba(255, 255, 255, 0.5); border: 3px solid #2cf35e; 
+            padding: 10px; border-radius: 16px; box-shadow: 0 10px 25px rgba(44, 243, 94, 0.2);
             animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .result-single-box img {
-            width: 100%;
-            border-radius: 12px;
-        }
+        .result-single-box img { width: 100%; border-radius: 12px; }
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-        @keyframes popIn {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        /* 【方案 A】十連抽大容器：強制不折行並支援手機左右滑動 */
+        /* 十連抽滑動框 */
         #multi-result-container { 
-            display: none; 
-            flex-wrap: nowrap; 
-            gap: 10px; 
-            justify-content: flex-start; 
-            margin: 20px auto; 
-            width: 100%; 
-            background: rgba(255, 255, 255, 0.3); 
-            backdrop-filter: blur(10px); 
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 15px 12px; 
-            border-radius: 16px; 
-            box-sizing: border-box; 
-            overflow-x: auto; 
-            -webkit-overflow-scrolling: touch; 
+            display: none; flex-wrap: nowrap; gap: 10px; justify-content: flex-start; 
+            margin: 20px auto; width: 100%; background: rgba(255, 255, 255, 0.3); 
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5); padding: 15px 12px; border-radius: 16px; 
+            box-sizing: border-box; overflow-x: auto; -webkit-overflow-scrolling: touch; 
         }
+        #multi-result-container::-webkit-scrollbar { height: 5px; }
+        #multi-result-container::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.15); border-radius: 10px; }
 
-        #multi-result-container::-webkit-scrollbar {
-            height: 5px;
-        }
-        #multi-result-container::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.15);
-            border-radius: 10px;
-        }
-
-        /* 【方案 A】十連抽小卡底座：固定寬度，禁止被手機螢幕壓扁 */
         .mini-card-box {
-            width: 95px; 
-            flex-shrink: 0; 
-            text-align: center;
-            background: rgba(255, 255, 255, 0.45);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            padding: 5px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            box-sizing: border-box;
-            opacity: 0;
-            transform: scale(0.6);
-            animation: miniPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+            width: 95px; flex-shrink: 0; text-align: center;
+            background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(255, 255, 255, 0.6);
+            padding: 5px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box;
+            opacity: 0; transform: scale(0.6); animation: miniPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
         }
+        @keyframes miniPop { to { opacity: 1; transform: scale(1); } }
 
-        @keyframes miniPop {
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .input-group { margin-bottom: 15px; }
+        /* 輸入與按鈕 */
         input { 
             width: 100%; padding: 12px; border-radius: 12px; 
-            border: 1px solid rgba(255, 255, 255, 0.6); 
-            background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.6); background: rgba(255, 255, 255, 0.5); 
             color: #333; box-sizing: border-box; font-size: 16px; margin-bottom: 10px;
-            font-family: 'Noto Sans TC', sans-serif;
-            font-weight: 500;
+            font-family: 'Noto Sans TC', sans-serif; font-weight: 500;
         }
-        input::placeholder { color: #777; }
-        
-        .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        .btn-group { display: flex; gap: 10px; margin-top: 5px; }
         .btn { flex: 1; background: #ff4757; color: white; border: none; padding: 16px 10px; font-size: 16px; font-weight: 800; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 0 #cc3a47; transition: 0.1s; font-family: 'Noto Sans TC', sans-serif; }
         .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #cc3a47; }
         .btn:disabled { background: rgba(0,0,0,0.1); color: #999; box-shadow: none; cursor: not-allowed; transform: none !important; border: 1px solid rgba(0,0,0,0.05); }
         #draw-btn-10 { background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%); box-shadow: 0 4px 0 #cc3a47; }
         
-        .history-section { 
-            margin-top: 30px; text-align: left; background: rgba(255, 255, 255, 0.4); 
-            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 15px; border-radius: 16px; 
-        }
         .history-item { padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 13px; color: #ff5e6c; font-weight: 500; }
-        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 1000; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 1001; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
     </style>
 </head>
 <body>
     <div id="loading">📡 正在連線雲端獎池...</div>
 
+    <div class="side-tabs">
+        <div class="side-tab" id="tab-rule" onclick="openModal('rule-modal')">規則</div>
+        <div class="side-tab" id="tab-history" onclick="openModal('history-modal')">紀錄</div>
+    </div>
+
+    <div class="modal-overlay" id="rule-modal" onclick="closeModal(event, 'rule-modal')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <span>📋 活動抽獎規則</span>
+                <span class="modal-close" onclick="document.getElementById('rule-modal').style.display='none'">×</span>
+            </div>
+            <div class="modal-body">
+                <b>【一番賞抽獎說明】</b><br>
+                1. 請先確實輸入您的 IG 或 FB 帳號與專屬抽獎代碼。<br>
+                2. 本次活動代碼分為「單抽券(S開頭)」與「十連抽券(T開頭)」，請對應按鈕使用。<br>
+                3. 每組抽獎代碼皆為一次性使用，一經抽取即作廢。<br>
+                4. 抽獎結果將即時同步登錄至後台，保障抽獎公平性。<br>
+                5. 當獎箱抽空時，最後一位抽取完成者將額外獲得 <b>Last賞 壓軸大獎</b>！
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="history-modal" onclick="closeModal(event, 'history-modal')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <span>📜 我的抽獎紀錄</span>
+                <span class="modal-close" onclick="document.getElementById('history-modal').style.display='none'">×</span>
+            </div>
+            <div class="modal-body" id="my-history">
+                尚未有紀錄
+            </div>
+        </div>
+    </div>
+
     <div class="container">
-        <h2 style="color: #1a3a60; font-weight: 900;">時代少年團一番賞</h2>
+        <h2 style="color: #1a3a60; font-weight: 900; margin-top: 10px;">時代少年團一番賞</h2>
         <div class="pool-card">
             <div style="font-size: 14px; color: #666; font-weight: 800;">目前獎箱剩餘</div>
             <div class="total-rem" id="total-count">--</div>
@@ -260,17 +278,11 @@
         </div>
         
         <div id="multi-result-container"></div>
-
         <div id="card-name" style="margin-bottom:15px; font-weight:900; height:1.2em; font-size: 22px;"></div>
         
         <div class="btn-group">
             <button id="draw-btn-10" class="btn" onclick="draw(10)" disabled>十連抽</button>
             <button id="draw-btn" class="btn" onclick="draw(1)" disabled>請完整輸入資料</button>
-        </div>
-
-        <div class="history-section">
-            <h4 style="margin: 0 0 10px 0; color: #1a3a60; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px; font-weight:900;">📜 我的抽獎紀錄</h4>
-            <div id="my-history" style="max-height: 200px; overflow-y: auto; color: #555; font-weight:500;">尚未有紀錄</div>
         </div>
     </div>
 
@@ -766,6 +778,16 @@ let currentPool = [];
         let currentFocusIndex = 0; 
         let trackCards = [];      
 
+        /* 彈出視窗控制 */
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+        function closeModal(event, id) {
+            if (event.target.classList.contains('modal-overlay')) {
+                document.getElementById(id).style.display = 'none';
+            }
+        }
+
         function getGradeStyle(grade) {
             const upperGrade = grade.toUpperCase();
             let color = "#ffffff";
@@ -784,7 +806,6 @@ let currentPool = [];
             return `color: ${color}; text-shadow: ${shadow};`;
         }
 
-        /* 記憶體優化版：抽離不安全的定時器，改用穩定的重繪機制防止手機崩潰 */
         function initShowcaseStage() {
             const track = document.getElementById('main-track');
             track.innerHTML = "";
@@ -813,14 +834,11 @@ let currentPool = [];
             if (showcaseTimer) clearInterval(showcaseTimer);
             showcaseTimer = setInterval(() => {
                 if (isRolling) return;
-
                 currentFocusIndex++;
-                
                 if (currentFocusIndex >= basePool.length * 2) {
                     track.style.transition = 'none'; 
                     currentFocusIndex = basePool.length; 
                     updateTrackPosition();
-                    
                     requestAnimationFrame(() => {
                         if (isRolling) return;
                         track.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
@@ -837,17 +855,14 @@ let currentPool = [];
         function updateTrackPosition() {
             const track = document.getElementById('main-track');
             const itemWidth = 96; 
-            
             const offset = -(currentFocusIndex * itemWidth) - 48;
             track.style.transform = `translateX(${offset}px)`;
 
             trackCards.forEach((_, idx) => {
                 const item = document.getElementById(`track-item-${idx}`);
                 if (!item) return;
-
                 const distance = idx - currentFocusIndex; 
 
-                // 完美重現手稿：中間大、兩邊小、越遠越淡
                 if (distance === 0) {
                     item.style.transform = "scale(1.15) translateY(-5px)";
                     item.style.opacity = "1";
