@@ -30,28 +30,56 @@
         }
         .total-rem { font-size: 32px; font-weight: bold; color: #ff4757; }
         
-        /* 盲抽切換焦點大框 */
-        .blind-roll-box {
-            display: none;
-            width: 140px;
-            height: 200px;
-            margin: 15px auto;
-            border-radius: 16px;
-            border: 3px solid #ff4757;
+        /* =================【全新加入：手繪圖圓環旋轉舞台】================= */
+        .rotate-stage-container {
+            display: none; /* 平時隱藏，抽卡時亮出 */
+            width: 100%;
+            height: 260px;
+            margin: 20px 0;
+            perspective: 800px; /* 打造 3D 縱深感 */
+            position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(255, 71, 87, 0.3);
-            background: #fff;
         }
-        .blind-roll-box img {
+        
+        /* 旋轉的核心圓盤 */
+        .circle-carousel {
+            width: 76px;
+            height: 115px;
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            margin-left: -38px;
+            transform-style: preserve-3d;
+            /* 預設中心稍微傾斜，看得到立體環狀軌跡 */
+            transform: rotateX(-10deg) rotateY(0deg); 
+        }
+
+        /* 圓環上的每一張小卡 */
+        .carousel-item {
+            position: absolute;
+            width: 76px;
+            height: 115px;
+            left: 0;
+            top: 0;
+            background: #fff;
+            border-radius: 8px;
+            padding: 3px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-sizing: border-box;
+            backface-visibility: visible;
+        }
+        .carousel-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 6px;
         }
+        /* ================================================================= */
 
-        /* 【修改】容納滿滿 5 張小卡的舞台容器，微調間距讓手機完美並排 */
+        /* 常駐展示舞台 */
         .showcase-stage {
             display: flex;
-            justify-content: center; /* 居中讓5張卡片看起來對稱漂亮 */
+            justify-content: center; 
             gap: 6px;
             height: 175px;
             margin: 20px 0;
@@ -60,7 +88,7 @@
             position: relative;
         }
 
-        /* 【修改】微調卡片寬度 (76px)，確保 5 張卡能完美塞進一般手機螢幕寬度 */
+        /* 展示卡片樣式 */
         .showcase-item {
             flex: 0 0 76px; 
             background: rgba(255, 255, 255, 0.4);
@@ -91,22 +119,17 @@
             text-overflow: ellipsis;
         }
 
-        /* 由右向左登場的動畫 */
         @keyframes slideInLeft {
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            to { opacity: 1; transform: translateX(0); }
         }
 
-        /* 第一張卡片滑出舞台並消失的樣式 */
         .fade-out-left {
             opacity: 0 !important;
             transform: translateX(-120px) scale(0.8) !important;
-            margin-left: -82px; /* 擠壓 76px + 6px gap 空間讓後面的卡片平滑補位 */
+            margin-left: -82px; 
         }
 
-        /* 抽獎結果彈出區域 */
+        /* 開獎單抽框 */
         .result-single-box {
             display: none;
             width: 180px;
@@ -116,13 +139,19 @@
             padding: 10px;
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(44, 243, 94, 0.2);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .result-single-box img {
             width: 100%;
             border-radius: 12px;
         }
 
-        /* 十連抽個別卡片玻璃底座 */
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* 十連抽底座 */
         .mini-card-box {
             width: 18%;
             text-align: center;
@@ -135,18 +164,11 @@
         }
 
         .input-group { margin-bottom: 15px; }
-        
         input { 
-            width: 100%; 
-            padding: 12px; 
-            border-radius: 12px; 
+            width: 100%; padding: 12px; border-radius: 12px; 
             border: 1px solid rgba(255, 255, 255, 0.6); 
-            background: rgba(255, 255, 255, 0.5); 
-            backdrop-filter: blur(5px);
-            color: #333; 
-            box-sizing: border-box; 
-            font-size: 16px; 
-            margin-bottom: 10px; 
+            background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px);
+            color: #333; box-sizing: border-box; font-size: 16px; margin-bottom: 10px; 
         }
         input::placeholder { color: #777; }
         
@@ -157,28 +179,16 @@
         #draw-btn-10 { background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%); box-shadow: 0 4px 0 #cc3a47; }
         
         #multi-result-container { 
-            display: none; 
-            flex-wrap: wrap; 
-            gap: 8px; 
-            justify-content: center; 
-            margin: 20px auto; 
-            width: 100%; 
-            background: rgba(255, 255, 255, 0.3); 
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 12px; 
-            border-radius: 16px; 
-            box-sizing: border-box; 
+            display: none; flex-wrap: wrap; gap: 8px; justify-content: center; 
+            margin: 20px auto; width: 100%; background: rgba(255, 255, 255, 0.3); 
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 12px; border-radius: 16px; box-sizing: border-box; 
         }
 
         .history-section { 
-            margin-top: 30px; 
-            text-align: left; 
-            background: rgba(255, 255, 255, 0.4); 
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 15px; 
-            border-radius: 16px; 
+            margin-top: 30px; text-align: left; background: rgba(255, 255, 255, 0.4); 
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 15px; border-radius: 16px; 
         }
         .history-item { padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 13px; color: #ff5e6c; font-weight: 500; }
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 1000; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
@@ -201,8 +211,8 @@
         <div style="text-align: left; font-size: 13px; color: #666; font-weight: bold; padding-left: 5px;">🃏 本期賞品展示 (最高S賞依序由右向左登場)</div>
         <div class="showcase-stage" id="showcase-wall"></div>
         
-        <div class="blind-roll-box" id="blind-box">
-            <img id="blind-img" src="" alt="隨機切換中">
+        <div class="rotate-stage-container" id="rotate-stage">
+            <div class="circle-carousel" id="carousel-vault"></div>
         </div>
 
         <div class="result-single-box" id="single-result-box">
@@ -713,9 +723,11 @@
 let currentPool = [];
         let isRolling = false;
         let activeDisplayedCards = []; 
+        let showcaseTimer = null;
 
-        // 【修改核心邏輯】舞台上展示 5 張卡片，第 6 張進來時第 1 張才移除
+        // 圖鑑跑馬燈流動
         function startShowcaseSequence() {
+            if (showcaseTimer) clearInterval(showcaseTimer);
             const wall = document.getElementById('showcase-wall');
             wall.innerHTML = "";
             activeDisplayedCards = [];
@@ -727,7 +739,6 @@ let currentPool = [];
 
             function spawnNextCard() {
                 if (isRolling) return; 
-                
                 const card = sortedConfig[currentIndex];
                 
                 const cardDiv = document.createElement('div');
@@ -740,7 +751,6 @@ let currentPool = [];
                 wall.appendChild(cardDiv);
                 activeDisplayedCards.push(cardDiv);
 
-                // 當長度大於 5 張時（即第 6 張推進來），才拔除最左側第 1 張
                 if (activeDisplayedCards.length > 5) {
                     const firstCard = activeDisplayedCards.shift(); 
                     firstCard.classList.add('fade-out-left');       
@@ -748,10 +758,32 @@ let currentPool = [];
                 }
 
                 currentIndex = (currentIndex + 1) % sortedConfig.length;
-                setTimeout(spawnNextCard, 1500);
             }
 
             spawnNextCard();
+            showcaseTimer = setInterval(spawnNextCard, 1500);
+        }
+
+        // 初始化建立旋轉圓環內部的卡片（隨機挑選7張排成一圈）
+        function buildRotationCircle() {
+            const vault = document.getElementById('carousel-vault');
+            vault.innerHTML = "";
+            
+            const totalCards = 7; // 用7張小卡圍成一個完美的圓
+            const radius = 110;  // 圓環半徑 (px)
+            
+            for (let i = 0; i < totalCards; i++) {
+                const randomCard = cardConfig[Math.floor(Math.random() * cardConfig.length)];
+                const angle = (i * 360) / totalCards;
+                
+                const item = document.createElement('div');
+                item.className = 'carousel-item';
+                // 核心 3D 空間公式：每張卡片旋轉各自角度後，向外推 radius 距離
+                item.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
+                item.innerHTML = `<img src="${randomCard.url}">`;
+                
+                vault.appendChild(item);
+            }
         }
 
         startShowcaseSequence();
@@ -796,19 +828,25 @@ let currentPool = [];
             }
         }
 
-        let rollTimeout;
-        function runVariableSpeedRoll(currentSpeed) {
+        // 【全新物理引擎】控制圓環「由慢到快」的旋轉核心
+        let animationFrameId;
+        let currentAngle = 0;
+        let currentSpeed = 2; // 起始慢速速度
+
+        function animateCarousel() {
             if (!isRolling) return;
             
-            const blindImg = document.getElementById('blind-img');
-            const randomCard = cardConfig[Math.floor(Math.random() * cardConfig.length)];
-            blindImg.src = randomCard.url;
-
-            let nextSpeed = Math.max(30, currentSpeed * 0.85);
+            const vault = document.getElementById('carousel-vault');
+            currentAngle += currentSpeed;
+            // 驅動圓盤 3D 旋轉
+            vault.style.transform = `rotateX(-10deg) rotateY(${currentAngle}deg)`;
             
-            rollTimeout = setTimeout(() => {
-                runVariableSpeedRoll(nextSpeed);
-            }, currentSpeed);
+            // 越轉越快！每一影格速度加乘，最高速上限卡在 25 (極速殘影)
+            if (currentSpeed < 25) {
+                currentSpeed += 0.12; 
+            }
+            
+            animationFrameId = requestAnimationFrame(animateCarousel);
         }
 
         async function draw(drawCount) {
@@ -839,26 +877,35 @@ let currentPool = [];
             const nameDisplay = document.getElementById('card-name');
             const multiContainer = document.getElementById('multi-result-container');
             const singleResultBox = document.getElementById('single-result-box');
-            const blindBox = document.getElementById('blind-box');
+            const rotateStage = document.getElementById('rotate-stage');
+            const showcaseWall = document.getElementById('showcase-wall');
 
+            // 1. 隱藏平時的跑馬燈圖鑑，並清空開獎畫面
+            showcaseWall.style.display = "none";
             nameDisplay.innerText = "";
             multiContainer.innerHTML = "";
             multiContainer.style.display = "none";
             singleResultBox.style.display = "none";
             
-            blindBox.style.display = "block";
+            // 2. 初始化並亮出 3D 旋轉舞台
+            buildRotationCircle();
+            rotateStage.style.display = "block";
+            
+            // 3. 重設旋轉參數並啟動變速齒輪
+            currentSpeed = 2; 
+            currentAngle = 0;
+            animateCarousel();
 
             const codeRef = db.ref('usedCodes/' + code);
             const snapshot = await codeRef.get();
             if (snapshot.exists()) {
                 alert("⚠️ 此代碼已被使用過，一組代碼僅限抽獎一次！");
                 isRolling = false;
-                blindBox.style.display = "none";
+                rotateStage.style.display = "none";
+                showcaseWall.style.display = "flex";
                 checkStatus();
                 return;
             }
-
-            runVariableSpeedRoll(350);
 
             db.ref('pool').transaction((p) => {
                 if (p && p.length >= drawCount) {
@@ -880,30 +927,20 @@ let currentPool = [];
                             }
                         }
 
-                        let finalIdx;
-                        let drawnId;
-                        let card;
-                        let maxAttempts = 500; 
-                        let attempts = 0;
+                        let finalIdx; let drawnId; let card;
+                        let maxAttempts = 500; let attempts = 0;
 
                         do {
                             finalIdx = Math.floor(Math.random() * p.length);
                             drawnId = p[finalIdx];
                             card = cardConfig.find(c => c.id === drawnId);
                             attempts++;
-                            
-                            if (p.length > 5 && card && (card.grade === "S" || card.grade === "A")) {
-                                continue; 
-                            }
+                            if (p.length > 5 && card && (card.grade === "S" || card.grade === "A")) { continue; }
                             break; 
                         } while (attempts < maxAttempts);
 
                         window.lastDrawResults.push(drawnId);
-                        
-                        if (card && ["S","A","B","C","D"].includes(card.grade)) {
-                            hasHighAward = true;
-                        }
-
+                        if (card && ["S","A","B","C","D"].includes(card.grade)) { hasHighAward = true; }
                         p.splice(finalIdx, 1);
                     }
                     return p;
@@ -917,9 +954,11 @@ let currentPool = [];
                         count: drawCount
                     });
 
+                    // 旋轉狂飆 2.8 秒，享受極速快感後華麗開獎
                     setTimeout(() => {
-                        clearTimeout(rollTimeout); 
-                        blindBox.style.display = "none"; 
+                        cancelAnimationFrame(animationFrameId); // 煞車停止動畫
+                        rotateStage.style.display = "none";     // 隱藏旋轉圓環
+                        showcaseWall.style.display = "flex";    // 恢復下方的展示牆
                         
                         if (drawCount === 1) {
                             const result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
@@ -931,10 +970,8 @@ let currentPool = [];
                             sendToGoogleForm(name, code, result.name);
                         } else {
                             multiContainer.style.display = "flex";
-                            
                             window.lastDrawResults.forEach((id, index) => {
                                 const result = cardConfig.find(c => c.id === id);
-                                
                                 const cardDiv = document.createElement('div');
                                 cardDiv.className = 'mini-card-box';
                                 cardDiv.innerHTML = `
@@ -942,7 +979,6 @@ let currentPool = [];
                                     <div style="font-size: 10px; margin-top: 5px; color:#555;">#${index+1}<br><span style="color:#ff4757; font-weight:bold;">${result.name.split('-')[0]}</span></div>
                                 `;
                                 multiContainer.appendChild(cardDiv);
-                                
                                 saveLocalRecord(`[十連抽-${index+1}] ${result.name}`);
                                 sendToGoogleForm(`${name}(十連抽-${index+1})`, code, result.name);
                             });
@@ -950,11 +986,12 @@ let currentPool = [];
                         
                         isRolling = false;
                         checkStatus();
-                        setTimeout(startShowcaseSequence, 1000);
-                    }, 2500); 
+                        startShowcaseSequence(); // 重新跑大排燈
+                    }, 2800); 
                 } else {
-                    clearTimeout(rollTimeout);
-                    blindBox.style.display = "none";
+                    cancelAnimationFrame(animationFrameId);
+                    rotateStage.style.display = "none";
+                    showcaseWall.style.display = "flex";
                     alert("抽獎失敗，剩餘抽數可能不足，請再試一次");
                     isRolling = false;
                     checkStatus();
