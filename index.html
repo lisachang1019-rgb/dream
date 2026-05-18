@@ -35,13 +35,13 @@
         }
         .total-rem { font-size: 32px; font-weight: 900; color: #ff4757; }
         
-        /* 3D 圓環旋轉舞台 */
+        /* 抽獎時的 3D 圓環旋轉舞台 */
         .rotate-stage-container {
             display: none; 
             width: 100%;
             height: 260px;
             margin: 20px 0;
-            perspective: 800px; 
+            perspective: 1000px; 
             position: relative;
             overflow: hidden;
         }
@@ -50,7 +50,7 @@
             width: 76px;
             height: 115px;
             position: absolute;
-            top: 25%;
+            top: 20%;
             left: 50%;
             margin-left: -38px;
             transform-style: preserve-3d;
@@ -77,55 +77,61 @@
             border-radius: 6px;
         }
 
-        /* 【核心重構】全新的傳送軌道外框 */
+        /* 獎池展示立體旋轉舞台外框 */
         .showcase-stage {
             display: flex;
             justify-content: center; 
             align-items: center;
-            height: 200px;
+            height: 220px;
             margin: 15px 0;
+            perspective: 1000px; 
             position: relative;
             overflow: hidden;
             width: 100%;
         }
 
-        /* 傳送帶容器：直接使用 transform 達成順暢、無限向左滾動 */
-        .showcase-track {
-            display: flex;
-            position: absolute;
-            left: 50%;
+        /* 旋轉軌道中心：修正了定位與軸心，確保不會縮小消失 */
+        .showcase-carousel {
+            width: 85px;
+            height: 125px;
+            position: relative;
+            margin-top: 20px;
             transform-style: preserve-3d;
-            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
             will-change: transform;
+            transform: rotateX(-4deg) rotateY(0deg);
         }
 
-        /* 傳送帶上的每一張卡片，利用動態 JS 控制立體樣式 */
-        .track-item {
-            width: 80px;
-            margin: 0 5px;
-            background: rgba(255, 255, 255, 0.45); 
-            border: 1px solid rgba(255, 255, 255, 0.6);
+        /* 卡片本體 */
+        .showcase-item {
+            position: absolute;
+            width: 85px;
+            height: 125px;
+            left: 0;
+            top: 0;
+            background: rgba(255, 255, 255, 0.6); 
+            border: 1px solid rgba(255, 255, 255, 0.7);
             padding: 4px;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             align-items: center;
-            flex-shrink: 0;
-            transition: transform 0.5s, opacity 0.5s;
-            will-change: transform, opacity;
+            backface-visibility: hidden; 
+            transition: opacity 0.6s, filter 0.6s, transform 0.6s;
+            transform-origin: center center -150px; /* 關鍵修正：定義圓環中心半徑 */
         }
-        .track-item img {
+        .showcase-item img {
             width: 100%;
-            height: 115px;
+            height: 95px;
             object-fit: cover;
             border-radius: 6px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
-        .track-item .card-label {
+        .showcase-item .card-label {
             font-size: 10px;
-            margin-top: 5px;
+            margin-top: 4px;
             font-weight: 800;
             white-space: nowrap;
             overflow: hidden;
@@ -225,7 +231,7 @@
         <div style="text-align: left; font-size: 13px; color: #1a3a60; font-weight: 900; padding-left: 5px;">🃏 獎池展示</div>
         
         <div class="showcase-stage" id="showcase-wall">
-            <div class="showcase-track" id="main-track"></div>
+            <div class="showcase-carousel" id="showcase-ring"></div>
         </div>
         
         <div class="rotate-stage-container" id="rotate-stage">
@@ -308,10 +314,10 @@
  "T4N1Z","TD88G","TBAB4","TME2E","T4INV","TL839","T00V0","T2383","TKDUW","T2ZJ4","TG4X7",
  "TK797","T335","TH8OR","T5ASC","TS1NX","TRA0K","T29PM","T1HAF","TP302","TQ97V","TAJ17",
  "T0JFA","TF5HI","T126I","T8F8P","T3IMF","T8907","T3C2E","TJHM0","TTHN1","TC06L","TO36S",
- "TS6OZ","T09T8","TXQ4W","TNH9B","TEWQ1","T276D","T7PX6","T7C18","TLUHB","T0K3N","T35CE",
- "TV28L","TZ15K","TWZH3","TNFCS","T6353","TIO26","T34T0","T392Q","THQ7K","T95BK","T0GP5",
- "T6174","TJJFX","T135","TG97B","T2G1M","T2G1D","TOB1K","T3M4S","TX0JV","T8EU2","TECZ3",
- "T2C76","TKHUQ","T62LQ","TMXC2"];
+ "TS6OZ","T09T8","TXQ4W","TNH9B","TEWQ1","T276D","T7PX6","T7C18","TLUHB","T0K3N","S2Q46",
+ "S83HR","S5WMU","S6ZRY","SRIY2","SXX93","SG2JC","S7O38","S3XQ2","S13HW","S6SG3","S96UC",
+ "S4M7Z","S94XB","SRURY","S5ZJB","S36WB","SDJWV","S2U93","SAXLZ","S1C06","S0J8C","SSNA5",
+ "S61KF","S486Y","S3626","S493M"];
 
   const cardConfig = [
 {id:1, grade:"F", name:"F賞-3單人卡", count:1, url:"https://i.postimg.cc/446p9wht/1.jpg"},
@@ -739,11 +745,11 @@
         ];
 let currentPool = [];
         let isRolling = false;
-        let showcaseTimer = null;
-        let currentFocusIndex = 0; // 當前正中央放大的卡片索引
-        let trackCards = [];      // 軌道內渲染的所有卡片數據
+        let ringTimer = null;
+        let ringAngleStep = 0;   
+        let currentRingIndex = 0; 
+        let cleanShowcaseList = []; 
 
-        // 獲取字體顏色：S紅、A紫、B黃、C藍、D綠、E灰、F白、Last粉
         function getGradeStyle(grade) {
             const upperGrade = grade.toUpperCase();
             let color = "#ffffff";
@@ -762,104 +768,74 @@ let currentPool = [];
             return `color: ${color}; text-shadow: ${shadow};`;
         }
 
-        // 【全新算法】建立真正無限長度、一個接一個順序往前推的軌道
         function initShowcaseStage() {
-            const track = document.getElementById('main-track');
-            track.innerHTML = "";
+            const ring = document.getElementById('showcase-ring');
+            ring.innerHTML = "";
 
-            // 1. 嚴格按 S -> A -> B -> C -> D -> E -> F 的順序將所有展示卡排成一長列
             const gradeOrder = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
-            const basePool = [...cardConfig]
+            cleanShowcaseList = [...cardConfig]
                 .filter(c => c.grade !== "Last")
                 .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 99) - (gradeOrder[b.grade.toUpperCase()] || 99));
             
-            // 2. 為了做到無限循環、不穿幫，我們將這個長陣列重複複製 3 次，拼成一個超級長火車
-            trackCards = [...basePool, ...basePool, ...basePool];
-            currentFocusIndex = 0; // 從第一個（也就是 S 賞）開始打頭陣
+            const totalCards = cleanShowcaseList.length;
+            ringAngleStep = 360 / totalCards; 
 
-            // 3. 生成 DOM 節點
-            trackCards.forEach((card, idx) => {
+            cleanShowcaseList.forEach((card, idx) => {
                 const item = document.createElement('div');
-                item.className = 'track-item';
-                item.id = `track-item-${idx}`;
+                item.className = 'showcase-item';
+                item.id = `ring-item-${idx}`;
+                
+                const cardAngle = idx * ringAngleStep;
+                // 利用 transform-origin 建立 3D 深度，這裡只保留 rotateY
+                item.style.transform = `rotateY(${cardAngle}deg)`;
+
                 item.innerHTML = `
                     <img src="${card.url}" alt="${card.name}">
                     <div class="card-label" style="${getGradeStyle(card.grade)}">[${card.grade}] ${card.name.split('-')[1] || card.name}</div>
                 `;
-                track.appendChild(item);
+                ring.appendChild(item);
             });
 
-            // 4. 更新初始位置與立體效果
-            updateTrackPosition();
+            currentRingIndex = 0;
+            updateRingItemsVisual();
 
-            // 5. 設定定時器：由右向左，一個接一個順序往前移動
-            if (showcaseTimer) clearInterval(showcaseTimer);
-            showcaseTimer = setInterval(() => {
+            if (ringTimer) clearInterval(ringTimer);
+            ringTimer = setInterval(() => {
                 if (isRolling) return;
 
-                currentFocusIndex++;
-                
-                // 當移動到第二組的末尾時，瞬間無縫拉回第一組對應位置，達成100%完美的無限循環往前
-                if (currentFocusIndex >= basePool.length * 2) {
-                    track.style.transition = 'none'; // 關閉動畫
-                    currentFocusIndex = basePool.length; // 閃現回中間組
-                    updateTrackPosition();
-                    
-                    // 稍微延遲讓瀏覽器反應，隨即補上正常的向前動畫
-                    setTimeout(() => {
-                        if (isRolling) return;
-                        track.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
-                        currentFocusIndex++;
-                        updateTrackPosition();
-                    }, 20);
-                } else {
-                    track.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
-                    updateTrackPosition();
-                }
+                currentRingIndex++;
+                const targetRotation = -currentRingIndex * ringAngleStep;
+                ring.style.transform = `rotateX(-4deg) rotateY(${targetRotation}deg)`;
+
+                updateRingItemsVisual();
             }, 1800);
         }
 
-        // 核心動態渲染：計算每個卡片與正中央焦點的距離，實現「中大邊小變淡」的概念圖特效
-        function updateTrackPosition() {
-            const track = document.getElementById('main-track');
-            const itemWidth = 90; // 包含 margin 的寬度 (80 + 5 + 5)
-            
-            // 將軌道向左偏移，使得當前 currentFocusIndex 卡片完美居中
-            // 減去 45px 是為了扣掉焦點卡片自身一半的寬度
-            const offset = -(currentFocusIndex * itemWidth) - 45;
-            track.style.transform = `translateX(${offset}px)`;
+        function updateRingItemsVisual() {
+            const total = cleanShowcaseList.length;
+            const activeIdx = currentRingIndex % total;
 
-            // 為軌道上的所有卡片動態刷新 3D 視覺比重
-            trackCards.forEach((_, idx) => {
-                const item = document.getElementById(`track-item-${idx}`);
+            cleanShowcaseList.forEach((_, idx) => {
+                const item = document.getElementById(`ring-item-${idx}`);
                 if (!item) return;
 
-                const distance = idx - currentFocusIndex; // 計算與正中央焦點卡片的格子距離
+                let diff = Math.abs(idx - activeIdx);
+                if (diff > total / 2) diff = total - diff;
 
-                if (distance === 0) {
-                    // 正中央：最大、完整清晰
-                    item.style.transform = "scale(1.15) translateY(-5px)";
+                if (diff === 0) {
                     item.style.opacity = "1";
-                    item.style.zIndex = "5";
+                    item.style.filter = "blur(0px)";
                     item.style.border = "1.5px solid rgba(255,255,255,0.85)";
-                    item.style.boxShadow = "0 10px 25px rgba(0,0,0,0.15)";
-                } else if (Math.abs(distance) === 1) {
-                    // 左右兩側第一格：中、微淡
-                    item.style.transform = "scale(0.9)";
-                    item.style.opacity = "0.7";
-                    item.style.zIndex = "3";
+                    item.style.boxShadow = "0 8px 25px rgba(0,0,0,0.15)";
+                } else if (diff === 1) {
+                    item.style.opacity = "0.75";
+                    item.style.filter = "blur(0.4px)";
                     item.style.border = "1px solid rgba(255,255,255,0.4)";
-                    item.style.boxShadow = "0 4px 10px rgba(0,0,0,0.05)";
-                } else if (Math.abs(distance) === 2) {
-                    // 左右兩側第二格：小、淡
-                    item.style.transform = "scale(0.75)";
-                    item.style.opacity = "0.3";
-                    item.style.zIndex = "1";
-                    item.style.border = "1px solid rgba(255,255,255,0.2)";
+                } else if (diff === 2) {
+                    item.style.opacity = "0.25";
+                    item.style.filter = "blur(1px)";
                 } else {
-                    // 其餘太遠的直接隱藏，節省效能
-                    item.style.opacity = "0";
-                    item.style.transform = "scale(0.6)";
+                    item.style.opacity = "0"; 
                 }
             });
         }
@@ -1058,7 +1034,7 @@ let currentPool = [];
                         
                         isRolling = false;
                         checkStatus();
-                        initShowcaseStage(); // 重置並重啟無限滾動軌道
+                        initShowcaseStage(); 
                     }, 2800); 
                 } else {
                     cancelAnimationFrame(animationFrameId); rotateStage.style.display = "none"; showcaseWall.style.display = "flex";
@@ -1106,7 +1082,6 @@ let currentPool = [];
             new Image().src = url;
         }
 
-        // 初始化跑馬燈展示
         setTimeout(initShowcaseStage, 500);
         renderHistory();
     </script>
