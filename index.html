@@ -20,9 +20,101 @@
             margin: 0; 
             padding: 20px; 
             min-height: 100vh;
+            position: relative;
         }
-        .container { max-width: 450px; margin: auto; }
+        .container { max-width: 450px; margin: auto; position: relative; }
         
+        /* 右上角功能標籤列 */
+        .top-nav-tabs {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding-right: 5px;
+        }
+        .nav-tab-btn {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #1a3a60;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+        .nav-tab-btn:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        /* 彈出視窗外框 (Modal) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .modal-window {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            text-align: left;
+            box-sizing: border-box;
+            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+        }
+        @keyframes modalPop {
+            0% { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f0f4f8;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: #1a3a60;
+        }
+        .modal-close {
+            background: #f0f2f5;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-weight: 900;
+            cursor: pointer;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-body {
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        /* 一番賞原本的樣式 */
         .pool-card { 
             background: rgba(255, 255, 255, 0.4); 
             backdrop-filter: blur(10px); 
@@ -35,7 +127,6 @@
         }
         .total-rem { font-size: 32px; font-weight: 900; color: #ff4757; }
         
-        /* 3D 圓環旋轉舞台 */
         .rotate-stage-container {
             display: none; 
             width: 100%;
@@ -77,7 +168,6 @@
             border-radius: 6px;
         }
 
-        /* 【核心重構】全新的傳送軌道外框 */
         .showcase-stage {
             display: flex;
             justify-content: center; 
@@ -89,7 +179,6 @@
             width: 100%;
         }
 
-        /* 傳送帶容器：直接使用 transform 達成順暢、無限向左滾動 */
         .showcase-track {
             display: flex;
             position: absolute;
@@ -99,7 +188,6 @@
             will-change: transform;
         }
 
-        /* 傳送帶上的每一張卡片，利用動態 JS 控制立體樣式 */
         .track-item {
             width: 80px;
             margin: 0 5px;
@@ -134,7 +222,6 @@
             text-align: center;
         }
 
-        /* 單抽結果框 */
         .result-single-box {
             display: none;
             width: 180px;
@@ -156,7 +243,6 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* 十連抽小卡底座 */
         .mini-card-box {
             width: 18%;
             text-align: center;
@@ -199,20 +285,26 @@
             padding: 12px; border-radius: 16px; box-sizing: border-box; 
         }
 
-        .history-section { 
-            margin-top: 30px; text-align: left; background: rgba(255, 255, 255, 0.4); 
-            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 15px; border-radius: 16px; 
+        .history-item { padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 13px; color: #ff5e6c; font-weight: 500; display: flex; justify-content: space-between; }
+        .history-item:last-child { border-bottom: none; }
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 3000; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
+        
+        .clear-history-btn {
+            background: #fee2e2; color: #ef4444; border: none; padding: 6px 12px; border-radius: 8px;
+            font-size: 12px; font-weight: 800; cursor: pointer; margin-top: 10px; width: 100%; text-align: center;
         }
-        .history-item { padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 13px; color: #ff5e6c; font-weight: 500; }
-        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 1000; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
     </style>
 </head>
 <body>
     <div id="loading">📡 正在連線雲端獎池...</div>
 
     <div class="container">
-        <h2 style="color: #1a3a60; font-weight: 900;">時代少年團一番賞</h2>
+        <div class="top-nav-tabs">
+            <button class="nav-tab-btn" onclick="openModal('rule-modal')">📋 抽獎規則</button>
+            <button class="nav-tab-btn" onclick="openModal('history-modal')">📜 我的紀錄</button>
+        </div>
+
+        <h2 style="color: #1a3a60; font-weight: 900; margin-top: 5px;">時代少年團一番賞</h2>
         <div class="pool-card">
             <div style="font-size: 14px; color: #666; font-weight: 800;">目前獎箱剩餘</div>
             <div class="total-rem" id="total-count">--</div>
@@ -244,10 +336,41 @@
             <button id="draw-btn-10" class="btn" onclick="draw(10)" disabled>十連抽</button>
             <button id="draw-btn" class="btn" onclick="draw(1)" disabled>請完整輸入資料</button>
         </div>
+    </div>
 
-        <div class="history-section">
-            <h4 style="margin: 0 0 10px 0; color: #1a3a60; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px; font-weight:900;">📜 我的抽獎紀錄</h4>
-            <div id="my-history" style="max-height: 200px; overflow-y: auto; color: #555; font-weight:500;">尚未有紀錄</div>
+    <div class="modal-overlay" id="rule-modal" onclick="closeModalOnOverlay(event, 'rule-modal')">
+        <div class="modal-window">
+            <div class="modal-header">
+                <div class="modal-title">📋 一番賞抽獎規則</div>
+                <button class="modal-close" onclick="closeModal('rule-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-top:0; font-weight:800; color:#1a3a60;">✨ 歡迎來到時代少年團一番賞！</p>
+                <ul style="padding-left:20px; margin-bottom:0;">
+                    <li style="margin-bottom:8px;">每個抽獎代碼皆為<strong>一次性使用</strong>，送出後該代碼即刻失效。</li>
+                    <li style="margin-bottom:8px;">代碼開頭字母有嚴格限制：<br>
+                        🔹 <strong>S 開頭</strong>：單抽專用券<br>
+                        🔹 <strong>T 開頭</strong>：十連抽專用券
+                    </li>
+                    <li style="margin-bottom:8px;"><strong>保底機制</strong>：進行十連抽時，前九抽若未獲得高等級獎項，最後一抽將啟動保底隨機抽出 D 賞！</li>
+                    <li style="margin-bottom:8px;"><strong>Last賞（壓軸大獎）</strong>：當抽走獎箱中最後剩餘的選票時，將額外直接獲得 Last 賞娃娃！</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="history-modal" onclick="closeModalOnOverlay(event, 'history-modal')">
+        <div class="modal-window">
+            <div class="modal-header">
+                <div class="modal-title">📜 我的抽獎足跡</div>
+                <button class="modal-close" onclick="closeModal('history-modal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="my-history" style="max-height: 220px; overflow-y: auto; color: #555; font-weight:500;">
+                    尚未有紀錄
+                </div>
+            
+            </div>
         </div>
     </div>
 
@@ -740,10 +863,26 @@
 let currentPool = [];
         let isRolling = false;
         let showcaseTimer = null;
-        let currentFocusIndex = 0; // 當前正中央放大的卡片索引
-        let trackCards = [];      // 軌道內渲染的所有卡片數據
+        let currentFocusIndex = 0; 
+        let trackCards = [];      
 
-        // 獲取字體顏色：S紅、A紫、B黃、C藍、D綠、E灰、F白、Last粉
+        // 新增：彈窗控制邏輯
+        function openModal(id) {
+            document.getElementById(id).style.display = "flex";
+        }
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+        }
+        function closeModalOnOverlay(e, id) {
+            if (e.target.id === id) closeModal(id);
+        }
+        function clearLocalHistory() {
+            if (confirm("確定要刪除手機上的本地抽獎紀錄嗎？\n（這不會影響雲端資料庫與 Google 表單）")) {
+                localStorage.removeItem('myDrawHistory');
+                renderHistory();
+            }
+        }
+
         function getGradeStyle(grade) {
             const upperGrade = grade.toUpperCase();
             let color = "#ffffff";
@@ -762,22 +901,19 @@ let currentPool = [];
             return `color: ${color}; text-shadow: ${shadow};`;
         }
 
-        // 【全新算法】建立真正無限長度、一個接一個順序往前推的軌道
         function initShowcaseStage() {
             const track = document.getElementById('main-track');
+            if(!track) return;
             track.innerHTML = "";
 
-            // 1. 嚴格按 S -> A -> B -> C -> D -> E -> F 的順序將所有展示卡排成一長列
             const gradeOrder = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
             const basePool = [...cardConfig]
                 .filter(c => c.grade !== "Last")
                 .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 99) - (gradeOrder[b.grade.toUpperCase()] || 99));
             
-            // 2. 為了做到無限循環、不穿幫，我們將這個長陣列重複複製 3 次，拼成一個超級長火車
             trackCards = [...basePool, ...basePool, ...basePool];
-            currentFocusIndex = 0; // 從第一個（也就是 S 賞）開始打頭陣
+            currentFocusIndex = 0; 
 
-            // 3. 生成 DOM 節點
             trackCards.forEach((card, idx) => {
                 const item = document.createElement('div');
                 item.className = 'track-item';
@@ -789,23 +925,19 @@ let currentPool = [];
                 track.appendChild(item);
             });
 
-            // 4. 更新初始位置與立體效果
             updateTrackPosition();
 
-            // 5. 設定定時器：由右向左，一個接一個順序往前移動
             if (showcaseTimer) clearInterval(showcaseTimer);
             showcaseTimer = setInterval(() => {
                 if (isRolling) return;
 
                 currentFocusIndex++;
                 
-                // 當移動到第二組的末尾時，瞬間無縫拉回第一組對應位置，達成100%完美的無限循環往前
                 if (currentFocusIndex >= basePool.length * 2) {
-                    track.style.transition = 'none'; // 關閉動畫
-                    currentFocusIndex = basePool.length; // 閃現回中間組
+                    track.style.transition = 'none'; 
+                    currentFocusIndex = basePool.length; 
                     updateTrackPosition();
                     
-                    // 稍微延遲讓瀏覽器反應，隨即補上正常的向前動畫
                     setTimeout(() => {
                         if (isRolling) return;
                         track.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
@@ -819,45 +951,37 @@ let currentPool = [];
             }, 1800);
         }
 
-        // 核心動態渲染：計算每個卡片與正中央焦點的距離，實現「中大邊小變淡」的概念圖特效
         function updateTrackPosition() {
             const track = document.getElementById('main-track');
-            const itemWidth = 90; // 包含 margin 的寬度 (80 + 5 + 5)
-            
-            // 將軌道向左偏移，使得當前 currentFocusIndex 卡片完美居中
-            // 減去 45px 是為了扣掉焦點卡片自身一半的寬度
+            if(!track) return;
+            const itemWidth = 90; 
             const offset = -(currentFocusIndex * itemWidth) - 45;
             track.style.transform = `translateX(${offset}px)`;
 
-            // 為軌道上的所有卡片動態刷新 3D 視覺比重
             trackCards.forEach((_, idx) => {
                 const item = document.getElementById(`track-item-${idx}`);
                 if (!item) return;
 
-                const distance = idx - currentFocusIndex; // 計算與正中央焦點卡片的格子距離
+                const distance = idx - currentFocusIndex; 
 
                 if (distance === 0) {
-                    // 正中央：最大、完整清晰
                     item.style.transform = "scale(1.15) translateY(-5px)";
                     item.style.opacity = "1";
                     item.style.zIndex = "5";
                     item.style.border = "1.5px solid rgba(255,255,255,0.85)";
                     item.style.boxShadow = "0 10px 25px rgba(0,0,0,0.15)";
                 } else if (Math.abs(distance) === 1) {
-                    // 左右兩側第一格：中、微淡
                     item.style.transform = "scale(0.9)";
                     item.style.opacity = "0.7";
                     item.style.zIndex = "3";
                     item.style.border = "1px solid rgba(255,255,255,0.4)";
                     item.style.boxShadow = "0 4px 10px rgba(0,0,0,0.05)";
                 } else if (Math.abs(distance) === 2) {
-                    // 左右兩側第二格：小、淡
                     item.style.transform = "scale(0.75)";
                     item.style.opacity = "0.3";
                     item.style.zIndex = "1";
                     item.style.border = "1px solid rgba(255,255,255,0.2)";
                 } else {
-                    // 其餘太遠的直接隱藏，節省效能
                     item.style.opacity = "0";
                     item.style.transform = "scale(0.6)";
                 }
@@ -1058,7 +1182,7 @@ let currentPool = [];
                         
                         isRolling = false;
                         checkStatus();
-                        initShowcaseStage(); // 重置並重啟無限滾動軌道
+                        initShowcaseStage(); 
                     }, 2800); 
                 } else {
                     cancelAnimationFrame(animationFrameId); rotateStage.style.display = "none"; showcaseWall.style.display = "flex";
@@ -1084,7 +1208,10 @@ let currentPool = [];
         function saveLocalRecord(cardName) {
             let history = JSON.parse(localStorage.getItem('myDrawHistory')) || [];
             if(history.length > 0 && history[0] === "尚未有紀錄") history = [];
-            history.unshift({ name: cardName, time: new Date().toLocaleTimeString() });
+            
+            // 取得現在時間 (時:分:秒)
+            const timeStr = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+            history.unshift({ name: cardName, time: timeStr });
             localStorage.setItem('myDrawHistory', JSON.stringify(history));
             renderHistory();
         }
@@ -1093,7 +1220,12 @@ let currentPool = [];
             const history = JSON.parse(localStorage.getItem('myDrawHistory')) || [];
             const container = document.getElementById('my-history');
             if (history.length === 0) { container.innerHTML = "尚未有紀錄"; return; }
-            container.innerHTML = history.map(h => `<div class="history-item" style="font-weight: 500;">🕒 ${h.time ? h.time : ''} - ${h.name}</div>`).join('');
+            container.innerHTML = history.map(h => `
+                <div class="history-item">
+                    <span>✨ ${h.name}</span>
+                    <span style="color:#94a3b8; font-size:11px;">${h.time ? h.time : ''}</span>
+                </div>
+            `).join('');
         }
 
         function sendToGoogleForm(name, code, card) {
@@ -1106,7 +1238,6 @@ let currentPool = [];
             new Image().src = url;
         }
 
-        // 初始化跑馬燈展示
         setTimeout(initShowcaseStage, 500);
         renderHistory();
     </script>
