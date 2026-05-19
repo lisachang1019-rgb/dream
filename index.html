@@ -13,7 +13,7 @@
     
     <style>
         body { 
-            font-family: 'Noto Sans TC', -apple-system, sans-serif; 
+            font-family: 'Noto Sans TC', -apple-system, sans-serif;
             background: linear-gradient(135deg, #e6f2ff 0%, #cce3ff 100%); 
             color: #333; 
             text-align: center; 
@@ -24,31 +24,36 @@
         }
         .container { max-width: 450px; margin: auto; position: relative; }
         
-        /* 右上角功能標籤列 */
-        .top-nav-tabs {
+        /* 右側固定功能標籤（符合手繪圖設計） */
+        .side-nav-tabs {
+            position: fixed;
+            right: 0;
+            top: 20%;
             display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-            margin-bottom: 10px;
-            padding-right: 5px;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1000;
         }
         .nav-tab-btn {
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            padding: 6px 14px;
-            border-radius: 20px;
+            border: 1px solid rgba(26, 58, 96, 0.2);
+            border-right: none;
+            padding: 12px 6px;
+            border-radius: 12px 0 0 12px;
             font-size: 13px;
             font-weight: 800;
             color: #1a3a60;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: -2px 4px 10px rgba(0,0,0,0.1);
             transition: all 0.2s ease;
+            writing-mode: vertical-rl; /* 文字直書 */
+            text-orientation: mixed;
         }
         .nav-tab-btn:active {
-            transform: scale(0.95);
-            background: rgba(255, 255, 255, 0.9);
+            transform: translateX(3px);
+            background: rgba(255, 255, 255, 1);
         }
 
         /* 彈出視窗外框 (Modal) */
@@ -116,7 +121,7 @@
 
         /* 一番賞原本的樣式 */
         .pool-card { 
-            background: rgba(255, 255, 255, 0.4); 
+            background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(10px); 
             -webkit-backdrop-filter: blur(10px);
             padding: 15px; 
@@ -128,7 +133,7 @@
         .total-rem { font-size: 32px; font-weight: 900; color: #ff4757; }
         
         .rotate-stage-container {
-            display: none; 
+            display: none;
             width: 100%;
             height: 260px;
             margin: 20px 0;
@@ -145,7 +150,7 @@
             left: 50%;
             margin-left: -38px;
             transform-style: preserve-3d;
-            transform: rotateX(-10deg) rotateY(0deg); 
+            transform: rotateX(-10deg) rotateY(0deg);
         }
 
         .carousel-item {
@@ -263,10 +268,12 @@
 
         .input-group { margin-bottom: 15px; }
         input { 
-            width: 100%; padding: 12px; border-radius: 12px; 
+            width: 100%;
+            padding: 12px; border-radius: 12px; 
             border: 1px solid rgba(255, 255, 255, 0.6); 
             background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px);
-            color: #333; box-sizing: border-box; font-size: 16px; margin-bottom: 10px;
+            color: #333;
+            box-sizing: border-box; font-size: 16px; margin-bottom: 10px;
             font-family: 'Noto Sans TC', sans-serif;
             font-weight: 500;
         }
@@ -279,31 +286,27 @@
         #draw-btn-10 { background: linear-gradient(135deg, #ff4757 0%, #ff6b81 100%); box-shadow: 0 4px 0 #cc3a47; }
         
         #multi-result-container { 
-            display: none; flex-wrap: wrap; gap: 8px; justify-content: center; 
+            display: none;
+            flex-wrap: wrap; gap: 8px; justify-content: center; 
             margin: 20px auto; width: 100%; background: rgba(255, 255, 255, 0.3); 
             backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 12px; border-radius: 16px; box-sizing: border-box; 
+            padding: 12px; border-radius: 16px; box-sizing: border-box;
         }
 
         .history-item { padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 13px; color: #ff5e6c; font-weight: 500; display: flex; justify-content: space-between; }
         .history-item:last-child { border-bottom: none; }
         #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 3000; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
-        
-        .clear-history-btn {
-            background: #fee2e2; color: #ef4444; border: none; padding: 6px 12px; border-radius: 8px;
-            font-size: 12px; font-weight: 800; cursor: pointer; margin-top: 10px; width: 100%; text-align: center;
-        }
     </style>
 </head>
 <body>
     <div id="loading">📡 正在連線雲端獎池...</div>
 
-    <div class="container">
-        <div class="top-nav-tabs">
-            <button class="nav-tab-btn" onclick="openModal('rule-modal')">📋 抽獎規則</button>
-            <button class="nav-tab-btn" onclick="openModal('history-modal')">📜 我的紀錄</button>
-        </div>
+    <div class="side-nav-tabs">
+        <button class="nav-tab-btn" onclick="openModal('rule-modal')">📋 抽獎規則</button>
+        <button class="nav-tab-btn" onclick="openModal('history-modal')">📜 我的紀錄</button>
+    </div>
 
+    <div class="container">
         <h2 style="color: #1a3a60; font-weight: 900; margin-top: 5px;">時代少年團一番賞</h2>
         <div class="pool-card">
             <div style="font-size: 14px; color: #666; font-weight: 800;">目前獎箱剩餘</div>
@@ -369,7 +372,6 @@
                 <div id="my-history" style="max-height: 220px; overflow-y: auto; color: #555; font-weight:500;">
                     尚未有紀錄
                 </div>
-            
             </div>
         </div>
     </div>
@@ -385,6 +387,7 @@
             measurementId: "G-64R8XB675N",
             databaseURL: "https://dream-9d0bc-default-rtdb.firebaseio.com/"
         };
+
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         // 這裡設定你可以使用的抽獎代碼清單
@@ -864,30 +867,16 @@ let currentPool = [];
         let isRolling = false;
         let showcaseTimer = null;
         let currentFocusIndex = 0; 
-        let trackCards = [];      
+        let trackCards = [];
 
-        // 新增：彈窗控制邏輯
-        function openModal(id) {
-            document.getElementById(id).style.display = "flex";
-        }
-        function closeModal(id) {
-            document.getElementById(id).style.display = "none";
-        }
-        function closeModalOnOverlay(e, id) {
-            if (e.target.id === id) closeModal(id);
-        }
-        function clearLocalHistory() {
-            if (confirm("確定要刪除手機上的本地抽獎紀錄嗎？\n（這不會影響雲端資料庫與 Google 表單）")) {
-                localStorage.removeItem('myDrawHistory');
-                renderHistory();
-            }
-        }
+        function openModal(id) { document.getElementById(id).style.display = "flex"; }
+        function closeModal(id) { document.getElementById(id).style.display = "none"; }
+        function closeModalOnOverlay(e, id) { if (e.target.id === id) closeModal(id); }
 
         function getGradeStyle(grade) {
             const upperGrade = grade.toUpperCase();
             let color = "#ffffff";
             let shadow = "0 2px 4px rgba(0,0,0,0.3)";
-            
             switch(upperGrade) {
                 case "S": color = "#ff4757"; shadow = "0 0 6px rgba(255, 71, 87, 0.6)"; break;
                 case "A": color = "#a55eea"; shadow = "0 0 6px rgba(165, 94, 234, 0.6)"; break;
@@ -908,9 +897,8 @@ let currentPool = [];
 
             const gradeOrder = { "S": 1, "A": 2, "B": 3, "C": 4, "D": 5, "E": 6, "F": 7 };
             const basePool = [...cardConfig]
-                .filter(c => c.grade !== "Last")
+                .filter(c => c.grade.toUpperCase() !== "LAST")
                 .sort((a, b) => (gradeOrder[a.grade.toUpperCase()] || 99) - (gradeOrder[b.grade.toUpperCase()] || 99));
-            
             trackCards = [...basePool, ...basePool, ...basePool];
             currentFocusIndex = 0; 
 
@@ -924,20 +912,16 @@ let currentPool = [];
                 `;
                 track.appendChild(item);
             });
-
             updateTrackPosition();
 
             if (showcaseTimer) clearInterval(showcaseTimer);
             showcaseTimer = setInterval(() => {
                 if (isRolling) return;
-
                 currentFocusIndex++;
-                
                 if (currentFocusIndex >= basePool.length * 2) {
                     track.style.transition = 'none'; 
                     currentFocusIndex = basePool.length; 
                     updateTrackPosition();
-                    
                     setTimeout(() => {
                         if (isRolling) return;
                         track.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
@@ -957,13 +941,10 @@ let currentPool = [];
             const itemWidth = 90; 
             const offset = -(currentFocusIndex * itemWidth) - 45;
             track.style.transform = `translateX(${offset}px)`;
-
             trackCards.forEach((_, idx) => {
                 const item = document.getElementById(`track-item-${idx}`);
                 if (!item) return;
-
                 const distance = idx - currentFocusIndex; 
-
                 if (distance === 0) {
                     item.style.transform = "scale(1.15) translateY(-5px)";
                     item.style.opacity = "1";
@@ -992,9 +973,10 @@ let currentPool = [];
             const vault = document.getElementById('carousel-vault');
             vault.innerHTML = "";
             const totalCards = 7; 
-            const radius = 110;  
+            const radius = 110;
+            const validDisplayCards = cardConfig.filter(c => c.grade.toUpperCase() !== "LAST");
             for (let i = 0; i < totalCards; i++) {
-                const randomCard = cardConfig[Math.floor(Math.random() * (cardConfig.length - 1))];
+                const randomCard = validDisplayCards[Math.floor(Math.random() * validDisplayCards.length)];
                 const angle = (i * 360) / totalCards;
                 const item = document.createElement('div');
                 item.className = 'carousel-item';
@@ -1019,7 +1001,9 @@ let currentPool = [];
         function initPool() {
             let p = [];
             cardConfig.forEach(c => { 
-                if(c.grade !== "Last") { for(let i=0; i<c.count; i++) p.push(c.id); }
+                if(c.grade.toUpperCase() !== "LAST") { 
+                    for(let i=0; i<c.count; i++) p.push(c.id); 
+                }
             });
             db.ref('pool').set(p);
         }
@@ -1031,12 +1015,13 @@ let currentPool = [];
             const btn1 = document.getElementById('draw-btn');
             const btn10 = document.getElementById('draw-btn-10');
             const isDisabled = (currentPool.length === 0 || name === "" || code === "");
-            
             if (currentPool.length === 0) {
-                btn1.innerText = "已全數售罄"; btn10.innerText = "已全數售罄";
+                btn1.innerText = "已全數售罄";
+                btn10.innerText = "已全數售罄";
                 btn1.disabled = true; btn10.disabled = true;
             } else {
-                btn1.innerText = "單抽"; btn10.innerText = `十連抽`;
+                btn1.innerText = "單抽";
+                btn10.innerText = `十連抽`;
                 btn1.disabled = isDisabled;
                 btn10.disabled = isDisabled || (currentPool.length < 10);
             }
@@ -1061,14 +1046,17 @@ let currentPool = [];
             const code = document.getElementById('user-code').value.trim();
 
             if (!validCodes.includes(code)) {
-                alert("❌ 無效的代碼，請重新確認！"); return;
+                alert("❌ 無效的代碼，請重新確認！");
+                return;
             }
             const firstLetter = code.charAt(0).toUpperCase();
             if (drawCount === 1 && firstLetter !== 'S') {
-                alert("❌ 此代碼為「十連抽專用券」，請點擊【十連抽】按鈕！"); return;
+                alert("❌ 此代碼為「十連抽專用券」，請點擊【十連抽】按鈕！");
+                return;
             }
             if (drawCount === 10 && firstLetter !== 'T') {
-                alert("❌ 此代碼為「單抽專用券」，請點擊【單抽】按鈕！"); return;
+                alert("❌ 此代碼為「單抽專用券」，請點擊【單抽】按鈕！");
+                return;
             }
 
             isRolling = true;
@@ -1101,7 +1089,7 @@ let currentPool = [];
             }
 
             let isLastDrawTriggered = (currentPool.length === drawCount);
-
+            
             db.ref('pool').transaction((p) => {
                 if (p && p.length >= drawCount) {
                     window.lastDrawResults = []; 
@@ -1121,14 +1109,15 @@ let currentPool = [];
                             }
                         }
 
-                        let finalIdx; let drawnId; let card; let attempts = 0;
+                        let finalIdx;
+                        let drawnId; let card; let attempts = 0;
                         do {
                             finalIdx = Math.floor(Math.random() * p.length);
                             drawnId = p[finalIdx];
                             card = cardConfig.find(c => c.id === drawnId);
                             attempts++;
                             if (p.length > 5 && card && (card.grade === "S" || card.grade === "A")) { continue; }
-                            break; 
+                            break;
                         } while (attempts < 500);
 
                         window.lastDrawResults.push(drawnId);
@@ -1143,7 +1132,6 @@ let currentPool = [];
                     db.ref('usedCodes/' + code).set({
                         user: name, time: firebase.database.ServerValue.TIMESTAMP, count: drawCount
                     });
-
                     setTimeout(() => {
                         cancelAnimationFrame(animationFrameId); 
                         rotateStage.style.display = "none";     
@@ -1151,14 +1139,21 @@ let currentPool = [];
                         
                         if (drawCount === 1) {
                             let result = cardConfig.find(c => c.id === window.lastDrawResults[0]);
-                            if(isLastDrawTriggered) { result = cardConfig.find(c => c.grade === "Last"); }
-
+                            
                             img.src = result.url;
                             singleResultBox.style.display = "block"; 
-                            nameDisplay.innerHTML = `<span style="${getGradeStyle(result.grade)}">${result.name}</span>`;
-
-                            saveLocalRecord(result.name);
-                            sendToGoogleForm(name, code, result.name);
+                            
+                            if(isLastDrawTriggered) {
+                                const lastAward = cardConfig.find(c => c.grade.toUpperCase() === "LAST");
+                                nameDisplay.innerHTML = `<span style="${getGradeStyle(result.grade)}">${result.name}</span><br><span style="${getGradeStyle('LAST')}">🎉【壓軸大獎】${lastAward.name}</span>`;
+                                saveLocalRecord(result.name);
+                                saveLocalRecord(`[壓軸大獎] ${lastAward.name}`);
+                                sendToGoogleForm(name, code, `${result.name} + Last賞`);
+                            } else {
+                                nameDisplay.innerHTML = `<span style="${getGradeStyle(result.grade)}">${result.name}</span>`;
+                                saveLocalRecord(result.name);
+                                sendToGoogleForm(name, code, result.name);
+                            }
                         } else {
                             multiContainer.style.display = "flex";
                             
@@ -1168,12 +1163,12 @@ let currentPool = [];
                                 saveLocalRecord(`[十連抽-${index+1}] ${result.name}`);
                                 sendToGoogleForm(`${name}(十連抽-${index+1})`, code, result.name);
                             });
-
+                            
                             if(isLastDrawTriggered) {
-                                const lastAward = cardConfig.find(c => c.grade === "Last");
+                                const lastAward = cardConfig.find(c => c.grade.toUpperCase() === "LAST");
                                 setTimeout(() => {
                                     appendMiniCard(lastAward, "LAST", 0);
-                                    nameDisplay.innerHTML = `<span style="${getGradeStyle(lastAward.grade)}">🎉 恭喜獲得 ${lastAward.name}！</span>`;
+                                    nameDisplay.innerHTML = `<span style="${getGradeStyle(lastAward.grade)}">🎉 恭喜清空獎池！獲得額外贈送：${lastAward.name}！</span>`;
                                     saveLocalRecord(`[壓軸大獎] ${lastAward.name}`);
                                     sendToGoogleForm(`${name}(Last賞)`, code, lastAward.name);
                                 }, 10 * 150 + 200);
@@ -1185,9 +1180,10 @@ let currentPool = [];
                         initShowcaseStage(); 
                     }, 2800); 
                 } else {
-                    cancelAnimationFrame(animationFrameId); rotateStage.style.display = "none"; showcaseWall.style.display = "flex";
+                    cancelAnimationFrame(animationFrameId);
+                    rotateStage.style.display = "none"; showcaseWall.style.display = "flex";
                     alert("抽獎失敗，請再試一次"); isRolling = false; checkStatus();
-                    initShowcaseStage();
+                    initPool();
                 }
             });
         }
@@ -1208,8 +1204,6 @@ let currentPool = [];
         function saveLocalRecord(cardName) {
             let history = JSON.parse(localStorage.getItem('myDrawHistory')) || [];
             if(history.length > 0 && history[0] === "尚未有紀錄") history = [];
-            
-            // 取得現在時間 (時:分:秒)
             const timeStr = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
             history.unshift({ name: cardName, time: timeStr });
             localStorage.setItem('myDrawHistory', JSON.stringify(history));
